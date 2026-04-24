@@ -5,16 +5,16 @@ import * as ownerPremiumDb from "./src/lib/ourin-premium-db.js";
 const config = {
   info: {
     website: "https://sc.ourin.my.id",
-    grupwa: "https://chat.whatsapp.com/C8pzXYhMJMyKbHMdehT9Yt",
+    grupwa: "",
   },
 
   owner: {
-    name: "Zann", // Nama owner
-    number: ["628xxxxxx"], // Format: 628xxx (tanpa + atau 0)
+    name: "sebas", "keni", // Nama owner
+    number: ["5491138403093", "5491164431320"], // Format: 628xxx (tanpa + atau 0)
   },
 
   session: {
-    pairingNumber: "628xxxxxx", // Nomor WA yang akan di-pair
+    pairingNumber: "5491140951814", // Nomor WA yang akan di-pair
     usePairingCode: true, // true = Pairing Code, false = QR Code
   },
 
