@@ -3,10 +3,10 @@ import te from '../../src/lib/ourin-error.js'
 
 const pluginConfig = {
     name: 'toisland',
-    alias: ['island', 'tropical'],
+    alias: ['island', 'tropical', 'isla'],
     category: 'ai',
-    description: 'Ubah foto menjadi suasana pulau tropis',
-    usage: '.toisland (reply/kirim gambar)',
+    description: 'Convierte la foto a una atmósfera de isla tropical',
+    usage: '.toisland (responde/envía una imagen)',
     example: '.toisland',
     isOwner: false,
     isPremium: true,
@@ -17,18 +17,18 @@ const pluginConfig = {
     isEnabled: true
 }
 
-const PROMPT = `Transform this image into a tropical island scene. 
-Place the subject in a beautiful island environment with clear blue ocean, palm trees, and warm sunlight. 
-Add realistic lighting, shadows, and vibrant tropical colors. 
-Keep the original identity, high detail, cinematic, photorealistic.`
+const PROMPT = `Transforma esta imagen en una escena de isla tropical. 
+Coloca al sujeto en un hermoso entorno de isla con un océano azul cristalino, palmeras y luz solar cálida. 
+Añade iluminación realista, sombras y colores tropicales vibrantes. 
+Mantén la identidad original, con alto detalle, cinemático y fotorrealista.`
 
 async function handler(m, { sock }) {
     const isImage = m.isImage || (m.quoted && (m.quoted.isImage || m.quoted.type === 'imageMessage'))
     
     if (!isImage) {
         return m.reply(
-            `🏝️ *ᴛᴏ ɪsʟᴀɴᴅ*\n\n` +
-            `> Kirim/reply gambar untuk suasana pulau\n\n` +
+            `🏝️ *ᴀ ɪsʟᴀ*\n\n` +
+            `> Envía o responde a una imagen para el efecto de isla\n\n` +
             `\`${m.prefix}toisland\``
         )
     }
@@ -45,7 +45,7 @@ async function handler(m, { sock }) {
         
         if (!buffer) {
             m.react('❌')
-            return m.reply(`❌ Gagal mendownload gambar`)
+            return m.reply(`❌ Error al descargar la imagen`)
         }
         
         const result = await live3d(buffer, PROMPT)
