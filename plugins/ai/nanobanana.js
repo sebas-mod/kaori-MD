@@ -6,9 +6,9 @@ const pluginConfig = {
     name: 'nanobanana',
     alias: ['nano', 'imgedit'],
     category: 'ai',
-    description: 'Edit gambar dengan AI menggunakan prompt',
+    description: 'Edita imágenes con IA usando un prompt',
     usage: '.nanobanana <prompt>',
-    example: '.nanobanana make it anime style',
+    example: '.nanobanana hazlo estilo anime',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -28,7 +28,7 @@ async function uploadTmpfiles(buffer) {
         timeout: 30000
     });
 
-    if (!res.data?.status || !res.data?.path) throw new Error("Upload gagal: " + JSON.stringify(res.data));
+    if (!res.data?.status || !res.data?.path) throw new Error("Subida fallida: " + JSON.stringify(res.data));
 
     return res.data.path;
 }
@@ -38,15 +38,15 @@ async function handler(m, { sock }) {
     if (!prompt) {
         return m.reply(
             `🍌 *ɴᴀɴᴏ ʙᴀɴᴀɴᴀ*\n\n` +
-            `> Edit gambar dengan AI\n\n` +
-            `\`Contoh: ${m.prefix}nanobanana make it anime style\`\n\n` +
-            `> Reply atau kirim gambar dengan caption`
+            `> Edita imágenes con IA\n\n` +
+            `\`Ejemplo: ${m.prefix}nanobanana hazlo estilo anime\`\n\n` +
+            `> Responde a una imagen o envía una con el texto`
         )
     }
 
     const isImage = m.isImage || (m.quoted && m.quoted.isImage)
     if (!isImage) {
-        return m.reply(`🍌 *ɴᴀɴᴏ ʙᴀɴᴀɴᴀ*\n\n> Reply atau kirim gambar dengan caption`)
+        return m.reply(`🍌 *ɴᴀɴᴏ ʙᴀɴᴀɴᴀ*\n\n> Responde a una imagen o envía una con el texto`)
     }
 
     m.react('🕕')
@@ -60,7 +60,7 @@ async function handler(m, { sock }) {
 
         if (!mediaBuffer || !Buffer.isBuffer(mediaBuffer)) {
             m.react('❌')
-            return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Gagal mengunduh gambar`)
+            return m.reply(`❌ *ꜰᴀʟʟᴀ*\n\n> No se pudo descargar la imagen`)
         }
 
         const imageUrl = await uploadTmpfiles(mediaBuffer)
@@ -84,7 +84,7 @@ async function handler(m, { sock }) {
 
         if (!data.status) {
             m.react('❌')
-            return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak dapat mengedit gambar`)
+            return m.reply(`❌ *ꜰᴀʟʟᴀ*\n\n> No se pudo editar la imagen`)
         }
 
         m.react('✅')
@@ -96,8 +96,8 @@ async function handler(m, { sock }) {
     } catch (error) {
         console.log(error?.response?.data || error.message)
         m.react('❌')
-        m.reply(`🍀 *Waduhh, sepertinya ini ada kendala*
-Silahkan coba lagi nanti, dimohon jangan spam, atau coba Opsi lain: ${m.prefix}ourinbanana ${m.text} ( reply gambar )`)
+        m.reply(`🍀 *Vaya, parece que hay un problema*
+Por favor, inténtalo de nuevo más tarde, no hagas spam, o prueba otra opción: ${m.prefix}ourinbanana ${m.text} (responde a una imagen)`)
     }
 }
 
