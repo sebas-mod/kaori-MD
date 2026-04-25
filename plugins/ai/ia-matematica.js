@@ -2,13 +2,14 @@ import { f } from '../../src/lib/ourin-http.js'
 import te from '../../src/lib/ourin-error.js'
 import axios from 'axios'
 import config from '../../config.js'
+
 const pluginConfig = {
-    name: 'matematika',
+    name: 'matematica',
     alias: ['mathgpt', 'math', 'mathsolver'],
     category: 'ai',
-    description: 'AI untuk menyelesaikan soal matematika',
-    usage: '.matematika <soal> atau reply gambar soal',
-    example: '.matematika 2+2 berapa?',
+    description: 'IA para resolver problemas matemáticos',
+    usage: '.matematica <problema> o responde a una imagen con el problema',
+    example: '.matematica ¿cuánto es 2+2?',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -22,7 +23,7 @@ async function handler(m, { sock }) {
     const text = m.args.join(' ')
 
     if (!text) {
-        return m.reply(`📐 *ᴍᴀᴛʜ ɢᴘᴛ*\n\n> Masukkan soal matematika\n\n\`Contoh: ${m.prefix}matematika 2+2 berapa?\``)
+        return m.reply(`📐 *ᴍᴀᴛʜ ɢᴘᴛ*\n\n> Ingresa un problema matemático\n\n\`Ejemplo: ${m.prefix}matematika ¿cuánto es 2+2?\``)
     }
     
     m.react('🕕')
