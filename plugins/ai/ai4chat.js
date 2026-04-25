@@ -1,12 +1,13 @@
 import { f } from '../../src/lib/ourin-http.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'ai4chat',
     alias: ['ai'],
     category: 'ai',
-    description: 'Chat dengan AI4Chat',
-    usage: '.ai4chat <pertanyaan>',
-    example: '.ai4chat Apa itu JavaScript?',
+    description: 'Chatea con AI4Chat',
+    usage: '.ai4chat <pregunta>',
+    example: '.ai4chat ¿Qué es JavaScript?',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -19,7 +20,7 @@ const pluginConfig = {
 async function handler(m) {
     const text = m.text
     if (!text) {
-        return m.reply(`🤖 *ᴀɪᴄʜᴀᴛ*\n\n> Masukkan pertanyaan\n\n\`Contoh: ${m.prefix}ai4chat Apa itu JavaScript?\``)
+        return m.reply(`🤖 *ᴀɪᴄʜᴀᴛ*\n\n> Ingresa una pregunta\n\n\`Ejemplo: ${m.prefix}ai4chat ¿Qué es JavaScript?\``)
     }
     m.react('🕕')
     try {
