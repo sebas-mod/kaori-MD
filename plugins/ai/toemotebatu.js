@@ -1,12 +1,13 @@
 import { uploadImage } from '../../src/lib/ourin-uploader.js'
 import { f } from '../../src/lib/ourin-http.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'toemotebatu',
     alias: ['emotebatu', 'moai', 'tomoai'],
     category: 'ai',
-    description: 'Ubah gambar ke emote batu 🗿',
-    usage: '.toemotebatu (reply gambar)',
+    description: 'Convierte la imagen al estilo del emoji de piedra 🗿',
+    usage: '.toemotebatu (responde a una imagen)',
     example: '.toemotebatu',
     isOwner: false,
     isPremium: false,
@@ -21,7 +22,7 @@ async function handler(m, { sock }) {
     const isImage = m.isImage || (m.quoted && m.quoted.type === 'imageMessage')
     
     if (!isImage) {
-        return m.reply(`🗿 *ᴇᴍᴏᴛᴇ ʙᴀᴛᴜ*\n\n> Kirim/reply gambar\n\n\`${m.prefix}toemotebatu\``)
+        return m.reply(`🗿 *ᴇᴍᴏᴊɪ ᴅᴇ ᴘɪᴇᴅʀᴀ*\n\n> Envía o responde a una imagen\n\n\`${m.prefix}toemotebatu\``)
     }
     
     m.react('🕕')
@@ -36,7 +37,7 @@ async function handler(m, { sock }) {
         
         if (!buffer) {
             m.react('❌')
-            return m.reply(`❌ Gagal mendownload gambar`)
+            return m.reply(`❌ Error al descargar la imagen`)
         }
         
         const imageUrl = await uploadImage(buffer, 'image.jpg')
