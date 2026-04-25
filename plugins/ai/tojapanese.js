@@ -2,12 +2,13 @@ import axios from 'axios'
 import { uploadImage } from '../../src/lib/ourin-uploader.js'
 import { f } from '../../src/lib/ourin-http.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'tojapanese',
-    alias: ['japanese', 'japanesestyle'],
+    alias: ['japanese', 'japanesestyle', 'japones'],
     category: 'ai',
-    description: 'Ubah gambar ke style Japanese',
-    usage: '.tojapanese (reply gambar)',
+    description: 'Convierte la imagen al estilo japonés',
+    usage: '.tojapanese (responde a una imagen)',
     example: '.tojapanese',
     isOwner: false,
     isPremium: false,
@@ -22,11 +23,11 @@ async function handler(m, { sock }) {
     const isImage = m.isImage || (m.quoted && m.quoted.type === 'imageMessage')
     
     if (!isImage) {
-        return m.reply(`🎌 *ᴊᴀᴘᴀɴᴇsᴇ sᴛʏʟᴇ*\n\n> Kirim/reply gambar untuk diubah ke style Japanese\n\n\`${m.prefix}tojapanese\``)
+        return m.reply(`🎌 *ᴇsᴛɪʟᴏ ᴊᴀᴘᴏɴᴇ́s*\n\n> Envía o responde a una imagen para convertirla al estilo japonés\n\n\`${m.prefix}tojapanese\``)
     }
     
     m.react('🕕')
- 
+
     try {
         let buffer
         if (m.quoted && m.quoted.isMedia) {
@@ -37,7 +38,7 @@ async function handler(m, { sock }) {
         
         if (!buffer) {
             m.react('❌')
-            return m.reply(`❌ Gagal mendownload gambar`)
+            return m.reply(`❌ Error al descargar la imagen`)
         }
         
         const imageUrl = await uploadImage(buffer, 'image.jpg')
