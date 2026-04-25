@@ -1,12 +1,13 @@
 import nanoBanana from '../../src/scraper/nanobanana.js'
 import te from '../../src/lib/ourin-error.js'
 import { live3d } from '../../src/scraper/seaart.js'
+
 const pluginConfig = {
     name: 'tomanga',
-    alias: ['manga', 'mangafy', 'mangastyle'],
+    alias: ['manga', 'mangafy', 'estilomanga'],
     category: 'ai',
-    description: 'Ubah foto menjadi gaya manga Jepang',
-    usage: '.tomanga (reply/kirim gambar)',
+    description: 'Convierte fotos al estilo de manga japonés',
+    usage: '.tomanga (responde/envía una imagen)',
     example: '.tomanga',
     isOwner: false,
     isPremium: true,
@@ -17,19 +18,19 @@ const pluginConfig = {
     isEnabled: true
 }
 
-const PROMPT = `Transform this image into Japanese manga style illustration. 
-Apply black and white manga aesthetics with dramatic shading, speed lines, 
-expressive eyes, and detailed screentones. Keep the original composition 
-but convert it to look like a page from a Japanese manga with bold ink lines, 
-dynamic poses, and that distinctive manga art style.`
+const PROMPT = `Transforma esta imagen en una ilustración de estilo manga japonés. 
+Aplica la estética del manga en blanco y negro con sombreado dramático, líneas de velocidad, 
+ojos expresivos y tramas detalladas. Mantén la composición original pero conviértela para 
+que parezca una página de un manga japonés con líneas de tinta gruesas, poses dinámicas 
+y ese estilo artístico distintivo del manga.`
 
 async function handler(m, { sock }) {
     const isImage = m.isImage || (m.quoted && (m.quoted.isImage || m.quoted.type === 'imageMessage'))
     
     if (!isImage) {
         return m.reply(
-            `📖 *ᴛᴏ ᴍᴀɴɢᴀ*\n\n` +
-            `> Kirim/reply gambar untuk diubah ke gaya manga\n\n` +
+            `📖 *ᴀ ᴍᴀɴɢᴀ*\n\n` +
+            `> Envía o responde a una imagen para convertirla a estilo manga\n\n` +
             `\`${m.prefix}tomanga\``
         )
     }
@@ -46,7 +47,7 @@ async function handler(m, { sock }) {
         
         if (!buffer) {
             m.react('❌')
-            return m.reply(`❌ Gagal mendownload gambar`)
+            return m.reply(`❌ Error al descargar la imagen`)
         }
         
         const result = await live3d(buffer, PROMPT)
