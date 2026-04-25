@@ -1,12 +1,13 @@
 import nanoBanana from '../../src/scraper/nanobanana.js'
 import te from '../../src/lib/ourin-error.js'
 import { live3d } from '../../src/scraper/seaart.js'
+
 const pluginConfig = {
     name: 'tofigure3',
-    alias: ['figurine3', 'tofigure3', 'bandai3', 'actionfigure3'],
+    alias: ['figurine3', 'tofigure3', 'bandai3', 'actionfigure3', 'figura3'],
     category: 'ai',
-    description: 'Ubah foto menjadi action figure/figurine koleksi',
-    usage: '.tofigure3 (reply/kirim gambar)',
+    description: 'Convierte una foto en una figura de acción o estatuilla de colección',
+    usage: '.tofigure3 (responde/envía una imagen)',
     example: '.tofigure3',
     isOwner: false,
     isPremium: true,
@@ -17,20 +18,20 @@ const pluginConfig = {
     isEnabled: true
 }
 
-const PROMPT = `Using the model, create a 1/7 scale commercialized figurine of the characters in the picture, 
-in a realistic style, in a real environment. The figurine is placed on a computer desk. 
-The figurine has a round transparent acrylic base, with no text on the base. 
-The content on the computer screen is the modeling process of this figurine. 
-Next to the computer screen is a BANDAI-style toy packaging box printed with the original artwork. 
-The packaging features two-dimensional flat illustrations.`
+const PROMPT = `Utilizando el modelo, crea una figura comercializada a escala 1/7 de los personajes de la imagen, 
+en un estilo realista y en un entorno real. La figura está colocada sobre un escritorio de computadora. 
+La estatuilla tiene una base redonda de acrílico transparente, sin texto en la base. 
+El contenido de la pantalla de la computadora es el proceso de modelado de esta figura. 
+Junto a la pantalla hay una caja de empaque de juguete estilo BANDAI impresa con el arte original. 
+El empaque presenta ilustraciones planas bidimensionales.`
 
 async function handler(m, { sock }) {
     const isImage = m.isImage || (m.quoted && (m.quoted.isImage || m.quoted.type === 'imageMessage'))
     
     if (!isImage) {
         return m.reply(
-            `🎭 *ᴛᴏ ꜰɪɢᴜʀ 3*\n\n` +
-            `> Kirim/reply gambar untuk diubah ke figurine/action figure\n\n` +
+            `🎭 *ᴀ ғɪɢᴜʀᴀ 3*\n\n` +
+            `> Envía o responde a una imagen para convertirla en figura de acción\n\n` +
             `\`${m.prefix}tofigure3\``
         )
     }
@@ -47,10 +48,8 @@ async function handler(m, { sock }) {
         
         if (!buffer) {
             m.react('❌')
-            return m.reply(`❌ Gagal mendownload gambar`)
+            return m.reply(`❌ Error al descargar la imagen`)
         }
-        
-        
         
         const result = await live3d(buffer, PROMPT)
         
