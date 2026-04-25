@@ -4,10 +4,10 @@ import { live3d } from '../../src/scraper/seaart.js'
 
 const pluginConfig = {
     name: 'tocermin',
-    alias: ['mirror', 'tomirror'],
+    alias: ['mirror', 'espejo', 'reflejo'],
     category: 'ai',
-    description: 'Ubah foto menjadi efek cermin (mirror reflection)',
-    usage: '.tocermin (reply/kirim gambar)',
+    description: 'Añade un efecto de reflejo de espejo a la imagen',
+    usage: '.tocermin (responde/envía una imagen)',
     example: '.tocermin',
     isOwner: false,
     isPremium: true,
@@ -18,18 +18,18 @@ const pluginConfig = {
     isEnabled: true
 }
 
-const PROMPT = `Create a mirror reflection effect of this image. 
-Add a realistic reflection as if the subject is in front of a mirror or reflective surface. 
-Ensure symmetry, smooth reflection blending, realistic lighting and shadows. 
-Keep the original identity and details, high quality, photorealistic.`
+const PROMPT = `Crea un efecto de reflejo de espejo en esta imagen. 
+Añade un reflejo realista como si el sujeto estuviera frente a un espejo o una superficie reflectante. 
+Asegura la simetría, una mezcla suave del reflejo, así como luces y sombras realistas. 
+Mantén la identidad y los detalles originales, alta calidad, fotorrealista.`
 
 async function handler(m, { sock }) {
     const isImage = m.isImage || (m.quoted && (m.quoted.isImage || m.quoted.type === 'imageMessage'))
     
     if (!isImage) {
         return m.reply(
-            `🪞 *ᴛᴏ ᴄᴇʀᴍɪɴ*\n\n` +
-            `> Kirim/reply gambar untuk efek cermin\n\n` +
+            `🪞 *ᴀ ᴇsᴘᴇᴊᴏ*\n\n` +
+            `> Envía o responde a una imagen para aplicar el efecto de espejo\n\n` +
             `\`${m.prefix}tocermin\``
         )
     }
@@ -46,7 +46,7 @@ async function handler(m, { sock }) {
         
         if (!buffer) {
             m.react('❌')
-            return m.reply(`❌ Gagal mendownload gambar`)
+            return m.reply(`❌ Error al descargar la imagen`)
         }
         
         const result = await live3d(buffer, PROMPT)
