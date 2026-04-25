@@ -1,11 +1,12 @@
 import axios from 'axios'
 import config from '../../config.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'ainsfw',
     alias: ['nsfwai', 'aiimage18'],
     category: 'ai',
-    description: 'Generate AI image (NSFW - 18+)',
+    description: 'Generar imagen IA (NSFW - 18+)',
     usage: '.ainsfw <prompt>',
     example: '.ainsfw beautiful anime girl',
     isOwner: false,
@@ -80,7 +81,7 @@ async function generateNSFW(prompt, options = {}) {
     }
     
     if (!imageUrl) {
-        throw new Error('Timeout atau limit tercapai')
+        throw new Error('Tiempo de espera agotado o límite alcanzado')
     }
     
     return imageUrl
@@ -92,16 +93,16 @@ async function handler(m, { sock }) {
     if (!prompt) {
         return m.reply(
             `🔞 *ᴀɪ ɴsꜰᴡ ɢᴇɴᴇʀᴀᴛᴏʀ*\n\n` +
-            `> Generate gambar AI (18+)\n\n` +
-            `⚠️ *Hanya untuk 18+ dan Private Chat*\n\n` +
-            `> *Contoh:*\n` +
+            `> Genera imágenes con IA (18+)\n\n` +
+            `⚠️ *Solo para mayores de 18 años y Chat Privado*\n\n` +
+            `> *Ejemplo:*\n` +
             `> ${m.prefix}ainsfw beautiful anime girl`
         )
     }
     await m.react('🕕')
     try {
         const imageUrl = await generateNSFW(prompt)
-        await sock.sendMedia(m.chat, imageUrl, `🔞 *DONE BANG*`, m, {
+        await sock.sendMedia(m.chat, imageUrl, `🔞 *Aquí tienes tu imagen*`, m, {
             type: 'image'
         })
         await m.react('✅')
