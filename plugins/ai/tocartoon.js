@@ -1,12 +1,13 @@
 import nanoBanana from '../../src/scraper/nanobanana.js'
 import te from '../../src/lib/ourin-error.js'
 import { live3d } from '../../src/scraper/seaart.js'
+
 const pluginConfig = {
     name: 'tocartoon',
-    alias: ['cartoon', 'cartoonify', 'tooncartoon'],
+    alias: ['cartoon', 'cartoonify', 'caricatura'],
     category: 'ai',
-    description: 'Ubah foto menjadi gaya kartun',
-    usage: '.tocartoon (reply/kirim gambar)',
+    description: 'Convierte fotos al estilo dibujo animado',
+    usage: '.tocartoon (responde/envía una imagen)',
     example: '.tocartoon',
     isOwner: false,
     isPremium: true,
@@ -17,18 +18,18 @@ const pluginConfig = {
     isEnabled: true
 }
 
-const PROMPT = `Transform this image into a vibrant cartoon style like Disney or Pixar animation. 
-Apply bold colors, smooth shading, exaggerated features, and that playful cartoon aesthetic. 
-Keep the original composition but make it look like a frame from an animated movie with 
-clean lines, expressive faces, and bright cheerful colors.`
+const PROMPT = `Transforma esta imagen en un estilo de dibujo animado vibrante como la animación de Disney o Pixar. 
+Aplica colores intensos, sombreado suave, rasgos exagerados y esa estética juguetona de caricatura. 
+Mantén la composición original pero haz que parezca un fotograma de una película animada con 
+líneas limpias, rostros expresivos y colores alegres y brillantes.`
 
 async function handler(m, { sock }) {
     const isImage = m.isImage || (m.quoted && (m.quoted.isImage || m.quoted.type === 'imageMessage'))
     
     if (!isImage) {
         return m.reply(
-            `🎬 *ᴛᴏ ᴄᴀʀᴛᴏᴏɴ*\n\n` +
-            `> Kirim/reply gambar untuk diubah ke gaya kartun\n\n` +
+            `🎬 *ᴀ ᴄᴀʀɪᴄᴀᴛᴜʀᴀ*\n\n` +
+            `> Envía o responde a una imagen para convertirla a estilo dibujo animado\n\n` +
             `\`${m.prefix}tocartoon\``
         )
     }
@@ -45,7 +46,7 @@ async function handler(m, { sock }) {
         
         if (!buffer) {
             m.react('❌')
-            return m.reply(`❌ Gagal mendownload gambar`)
+            return m.reply(`❌ Error al descargar la imagen`)
         }
         
         const result = await live3d(buffer, PROMPT)
