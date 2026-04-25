@@ -1,11 +1,12 @@
 import nanoBanana from '../../src/scraper/nanobanana.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'tooilpainting',
-    alias: ['oilpainting', 'tooil', 'oil'],
+    alias: ['oilpainting', 'tooil', 'oleo', 'pinturaoleo'],
     category: 'ai',
-    description: 'Ubah foto menjadi gaya lukisan minyak (oil painting)',
-    usage: '.tooilpainting (reply/kirim gambar)',
+    description: 'Convierte fotos al estilo de pintura al óleo',
+    usage: '.tooilpainting (responde/envía una imagen)',
     example: '.tooilpainting',
     isOwner: false,
     isPremium: true,
@@ -16,18 +17,18 @@ const pluginConfig = {
     isEnabled: true
 }
 
-const PROMPT = `Transform this image into a classical oil painting style. 
-Apply thick brushstrokes, rich colors, and the texture of traditional oil paint on canvas. 
-Keep the original composition but make it look like a masterpiece painting 
-with visible brushwork, artistic color blending, and that timeless gallery-quality aesthetic.`
+const PROMPT = `Transforma esta imagen en un estilo de pintura al óleo clásica. 
+Aplica pinceladas gruesas, colores intensos y la textura de la pintura al óleo tradicional sobre lienzo. 
+Mantén la composición original pero haz que parezca una obra maestra con pinceladas visibles, 
+mezclas de colores artísticas y esa estética atemporal de calidad de galería.`
 
 async function handler(m, { sock }) {
     const isImage = m.isImage || (m.quoted && (m.quoted.isImage || m.quoted.type === 'imageMessage'))
     
     if (!isImage) {
         return m.reply(
-            `🖼️ *ᴛᴏ ᴏɪʟ ᴘᴀɪɴᴛɪɴɢ*\n\n` +
-            `> Kirim/reply gambar untuk diubah ke gaya lukisan minyak\n\n` +
+            `🖼️ *ᴀ ᴘɪɴᴛᴜʀᴀ ᴀʟ ᴏ́ʟᴇᴏ*\n\n` +
+            `> Envía o responde a una imagen para convertirla a estilo pintura al óleo\n\n` +
             `\`${m.prefix}tooilpainting\``
         )
     }
@@ -44,7 +45,7 @@ async function handler(m, { sock }) {
         
         if (!buffer) {
             m.react('❌')
-            return m.reply(`❌ Gagal mendownload gambar`)
+            return m.reply(`❌ Error al descargar la imagen`)
         }
         
         const result = await nanoBanana(buffer, PROMPT)
