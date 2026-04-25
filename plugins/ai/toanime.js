@@ -1,12 +1,13 @@
 import nanoBanana from '../../src/scraper/nanobanana.js'
 import te from '../../src/lib/ourin-error.js'
 import { live3d } from '../../src/scraper/seaart.js'
+
 const pluginConfig = {
     name: 'toanime',
     alias: ['anime', 'animefy', 'ghibli'],
     category: 'ai',
-    description: 'Ubah foto menjadi gaya anime/Ghibli Studio',
-    usage: '.toanime (reply/kirim gambar)',
+    description: 'Convierte fotos al estilo anime/Estudio Ghibli',
+    usage: '.toanime (responde/envía una imagen)',
     example: '.toanime',
     isOwner: false,
     isPremium: true,
@@ -17,19 +18,19 @@ const pluginConfig = {
     isEnabled: true
 }
 
-const PROMPT = `Transform this image into Studio Ghibli anime style. 
-Make the characters look like they belong in a Ghibli movie with soft colors, 
-detailed backgrounds, expressive eyes, and that signature warm, magical atmosphere. 
-Keep the original composition but apply the distinct Ghibli artistic style with 
-watercolor-like textures and dreamy lighting.`
+const PROMPT = `Transforma esta imagen al estilo de anime de Studio Ghibli. 
+Haz que los personajes parezcan pertenecer a una película de Ghibli con colores suaves, 
+fondos detallados, ojos expresivos y esa atmósfera cálida y mágica característica. 
+Mantén la composición original pero aplica el estilo artístico distintivo de Ghibli con 
+texturas tipo acuarela e iluminación de ensueño.`
 
 async function handler(m, { sock }) {
     const isImage = m.isImage || (m.quoted && (m.quoted.isImage || m.quoted.type === 'imageMessage'))
     
     if (!isImage) {
         return m.reply(
-            `🎨 *ᴛᴏ ᴀɴɪᴍᴇ*\n\n` +
-            `> Kirim/reply gambar untuk diubah ke gaya anime\n\n` +
+            `🎨 *ᴀ ᴀɴɪᴍᴇ*\n\n` +
+            `> Envía o responde a una imagen para convertirla a estilo anime\n\n` +
             `\`${m.prefix}toanime\``
         )
     }
@@ -44,7 +45,7 @@ async function handler(m, { sock }) {
         
         if (!buffer) {
             m.react('❌')
-            return m.reply(`❌ Gagal mendownload gambar`)
+            return m.reply(`❌ Error al descargar la imagen`)
         }
         
         await m.react('🕕')
