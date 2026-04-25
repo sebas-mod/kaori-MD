@@ -1,12 +1,13 @@
 import axios from 'axios'
 import { f } from '../../src/lib/ourin-http.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'gita',
     alias: ['gitagpt', 'bhagavadgita'],
     category: 'ai',
-    description: 'Chat dengan Gita GPT (Bhagavad Gita AI)',
-    usage: '.gita <pertanyaan>',
+    description: 'Chatea con Gita GPT (IA de Bhagavad Gita)',
+    usage: '.gita <pregunta>',
     example: '.gita What is dharma?',
     isOwner: false,
     isPremium: false,
@@ -20,7 +21,7 @@ const pluginConfig = {
 async function handler(m, { sock }) {
     const text = m.args.join(' ')
     if (!text) {
-        return m.reply(`📿 *ɢɪᴛᴀ ɢᴘᴛ*\n\n> Masukkan pertanyaan\n\n\`Contoh: ${m.prefix}gita What is dharma?\``)
+        return m.reply(`📿 *ɢɪᴛᴀ ɢᴘᴛ*\n\n> Por favor, ingresa una pregunta\n\n\`Ejemplo: ${m.prefix}gita What is dharma?\``)
     }
     
     m.react('🕕')
