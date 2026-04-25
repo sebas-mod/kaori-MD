@@ -2,12 +2,13 @@ import axios from 'axios'
 import { uploadImage } from '../../src/lib/ourin-uploader.js'
 import { f } from '../../src/lib/ourin-http.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'tofigure',
-    alias: ['figure', 'figurestyle'],
+    alias: ['figure', 'figurestyle', 'figura'],
     category: 'ai',
-    description: 'Ubah gambar ke style Figure/Action',
-    usage: '.tofigure (reply gambar)',
+    description: 'Convierte la imagen a estilo Figura/Acción',
+    usage: '.tofigure (responde a una imagen)',
     example: '.tofigure',
     isOwner: false,
     isPremium: false,
@@ -22,7 +23,7 @@ async function handler(m, { sock }) {
     const isImage = m.isImage || (m.quoted && m.quoted.type === 'imageMessage')
     
     if (!isImage) {
-        return m.reply(`🎭 *ꜰɪɢᴜʀᴇ sᴛʏʟᴇ*\n\n> Kirim/reply gambar untuk diubah ke style Figure\n\n\`${m.prefix}tofigure\``)
+        return m.reply(`🎭 *ᴇsᴛɪʟᴏ ғɪɢᴜʀᴀ*\n\n> Envía o responde a una imagen para convertirla a estilo Figura\n\n\`${m.prefix}tofigure\``)
     }
     
     m.react('🕕')
@@ -36,7 +37,7 @@ async function handler(m, { sock }) {
         
         if (!buffer) {
             m.react('❌')
-            return m.reply(`❌ Gagal mendownload gambar`)
+            return m.reply(`❌ Error al descargar la imagen`)
         }
         
         const imageUrl = await uploadImage(buffer, 'image.jpg')
