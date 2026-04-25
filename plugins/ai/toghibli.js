@@ -2,12 +2,13 @@ import axios from 'axios'
 import { uploadImage } from '../../src/lib/ourin-uploader.js'
 import { f } from '../../src/lib/ourin-http.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'toghibli',
-    alias: ['ghibli', 'ghiblistyle'],
+    alias: ['ghibli', 'ghiblistyle', 'estiloghibli'],
     category: 'ai',
-    description: 'Ubah gambar ke style Ghibli',
-    usage: '.toghibli (reply gambar)',
+    description: 'Convierte la imagen al estilo de Studio Ghibli',
+    usage: '.toghibli (responde a una imagen)',
     example: '.toghibli',
     isOwner: false,
     isPremium: false,
@@ -22,7 +23,7 @@ async function handler(m, { sock }) {
     const isImage = m.isImage || (m.quoted && m.quoted.type === 'imageMessage')
     
     if (!isImage) {
-        return m.reply(`🎨 *ɢʜɪʙʟɪ sᴛʏʟᴇ*\n\n> Kirim/reply gambar untuk diubah ke style Ghibli\n\n\`${m.prefix}toghibli\``)
+        return m.reply(`🎨 *ᴇsᴛɪʟᴏ ɢʜɪʙʟɪ*\n\n> Envía o responde a una imagen para convertirla a estilo Ghibli\n\n\`${m.prefix}toghibli\``)
     }
     
     m.react('🕕')
@@ -37,7 +38,7 @@ async function handler(m, { sock }) {
         
         if (!buffer) {
             m.react('❌')
-            return m.reply(`❌ Gagal mendownload gambar`)
+            return m.reply(`❌ Error al descargar la imagen`)
         }
         
         const imageUrl = await uploadImage(buffer, 'image.jpg')
