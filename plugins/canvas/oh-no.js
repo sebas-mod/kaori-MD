@@ -1,13 +1,14 @@
 import axios from 'axios'
 import config from '../../config.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'oh-no',
-    alias: ['ohno', 'ohnomeme'],
+    alias: ['ohno', 'ohnomeme', 'ayno'],
     category: 'canvas',
-    description: 'Membuat meme oh no',
-    usage: '.oh-no <teks>',
-    example: '.oh-no Aku lupa ngerjain PR',
+    description: 'Crea el meme de "Oh No"',
+    usage: '.oh-no <texto>',
+    example: '.oh-no Me olvidé de hacer la tarea',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -27,14 +28,14 @@ async function handler(m, { sock }) {
     if (!text) {
         return m.reply(
             `😱 *ᴏʜ ɴᴏ ᴍᴇᴍᴇ*\n\n` +
-            `> Masukkan teks untuk meme\n\n` +
-            `> Contoh: \`${m.prefix}oh-no Aku lupa ngerjain PR\``
+            `> Ingresa un texto para el meme\n\n` +
+            `> Ejemplo: \`${m.prefix}oh-no Me olvidé de guardar los cambios\``
         )
     }
     
     const apikey = config.APIkey?.lolhuman
     if (!apikey) {
-        return m.reply(`❌ API key lolhuman tidak dikonfigurasi!`)
+        return m.reply(`❌ ¡La API key de lolhuman no está configurada!`)
     }
     
     m.react('🕕')
