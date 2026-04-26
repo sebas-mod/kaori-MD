@@ -97,110 +97,28 @@ let FormData,
   autoJoinDetector,
   isMutedMember;
 
-try {
-  FormData = (await import("form-data")).default || (await import("form-data"));
-} catch {}
-try {
-  levelHelper = await import("./lib/ourin-level.js");
-} catch {}
-try {
-  handleBuyerDone = (await import("../plugins/store/done.js")).handleBuyerDone;
-} catch {}
-try {
-  registrationAnswerHandler = (await import("../plugins/user/daftar.js"))
-    .registrationAnswerHandler;
-} catch {}
-try {
-  checkAfk = (await import("../plugins/group/afk.js")).checkAfk;
-} catch {}
-try {
-  isMuted = (await import("../plugins/group/mute.js")).isMuted;
-} catch {}
-try {
-  isMutedMember = (await import("../plugins/group/mutemember.js"))
-    .isMutedMember;
-} catch {}
-try {
-  detectBot = (await import("../plugins/group/antibot.js")).detectBot;
-} catch {}
-try {
-  autoStickerHandler = (await import("../plugins/group/autosticker.js"))
-    .autoStickerHandler;
-} catch {}
-try {
-  autoMediaHandler = (await import("../plugins/group/automedia.js"))
-    .autoMediaHandler;
-} catch {}
-try {
-  checkAntidocument = (await import("../plugins/group/antidocument.js"))
-    .checkAntidocument;
-} catch {}
-try {
-  checkAntisticker = (await import("../plugins/group/antisticker.js"))
-    .checkAntisticker;
-} catch {}
-try {
-  checkAntimedia = (await import("../plugins/group/antimedia.js"))
-    .checkAntimedia;
-} catch {}
-try {
-  ytmp4Plugin = await import("../plugins/download/ytmp4.js");
-} catch {}
-try {
-  confessPlugin = await import("../plugins/fun/confess.js");
-} catch {}
-try {
-  sulapPlugin = await import("../plugins/fun/sulap.js");
-} catch {}
-try {
-  handleAutoAI = (await import("./lib/ourin-auto-ai.js")).handleAutoAI;
-} catch {}
-try {
-  handleAutoDownload = (await import("./lib/ourin-auto-download.js"))
-    .handleAutoDownload;
-} catch {}
-try {
-  checkStickerCommand = (await import("./lib/ourin-sticker-command.js"))
-    .checkStickerCommand;
-} catch {}
-try {
-  sendWelcomeMessage = (await import("../plugins/group/welcome.js"))
-    .sendWelcomeMessage;
-} catch {}
-try {
-  sendGoodbyeMessage = (await import("../plugins/group/goodbye.js"))
-    .sendGoodbyeMessage;
-} catch {}
-try {
-  autoJoinDetector = (await import("../plugins/owner/autojoingc.js"))
-    .autoJoinDetector;
-} catch {}
-
-let checkSpam = null,
-  handleSpamAction = null;
-try {
-  const m = await import("../plugins/group/antispam.js");
-  checkSpam = m.checkSpam;
-  handleSpamAction = m.handleSpamAction;
-} catch {}
-
-let checkSlowmode = null,
-  incrementChatCount = null;
-try {
-  checkSlowmode = (await import("../plugins/group/slowmode.js")).checkSlowmode;
-} catch {}
-try {
-  incrementChatCount = (await import("../plugins/group/topchat.js"))
-    .incrementChatCount;
-} catch {}
-
-let isToxic = null,
-  handleToxicMessage = null;
-try {
-  const m = await import("../plugins/group/antitoxic.js");
-  isToxic = m.isToxic;
-  handleToxicMessage = m.handleToxicMessage;
-} catch {}
+try { FormData = (await import("form-data")).default || (await import("form-data")); } catch {}
+try { levelHelper = await import("./lib/ourin-level.js"); } catch {}
+try { handleBuyerDone = (await import("../plugins/store/done.js")).handleBuyerDone; } catch {}
+try { registrationAnswerHandler = (await import("../plugins/user/daftar.js")).registrationAnswerHandler; } catch {}
+try { checkAfk = (await import("../plugins/group/afk.js")).checkAfk; } catch {}
+try { isMuted = (await import("../plugins/group/mute.js")).isMuted; } catch {}
+try { isMutedMember = (await import("../plugins/group/mutemember.js")).isMutedMember; } catch {}
+try { detectBot = (await import("../plugins/group/antibot.js")).detectBot; } catch {}
+try { autoStickerHandler = (await import("../plugins/group/autosticker.js")).autoStickerHandler; } catch {}
+try { autoMediaHandler = (await import("../plugins/group/automedia.js")).autoMediaHandler; } catch {}
+try { checkAntidocument = (await import("../plugins/group/antidocument.js")).checkAntidocument; } catch {}
+try { checkAntisticker = (await import("../plugins/group/antisticker.js")).checkAntisticker; } catch {}
+try { checkAntimedia = (await import("../plugins/group/antimedia.js")).checkAntimedia; } catch {}
+try { ytmp4Plugin = await import("../plugins/download/ytmp4.js"); } catch {}
+try { confessPlugin = await import("../plugins/fun/confess.js"); } catch {}
+try { sulapPlugin = await import("../plugins/fun/sulap.js"); } catch {}
+try { handleAutoAI = (await import("./lib/ourin-auto-ai.js")).handleAutoAI; } catch {}
+try { handleAutoDownload = (await import("./lib/ourin-auto-download.js")).handleAutoDownload; } catch {}
+try { checkStickerCommand = (await import("./lib/ourin-sticker-command.js")).checkStickerCommand; } catch {}
+try { sendWelcomeMessage = (await import("../plugins/group/welcome.js")).sendWelcomeMessage; } catch {}
+try { sendGoodbyeMessage = (await import("../plugins/group/goodbye.js")).sendGoodbyeMessage; } catch {}
+try { autoJoinDetector = (await import("../plugins/owner/autojoingc.js")).autoJoinDetector; } catch {}
 
 const spamDelayTracker = new Map();
 setInterval(() => {
@@ -210,137 +128,46 @@ setInterval(() => {
   }
 }, 30000);
 
-let _smartTriggerThumb = undefined;
-function getSmartTriggerThumb() {
-  if (_smartTriggerThumb !== undefined) return _smartTriggerThumb;
-  try {
-    const p = "./assets/images/ourin2.jpg";
-    _smartTriggerThumb = fs.existsSync(p) ? fs.readFileSync(p) : null;
-  } catch {
-    _smartTriggerThumb = null;
-  }
-  return _smartTriggerThumb;
-}
-
 const globalRateLimiter = new RateLimiterMemory({
   points: 8,
   duration: 3,
   blockDuration: 2,
 });
 
-const cachedGamePlugins = new Map();
-
-try {
-  const gameDir = path.join(process.cwd(), "plugins", "game");
-  const gameFiles = fs
-    .readdirSync(gameDir)
-    .filter((f) => f.endsWith(".js") && !f.startsWith("_"));
-  for (const file of gameFiles) {
-    try {
-      const plugin = await import(`../plugins/game/${file}`);
-      const name = file.replace(".js", "");
-      if (plugin.answerHandler) cachedGamePlugins.set(name, plugin);
-    } catch {}
-  }
-} catch {}
-
-async function handleGameAnswer(m, sock) {
-  try {
-    if (sulapPlugin?.answerHandler) {
-      const handled = await sulapPlugin.answerHandler(m, sock);
-      if (handled) return true;
-    }
-    if (!hasActiveSession(m.chat)) return false;
-    const session = getSession(m.chat);
-    if (!session) return false;
-    const targeted = cachedGamePlugins.get(session.gameType);
-    if (targeted) {
-      const handled = await targeted.answerHandler(m, sock);
-      if (handled) return true;
-    }
-  } catch {}
-  return false;
-}
-
 async function handleSmartTriggers(m, sock, db) {
   if (!m.body) return false;
   const text = m.body.trim().toLowerCase();
-  const firstWord = text.split(" ")[0];
-  if (/^[\.\/\!\#\-]?(autoreply|ar|smarttrigger|smarttriggers)$/.test(firstWord)) {
-    return false;
-  }
-
-  if (text === "done") {
-    const sessions = db.setting("transactionSessions") || {};
-    if (sessions[m.sender]) {
-      try {
-        if (handleBuyerDone) {
-          const session = sessions[m.sender];
-          await handleBuyerDone(m, sock, session);
-          delete sessions[m.sender];
-          db.setting("transactionSessions", sessions);
-          await db.save();
-          return true;
-        }
-      } catch (e) {
-        console.error("[Handler] Done trigger error:", e.message);
-      }
-    }
-  }
-
-  if (global.registrationSessions?.[m.sender]) {
-    try {
-      if (registrationAnswerHandler) {
-        const handled = await registrationAnswerHandler(m, sock);
-        if (handled) return true;
-      }
-    } catch (e) {
-      console.error("[Handler] Registration answer error:", e.message);
-    }
-  }
-
-  const globalSmartTriggers = db.setting("smartTriggers") ?? config.features?.smartTriggers ?? false;
-
+  
   try {
     const botName = "KAORI MD";
-    let isAutoreplyEnabled = globalSmartTriggers;
-
-    if (m.isGroup) {
-      const groupData = db.getGroup(m.chat) || {};
-      isAutoreplyEnabled = groupData.autoreply ?? globalSmartTriggers;
-    } else {
-      const privateAutoreply = db.setting("autoreplyPrivate") ?? false;
-      isAutoreplyEnabled = privateAutoreply || globalSmartTriggers;
-    }
+    const globalSmartTriggers = db.setting("smartTriggers") ?? config.features?.smartTriggers ?? false;
+    let isAutoreplyEnabled = m.isGroup ? (db.getGroup(m.chat)?.autoreply ?? globalSmartTriggers) : (db.setting("autoreplyPrivate") ?? globalSmartTriggers);
 
     if (!isAutoreplyEnabled) return false;
 
+    const botJid = sock.user?.id;
+    const isMentioned = m.mentionedJid?.some((jid) => jid === botJid || jid?.includes(sock.user?.id?.split(":")[0]));
+
+    if (isMentioned) {
+      await m.reply(`¿Alguien llamó a ${botName}?\n\n¿Qué necesitas @${m.sender.split("@")[0]}?`, { mentions: [m.sender] });
+      return true;
+    }
     if (text === "p") {
-      await m.reply(`Hai @${m.sender.split("@")[0]}, utamakan salam dulu yahh`, { mentions: [m.sender] });
+      await m.reply(`Hola @${m.sender.split("@")[0]}, por favor saluda primero.`, { mentions: [m.sender] });
       return true;
     }
     if (text === "bot") {
-      await m.reply(`Hai @${m.sender.split("@")[0]}, ${botName} Aktif ✅`, { mentions: [m.sender] });
+      await m.reply(`Hola @${m.sender.split("@")[0]}, ${botName} está activa y lista para ayudar ✅`, { mentions: [m.sender] });
       return true;
     }
-    if (text.includes("assalamualaikum")) {
-      await m.reply(`Waaalaikumssalam @${m.sender.split("@")[0]}`, { mentions: [m.sender] });
+    if (text.includes("assalam") || text.includes("hola")) {
+      await m.reply(`¡Hola! @${m.sender.split("@")[0]}, espero que tengas un gran día.`, { mentions: [m.sender] });
       return true;
     }
-  } catch (error) {
-    console.error("[SmartTriggers] Error:", error.message);
+  } catch (e) {
+    console.error("[SmartTriggers] Error:", e.message);
   }
   return false;
-}
-
-async function isSpamming(jid) {
-  if (!config.features?.antiSpam) return false;
-  try {
-    await globalRateLimiter.consume(jid);
-    return false;
-  } catch {
-    return true;
-  }
 }
 
 async function messageHandler(msg, sock, options = {}) {
@@ -353,33 +180,49 @@ async function messageHandler(msg, sock, options = {}) {
     const db = getDatabase();
     if (!db?.ready) return;
 
-    if (m.isCommand) {
-        db.setUser(m.sender, {
-          name: m.pushName || "User",
-          lastSeen: new Date().toISOString(),
-        });
+    if (m.isBanned) {
+      if (m.isCommand) await m.reply("🚫 *Lo siento, estás baneado de KAORI MD y no puedes usar mis comandos.*");
+      return;
     }
 
-    // --- Smart Triggers ---
+    if (m.isCommand) {
+      db.setUser(m.sender, { name: m.pushName || "Usuario", lastSeen: new Date().toISOString() });
+    }
+
+    if (m.body && levelHelper?.addExpWithLevelCheck) {
+      const userObj = db.getUser(m.sender) || db.setUser(m.sender);
+      await levelHelper.addExpWithLevelCheck(sock, m, db, userObj, 5);
+    }
+
+    // Auto-Respuestas
     const smartHandled = await handleSmartTriggers(m, sock, db);
     if (smartHandled) return;
 
-    // --- Case System ---
+    // Comandos de Case
     try {
       const caseResult = await handleCaseCommand(m, sock);
       if (caseResult && caseResult.handled) return;
-    } catch (e) {
-      console.error("[CaseSystem] Error:", e.message);
-    }
+    } catch (e) {}
 
-    // --- Plugin System ---
-    if (m.isCommand) {
-        let plugin = getPlugin(m.command);
-        if (plugin && plugin.config.isEnabled) {
-            const context = { sock, m, config, db, uptime: getUptime() };
-            await plugin.handler(m, context);
-            return;
-        }
+    // Sistema de Plugins
+    let plugin = getPlugin(m.command);
+    if (plugin && plugin.config.isEnabled) {
+      const permission = checkPermission(m, plugin.config);
+      if (!permission.allowed) {
+        let reason = permission.reason;
+        if (reason.includes("Owner")) reason = "❌ *Función exclusiva para mi Creador.*";
+        if (reason.includes("Admin")) reason = "❌ *Necesitas ser Administrador del grupo para usar esto.*";
+        if (reason.includes("Group")) reason = "❌ *Este comando solo puede usarse en Grupos.*";
+        if (reason.includes("Premium")) reason = "⭐ *Este comando es solo para usuarios Premium.*";
+        await m.reply(reason);
+        return;
+      }
+      
+      const context = { sock, m, config, db, uptime: getUptime(), isJadibot, botName: "KAORI MD" };
+      await plugin.handler(m, context);
+      
+      db.incrementStat("commandsExecuted");
+      db.incrementStat(`command_${m.command}`);
     }
 
   } catch (error) {
@@ -388,22 +231,57 @@ async function messageHandler(msg, sock, options = {}) {
 }
 
 async function groupHandler(update, sock) {
-    // Implementación simplificada para evitar errores de token
+  try {
+    const { id: groupJid, participants, action } = update;
+    const db = getDatabase();
+    let groupMeta = await sock.groupMetadata(groupJid).catch(() => null);
+    
+    for (let participant of participants) {
+      if (action === "add" && sendWelcomeMessage) await sendWelcomeMessage(sock, groupJid, participant, groupMeta);
+      if (action === "remove" && sendGoodbyeMessage) await sendGoodbyeMessage(sock, groupJid, participant, groupMeta);
+      
+      if (action === "promote") {
+        await sock.sendMessage(groupJid, { text: `✨ @${participant.split("@")[0]} ¡Felicidades! Ahora eres Administrador de este grupo.`, mentions: [participant] });
+      }
+      if (action === "demote") {
+        await sock.sendMessage(groupJid, { text: `📉 @${participant.split("@")[0]} Ya no eres Administrador.`, mentions: [participant] });
+      }
+    }
+  } catch (e) {}
 }
 
 async function messageUpdateHandler(updates, sock) {
-    for (const update of updates) {
-        const newMsg = {
-            key: update.key,
-            message: update.update?.message,
-            messageTimestamp: update.messageTimestamp || Math.floor(Date.now() / 1000),
-            pushName: update.pushName || "User",
-        };
-        await messageHandler(newMsg, sock);
-    }
+  const db = getDatabase();
+  for (const update of updates) {
+    await handleAntiRemove(update, sock, db).catch(() => {});
+    const newMsg = {
+      key: update.key,
+      message: update.update?.message,
+      messageTimestamp: update.messageTimestamp || Math.floor(Date.now() / 1000),
+      pushName: update.pushName || "Usuario",
+    };
+    await messageHandler(newMsg, sock);
+  }
 }
 
-async function groupSettingsHandler(update, sock) {}
+async function groupSettingsHandler(update, sock) {
+  const { id: groupId, announce, restrict } = update;
+  const zannContext = {
+    contextInfo: {
+      externalAdReply: {
+        title: "NOTIFICACIÓN DE GRUPO",
+        body: "KAORI MD",
+        mediaType: 1,
+        sourceUrl: "",
+      },
+    },
+  };
+
+  if (announce !== undefined) {
+    const text = announce ? "🔒 *El grupo ha sido cerrado.* Solo los administradores pueden escribir." : "🔓 *El grupo ha sido abierto.* Todos pueden escribir ahora.";
+    await sock.sendMessage(groupId, { text }, zannContext);
+  }
+}
 
 export {
   messageHandler,
@@ -412,5 +290,4 @@ export {
   groupSettingsHandler,
   checkPermission,
   checkMode,
-  isSpamming,
 };
