@@ -1,10 +1,10 @@
 import { games } from '../../src/lib/ourin-games.js'
 
 games.register('tebakfilm', {
-    alias: ['tf', 'guessmovie'],
+    alias: ['tf', 'pelicula', 'guessmovie', 'cine'],
     emoji: '🎬',
-    title: 'TEBAK FILM',
-    description: 'Tebak judul film'
+    title: 'ADIVINA LA PELÍCULA',
+    description: 'Adiviná el título de la película'
 })
 
 const { config: pluginConfig, handler, answerHandler } = games.createPlugin('tebakfilm')
