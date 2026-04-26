@@ -1,23 +1,24 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 /**
- * 🐍🎲 ULAR TANGGA GAME
- * Classic snake and ladder game with visual board
+ * 🐍🎲 JUEGO SERPIENTES Y ESCALERAS
+ * Juego clásico con tablero visual
  *
- * Based on reference: RTXZY-MD-pro/plugins/game-ulartangga.js
- * Enhanced for OurinAI with visual board and full contextInfo
+ * Basado en referencia: RTXZY-MD-pro/plugins/game-ulartangga.js
+ * Adaptado para OurinAI con tablero visual y contextInfo completo
  */
 import { drawBoard, getRandomMap, DICE_STICKERS } from '../../src/lib/ourin-game-ulartangga.js'
 import config from '../../config.js'
 import fs from 'fs'
 import path from 'path'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-  name: "ulartangga",
-  alias: ["ut", "snakeladder", "sl"],
+  name: "serpientesyescaleras",
+  alias: ["se", "syv", "serpientes", "escaleras"],
   category: "game",
-  description: "Main ular tangga bersama player lain dengan visual board",
-  usage: ".ulartangga <create|join|start|info|exit|delete>",
-  example: ".ulartangga create",
+  description: "Jugá al serpientes y escaleras con otros usuarios (tablero visual)",
+  usage: ".serpientes <create|join|start|info|exit|delete>",
+  example: ".serpientes create",
   isOwner: false,
   isPremium: false,
   isGroup: true,
@@ -30,7 +31,7 @@ const pluginConfig = {
 if (!global.ulartanggaGames) global.ulartanggaGames = {};
 
 const PLAYER_COLORS = ["🔴", "🟡", "🟢", "🔵"];
-const PLAYER_NAMES = ["Merah", "Kuning", "Hijau", "Biru"];
+const PLAYER_NAMES = ["Rojo", "Amarillo", "Verde", "Azul"];
 
 const WIN_REWARD = { koin: 2000, exp: 1000, energi: 5 };
 
@@ -52,8 +53,8 @@ try {
 } catch (e) {}
 
 function getUTContextInfo(
-  title = "🐍🎲 ULAR TANGGA",
-  body = "Permainan klasik!",
+  title = "🐍🎲 SERPIENTES Y ESCALERAS",
+  body = "¡Un juego clásico!",
   mentions = [],
 ) {
   const saluranId = config.saluran?.id || "120363208449943317@newsletter";
@@ -101,13 +102,13 @@ async function handler(m, { sock }) {
           m.chat,
           {
             text:
-              `❌ *ROOM SUDAH ADA*\n\n` +
-              `> Masih ada sesi permainan di chat ini!\n` +
+              `❌ *SALA YA EXISTENTE*\n\n` +
+              `> ¡Ya hay una partida en este grupo!\n` +
               `> Host: @${ut[m.chat].host.split("@")[0]}\n` +
-              `> Status: ${ut[m.chat].status}`,
+              `> Estado: ${ut[m.chat].status}`,
             contextInfo: getUTContextInfo(
-              "🐍🎲 ULAR TANGGA",
-              "Permainan klasik!",
+              "🐍🎲 SERPIENTES Y ESCALERAS",
+              "¡Juego clásico!",
               [ut[m.chat].host],
             ),
           },
@@ -136,20 +137,20 @@ async function handler(m, { sock }) {
         m.chat,
         {
           text:
-            `🐍🎲 *ULAR TANGGA*\n\n` +
-            `Room berhasil dibuat!\n\n` +
-            `╭┈┈⬡「 📋 *INFO ROOM* 」\n` +
+            `🐍🎲 *SERPIENTES Y ESCALERAS*\n\n` +
+            `¡Sala creada con éxito!\n\n` +
+            `╭┈┈⬡「 📋 *INFO SALA* 」\n` +
             `┃ 👑 Host: @${m.sender.split("@")[0]}\n` +
-            `┃ 👥 Players: 1/4\n` +
-            `┃ 🗺️ Map: ${mapConfig.name}\n` +
+            `┃ 👥 Jugadores: 1/4\n` +
+            `┃ 🗺️ Mapa: ${mapConfig.name}\n` +
             `╰┈┈┈┈┈┈┈┈⬡\n\n` +
-            `╭┈┈⬡「 🎮 *COMMANDS* 」\n` +
-            `┃ ➕ \`${prefix}ut join\` - Gabung\n` +
-            `┃ ▶️ \`${prefix}ut start\` - Mulai\n` +
-            `┃ ℹ️ \`${prefix}ut info\` - Info room\n` +
-            `┃ 🚪 \`${prefix}ut exit\` - Keluar\n` +
+            `╭┈┈⬡「 🎮 *COMANDOS* 」\n` +
+            `┃ ➕ \`${prefix}se join\` - Unirse\n` +
+            `┃ ▶️ \`${prefix}se start\` - Empezar\n` +
+            `┃ ℹ️ \`${prefix}se info\` - Información\n` +
+            `┃ 🚪 \`${prefix}se exit\` - Salir\n` +
             `╰┈┈┈┈┈┈┈┈⬡`,
-          contextInfo: getUTContextInfo("🎲 ROOM CREATED", "Ayo bergabung!", [
+          contextInfo: getUTContextInfo("🎲 SALA CREADA", "¡Sumate a la partida!", [
             m.sender,
           ]),
         },
@@ -160,21 +161,21 @@ async function handler(m, { sock }) {
     join: async () => {
       if (!ut[m.chat]) {
         return m.reply(
-          `❌ Tidak ada sesi permainan!\n> Ketik \`${prefix}ut create\` untuk membuat room.`,
+          `❌ ¡No hay ninguna partida activa!\n> Escribí \`${prefix}se create\` para crear una sala.`,
         );
       }
 
       if (ut[m.chat].players[m.sender]) {
-        return m.reply(`❌ Kamu sudah bergabung di room ini!`);
+        return m.reply(`❌ ¡Ya estás en la sala!`);
       }
 
       const playerCount = Object.keys(ut[m.chat].players).length;
       if (playerCount >= 4) {
-        return m.reply(`❌ Room sudah penuh! (Max 4 player)`);
+        return m.reply(`❌ ¡La sala está llena! (Máx. 4 jugadores)`);
       }
 
       if (ut[m.chat].status === "PLAYING") {
-        return m.reply(`❌ Game sedang berjalan, tidak bisa join!`);
+        return m.reply(`❌ La partida ya empezó, no podés unirte ahora.`);
       }
 
       ut[m.chat].players[m.sender] = { rank: "MEMBER", position: 1 };
@@ -192,19 +193,19 @@ async function handler(m, { sock }) {
         m.chat,
         {
           text:
-            `✅ *PLAYER BERGABUNG*\n\n` +
-            `@${m.sender.split("@")[0]} masuk!\n\n` +
-            `╭┈┈⬡「 👥 *PLAYERS* 」\n` +
+            `✅ *JUGADOR UNIDO*\n\n` +
+            `@${m.sender.split("@")[0]} entró a la partida.\n\n` +
+            `╭┈┈⬡「 👥 *JUGADORES* 」\n` +
             `${playerList
               .split("\n")
               .map((l) => `┃ ${l}`)
               .join("\n")}\n` +
             `╰┈┈┈┈┈┈┈┈⬡\n\n` +
             `> Total: ${players.length}/4\n` +
-            `> ${players.length >= 2 ? `✅ Bisa mulai! \`${prefix}ut start\`` : "🕕 Butuh 1 player lagi"}`,
+            `> ${players.length >= 2 ? `✅ ¡Ya pueden empezar! \`${prefix}se start\`` : "🕕 Falta al menos 1 jugador más"}`,
           contextInfo: getUTContextInfo(
-            "👥 PLAYER JOINED",
-            `${players.length}/4 players`,
+            "👥 JUGADOR UNIDO",
+            `${players.length}/4 jugadores`,
             players,
           ),
         },
@@ -214,20 +215,20 @@ async function handler(m, { sock }) {
 
     start: async () => {
       if (!ut[m.chat]) {
-        return m.reply(`❌ Tidak ada sesi permainan!`);
+        return m.reply(`❌ ¡No hay ninguna partida activa!`);
       }
 
       if (ut[m.chat].status === "PLAYING") {
-        return m.reply(`❌ Permainan sudah berjalan!`);
+        return m.reply(`❌ ¡La partida ya empezó!`);
       }
 
       if (ut[m.chat].host !== m.sender && !config.isOwner?.(m.sender)) {
-        return m.reply(`❌ Hanya host yang dapat memulai permainan!`);
+        return m.reply(`❌ ¡Solo el creador de la sala puede empezar el juego!`);
       }
 
       const players = Object.keys(ut[m.chat].players);
       if (players.length < 2) {
-        return m.reply(`❌ Minimal 2 player untuk bermain!`);
+        return m.reply(`❌ ¡Hacen falta al menos 2 jugadores para jugar!`);
       }
 
       ut[m.chat].status = "PLAYING";
@@ -240,7 +241,6 @@ async function handler(m, { sock }) {
         )
         .join("\n");
 
-      // Draw initial board with all players at position 1
       const positions = players.map((p) => ut[m.chat].players[p].position);
       const boardImage = await drawBoard(
         ut[m.chat].map,
@@ -254,58 +254,36 @@ async function handler(m, { sock }) {
 
       await m.react("🎮");
 
-      if (boardImage) {
-        await sock.sendMessage(
-          m.chat,
-          {
-            image: boardImage,
-            caption:
-              `🐍🎲 *PERMAINAN DIMULAI!*\n\n` +
-              `╭┈┈⬡「 👥 *PLAYERS* 」\n` +
-              `${playerList
-                .split("\n")
-                .map((l) => `┃ ${l}`)
-                .join("\n")}\n` +
-              `╰┈┈┈┈┈┈┈┈⬡\n\n` +
-              `> 🎯 Giliran: @${players[0].split("@")[0]}\n` +
-              `> Ketik *kocok* untuk lempar dadu!`,
-            contextInfo: getUTContextInfo(
-              "🎮 GAME STARTED",
-              "Lempar dadu!",
-              players,
-            ),
-          },
-          { quoted: m },
-        );
-      } else {
-        // Fallback tanpa gambar
-        await sock.sendMessage(
-          m.chat,
-          {
-            text:
-              `🐍🎲 *PERMAINAN DIMULAI!*\n\n` +
-              `╭┈┈⬡「 👥 *PLAYERS* 」\n` +
-              `${playerList
-                .split("\n")
-                .map((l) => `┃ ${l}`)
-                .join("\n")}\n` +
-              `╰┈┈┈┈┈┈┈┈⬡\n\n` +
-              `> 🎯 Giliran: @${players[0].split("@")[0]}\n` +
-              `> Ketik *kocok* untuk lempar dadu!`,
-            contextInfo: getUTContextInfo(
-              "🎮 GAME STARTED",
-              "Lempar dadu!",
-              players,
-            ),
-          },
-          { quoted: m },
-        );
-      }
+      const caption = 
+        `🐍🎲 *¡EMPEZÓ EL JUEGO!*\n\n` +
+        `╭┈┈⬡「 👥 *JUGADORES* 」\n` +
+        `${playerList
+          .split("\n")
+          .map((l) => `┃ ${l}`)
+          .join("\n")}\n` +
+        `╰┈┈┈┈┈┈┈┈⬡\n\n` +
+        `> 🎯 Turno de: @${players[0].split("@")[0]}\n` +
+        `> ¡Escribí *girar* para lanzar el dado!`;
+
+      const msgOptions = boardImage ? { image: boardImage, caption } : { text: caption };
+      
+      await sock.sendMessage(
+        m.chat,
+        {
+          ...msgOptions,
+          contextInfo: getUTContextInfo(
+            "🎮 PARTIDA INICIADA",
+            "¡Tirá los dados!",
+            players,
+          ),
+        },
+        { quoted: m },
+      );
     },
 
     info: async () => {
       if (!ut[m.chat]) {
-        return m.reply(`❌ Tidak ada sesi permainan!`);
+        return m.reply(`❌ ¡No hay ninguna partida activa!`);
       }
 
       const players = Object.keys(ut[m.chat].players);
@@ -325,25 +303,25 @@ async function handler(m, { sock }) {
         m.chat,
         {
           text:
-            `🐍🎲 *INFO ROOM*\n\n` +
-            `╭┈┈⬡「 📋 *ROOM* 」\n` +
+            `🐍🎲 *INFO DE LA SALA*\n\n` +
+            `╭┈┈⬡「 📋 *SALA* 」\n` +
             `┃ 👑 Host: @${ut[m.chat].host.split("@")[0]}\n` +
-            `┃ 📍 Status: ${ut[m.chat].status}\n` +
-            `┃ 🗺️ Map: ${ut[m.chat].mapName}\n` +
-            `┃ 👥 Players: ${players.length}/4\n` +
+            `┃ 📍 Estado: ${ut[m.chat].status}\n` +
+            `┃ 🗺️ Mapa: ${ut[m.chat].mapName}\n` +
+            `┃ 👥 Jugadores: ${players.length}/4\n` +
             `╰┈┈┈┈┈┈┈┈⬡\n\n` +
-            `╭┈┈⬡「 👥 *PLAYERS* 」\n` +
+            `╭┈┈⬡「 👥 *JUGADORES* 」\n` +
             `${playerList
               .split("\n")
               .map((l) => `┃ ${l}`)
               .join("\n")}\n` +
             `╰┈┈┈┈┈┈┈┈⬡` +
             (currentTurn
-              ? `\n\n> 🎯 Giliran: @${currentTurn.split("@")[0]}`
+              ? `\n\n> 🎯 Turno de: @${currentTurn.split("@")[0]}`
               : ""),
           contextInfo: getUTContextInfo(
-            "📋 ROOM INFO",
-            `${players.length} players`,
+            "📋 INFO SALA",
+            `${players.length} jugadores`,
             players,
           ),
         },
@@ -353,21 +331,21 @@ async function handler(m, { sock }) {
 
     exit: async () => {
       if (!ut[m.chat]) {
-        return m.reply(`❌ Tidak ada sesi permainan!`);
+        return m.reply(`❌ ¡No hay ninguna partida activa!`);
       }
 
       if (!ut[m.chat].players[m.sender]) {
-        return m.reply(`❌ Kamu tidak ada di permainan ini!`);
+        return m.reply(`❌ ¡No estás en esta partida!`);
       }
 
       delete ut[m.chat].players[m.sender];
       await sock.sendMessage(
         m.chat,
         {
-          text: `👋 @${m.sender.split("@")[0]} keluar dari permainan.`,
+          text: `👋 @${m.sender.split("@")[0]} abandonó la partida.`,
           contextInfo: getUTContextInfo(
-            "🐍🎲 ULAR TANGGA",
-            "Permainan klasik!",
+            "🐍🎲 SERPIENTES Y ESCALERAS",
+            "¡Un juego clásico!",
             [m.sender],
           ),
         },
@@ -376,7 +354,7 @@ async function handler(m, { sock }) {
 
       if (Object.keys(ut[m.chat].players).length === 0) {
         delete ut[m.chat];
-        return m.reply(`🗑️ Room dihapus karena tidak ada player.`);
+        return m.reply(`🗑️ Se eliminó la sala porque no quedaron jugadores.`);
       }
 
       if (!ut[m.chat].players[ut[m.chat].host]) {
@@ -386,10 +364,10 @@ async function handler(m, { sock }) {
         await sock.sendMessage(
           m.chat,
           {
-            text: `👑 Host dipindahkan ke @${newHost.split("@")[0]}`,
+            text: `👑 Ahora @${newHost.split("@")[0]} es el nuevo host.`,
             contextInfo: getUTContextInfo(
-              "🐍🎲 ULAR TANGGA",
-              "Permainan klasik!",
+              "🐍🎲 SERPIENTES Y ESCALERAS",
+              "¡Un juego clásico!",
               [newHost],
             ),
           },
@@ -397,15 +375,14 @@ async function handler(m, { sock }) {
         );
       }
 
-      // Fix turn if playing
       if (ut[m.chat].status === "PLAYING") {
         const players = Object.keys(ut[m.chat].players);
         ut[m.chat].turn = ut[m.chat].turn % players.length;
         await sock.sendMessage(m.chat, {
-          text: `> Giliran: @${players[ut[m.chat].turn].split("@")[0]}\n> Ketik *kocok*`,
+          text: `> Turno de: @${players[ut[m.chat].turn].split("@")[0]}\n> ¡Escribí *girar*!`,
           contextInfo: getUTContextInfo(
-            "🐍🎲 ULAR TANGGA",
-            "Permainan klasik!",
+            "🐍🎲 SERPIENTES Y ESCALERAS",
+            "¡Un juego clásico!",
             [players[ut[m.chat].turn]],
           ),
         });
@@ -414,16 +391,16 @@ async function handler(m, { sock }) {
 
     delete: async () => {
       if (!ut[m.chat]) {
-        return m.reply(`❌ Tidak ada sesi permainan!`);
+        return m.reply(`❌ ¡No hay ninguna partida activa!`);
       }
 
       if (ut[m.chat].host !== m.sender && !config.isOwner?.(m.sender)) {
-        return m.reply(`❌ Hanya host yang dapat menghapus room!`);
+        return m.reply(`❌ ¡Solo el host puede eliminar la sala!`);
       }
 
       delete ut[m.chat];
       await m.react("🗑️");
-      await m.reply(`🗑️ Room berhasil dihapus!`);
+      await m.reply(`🗑️ ¡Sala eliminada con éxito!`);
     },
   };
 
@@ -432,24 +409,24 @@ async function handler(m, { sock }) {
       m.chat,
       {
         text:
-          `🐍🎲 *ULAR TANGGA*\n\n` +
-          `Permainan klasik yang penuh petualangan!\n` +
-          `Naiki tangga, hindari ular, sampai ke 100!\n\n` +
-          `╭┈┈⬡「 🎮 *COMMANDS* 」\n` +
-          `┃ 🎲 \`${prefix}ut create\` - Buat room\n` +
-          `┃ ➕ \`${prefix}ut join\` - Gabung room\n` +
-          `┃ ▶️ \`${prefix}ut start\` - Mulai game\n` +
-          `┃ ℹ️ \`${prefix}ut info\` - Info room\n` +
-          `┃ 🚪 \`${prefix}ut exit\` - Keluar\n` +
-          `┃ 🗑️ \`${prefix}ut delete\` - Hapus room\n` +
+          `🐍🎲 *SERPIENTES Y ESCALERAS*\n\n` +
+          `¡Un juego clásico lleno de aventuras!\n` +
+          `¡Subí por las escaleras, esquivá las serpientes y llegá al 100!\n\n` +
+          `╭┈┈⬡「 🎮 *COMANDOS* 」\n` +
+          `┃ 🎲 \`${prefix}se create\` - Crear sala\n` +
+          `┃ ➕ \`${prefix}se join\` - Unirse\n` +
+          `┃ ▶️ \`${prefix}se start\` - Empezar\n` +
+          `┃ ℹ️ \`${prefix}se info\` - Ver info\n` +
+          `┃ 🚪 \`${prefix}se exit\` - Salir\n` +
+          `┃ 🗑️ \`${prefix}se delete\` - Eliminar sala\n` +
           `╰┈┈┈┈┈┈┈┈⬡\n\n` +
-          `╭┈┈⬡「 🏆 *HADIAH* 」\n` +
+          `╭┈┈⬡「 🏆 *PREMIOS* 」\n` +
           `┃ 💰 +${WIN_REWARD.koin.toLocaleString()} Koin\n` +
           `┃ ⭐ +${WIN_REWARD.exp.toLocaleString()} EXP\n` +
-          `┃ ⚡ +${WIN_REWARD.energi} Energi\n` +
+          `┃ ⚡ +${WIN_REWARD.energi} Energía\n` +
           `╰┈┈┈┈┈┈┈┈⬡\n\n` +
-          `> Min 2 player, Max 4 player`,
-        contextInfo: getUTContextInfo("🐍🎲 ULAR TANGGA", "Ayo main!"),
+          `> Mín. 2 jugadores, Máx. 4.`,
+        contextInfo: getUTContextInfo("🐍🎲 SERPIENTES Y ESCALERAS", "¡Vamos a jugar!"),
       },
       { quoted: m },
     );
@@ -463,12 +440,12 @@ async function handler(m, { sock }) {
   }
 }
 
-// ==================== Answer Handler (for "kocok") ====================
+// ==================== Answer Handler (para "girar") ====================
 async function answerHandler(m, sock) {
   if (!m.body) return false;
 
   const text = m.body.trim().toLowerCase();
-  if (text !== "kocok") return false;
+  if (text !== "girar" && text !== "tira" && text !== "kocok") return false;
 
   const ut = global.ulartanggaGames;
   if (!ut[m.chat]) return false;
@@ -480,7 +457,7 @@ async function answerHandler(m, sock) {
   const currentTurn = ut[m.chat].turn % players.length;
   if (players.indexOf(m.sender) !== currentTurn) {
     await m.reply(
-      `❌ Bukan giliranmu!\n> Giliran: @${players[currentTurn].split("@")[0]}`,
+      `❌ ¡Todavía no es tu turno!\n> Turno de: @${players[currentTurn].split("@")[0]}`,
       {
         mentions: [players[currentTurn]],
       },
@@ -490,11 +467,9 @@ async function answerHandler(m, sock) {
 
   const db = getDatabase();
 
-  // Roll dice
   const dadu = Math.floor(Math.random() * 6) + 1;
   const DICE_EMOJI = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
 
-  // Send dice sticker
   try {
     const diceUrl = DICE_STICKERS[dadu - 1];
     await sock.sendMessage(
@@ -502,34 +477,31 @@ async function answerHandler(m, sock) {
       {
         sticker: { url: diceUrl },
         contextInfo: getUTContextInfo(
-          `🎲 DADU: ${dadu}`,
+          `🎲 DADO: ${dadu}`,
           PLAYER_NAMES[players.indexOf(m.sender)],
         ),
       },
       { quoted: m },
     );
   } catch (e) {
-    // Fallback: just react with dice emoji
     await m.react(DICE_EMOJI[dadu - 1]);
   }
 
   const oldPos = ut[m.chat].players[m.sender].position;
   let newPos = oldPos + dadu;
 
-  // Bounce back if over 100
   if (newPos > 100) {
     newPos = 100 - (newPos - 100);
   }
 
-  // Check snake/ladder
   let event = "";
   const snakesLadders = ut[m.chat].snakesLadders;
   if (snakesLadders[newPos]) {
     const destination = snakesLadders[newPos];
     if (destination > newPos) {
-      event = `\n🪜 *Naik tangga!*`;
+      event = `\n🪜 *¡Subiste por una escalera!*`;
     } else {
-      event = `\n🐍 *Kena ular!*`;
+      event = `\n🐍 *¡Te tragó una serpiente!*`;
     }
     newPos = destination;
   }
@@ -540,9 +512,7 @@ async function answerHandler(m, sock) {
   const color = PLAYER_COLORS[playerIdx];
   const name = PLAYER_NAMES[playerIdx];
 
-  // Check win condition
   if (newPos === 100) {
-    // Give rewards
     try {
       db.updateKoin(m.sender, WIN_REWARD.koin);
       db.updateEnergi(m.sender, WIN_REWARD.energi);
@@ -550,10 +520,9 @@ async function answerHandler(m, sock) {
       userData.exp = (userData.exp || 0) + WIN_REWARD.exp;
       db.setUser(m.sender, userData);
     } catch (e) {
-      console.log("[UT] Failed to give reward:", e.message);
+      console.log("[UT] Reward failed:", e.message);
     }
 
-    // Draw final board
     const positions = players.map(
       (p) => ut[m.chat].players[p]?.position || null,
     );
@@ -569,48 +538,33 @@ async function answerHandler(m, sock) {
 
     await m.react("🎉");
 
-    if (boardImage) {
-      await sock.sendMessage(m.chat, {
-        image: boardImage,
-        caption:
-          `🎉 *PEMENANG!*\n\n` +
-          `${color} @${m.sender.split("@")[0]} sampai ke 100!\n\n` +
-          `╭┈┈⬡「 🎁 *HADIAH* 」\n` +
-          `┃ 💰 +${WIN_REWARD.koin.toLocaleString()} Koin\n` +
-          `┃ ⭐ +${WIN_REWARD.exp.toLocaleString()} EXP\n` +
-          `┃ ⚡ +${WIN_REWARD.energi} Energi\n` +
-          `╰┈┈┈┈┈┈┈┈⬡\n\n` +
-          `> GG WP! Main lagi? \`.ut create\``,
-        contextInfo: getUTContextInfo("🏆 WINNER!", `${name} menang!`, [
-          m.sender,
-        ]),
-      });
-    } else {
-      await sock.sendMessage(m.chat, {
-        text:
-          `🎉 *PEMENANG!*\n\n` +
-          `${color} @${m.sender.split("@")[0]} sampai ke 100!\n\n` +
-          `╭┈┈⬡「 🎁 *HADIAH* 」\n` +
-          `┃ 💰 +${WIN_REWARD.koin.toLocaleString()} Koin\n` +
-          `┃ ⭐ +${WIN_REWARD.exp.toLocaleString()} EXP\n` +
-          `┃ ⚡ +${WIN_REWARD.energi} Energi\n` +
-          `╰┈┈┈┈┈┈┈┈⬡`,
-        contextInfo: getUTContextInfo("🏆 WINNER!", `${name} menang!`, [
-          m.sender,
-        ]),
-      });
-    }
+    const winCaption = 
+      `🎉 *¡TENEMOS UN GANADOR!*\n\n` +
+      `${color} @${m.sender.split("@")[0]} llegó al 100!\n\n` +
+      `╭┈┈⬡「 🎁 *PREMIOS* 」\n` +
+      `┃ 💰 +${WIN_REWARD.koin.toLocaleString()} Koin\n` +
+      `┃ ⭐ +${WIN_REWARD.exp.toLocaleString()} EXP\n` +
+      `┃ ⚡ +${WIN_REWARD.energi} Energía\n` +
+      `╰┈┈┈┈┈┈┈┈⬡\n\n` +
+      `> ¡GG! ¿Otra partida? \`.se create\``;
+
+    const winOptions = boardImage ? { image: boardImage, caption: winCaption } : { text: winCaption };
+
+    await sock.sendMessage(m.chat, {
+      ...winOptions,
+      contextInfo: getUTContextInfo("🏆 ¡GANADOR!", `¡${name} ganó la partida!`, [
+        m.sender,
+      ]),
+    });
 
     delete ut[m.chat];
     return true;
   }
 
-  // Continue game
   ut[m.chat].turn++;
   const nextTurn = ut[m.chat].turn % players.length;
   const nextPlayer = players[nextTurn];
 
-  // Draw updated board
   const positions = players.map((p) => ut[m.chat].players[p]?.position || null);
   const boardImage = await drawBoard(
     ut[m.chat].map,
@@ -622,30 +576,20 @@ async function answerHandler(m, sock) {
     ut[m.chat].stabil_y,
   );
 
-  if (boardImage) {
-    await sock.sendMessage(m.chat, {
-      image: boardImage,
-      caption:
-        `🎲 *DADU: ${dadu}* ${DICE_EMOJI[dadu - 1]}\n\n` +
-        `${color} ${name}: *${oldPos}* → *${newPos}*${event}\n\n` +
-        `> 🎯 Giliran: @${nextPlayer.split("@")[0]}\n` +
-        `> Ketik *kocok*`,
-      contextInfo: getUTContextInfo("🎲 GILIRAN", PLAYER_NAMES[nextTurn], [
-        nextPlayer,
-      ]),
-    });
-  } else {
-    await sock.sendMessage(m.chat, {
-      text:
-        `🎲 *DADU: ${dadu}* ${DICE_EMOJI[dadu - 1]}\n\n` +
-        `${color} ${name}: *${oldPos}* → *${newPos}*${event}\n\n` +
-        `> 🎯 Giliran: @${nextPlayer.split("@")[0]}\n` +
-        `> Ketik *kocok*`,
-      contextInfo: getUTContextInfo("🎲 GILIRAN", PLAYER_NAMES[nextTurn], [
-        nextPlayer,
-      ]),
-    });
-  }
+  const turnCaption = 
+    `🎲 *DADO: ${dadu}* ${DICE_EMOJI[dadu - 1]}\n\n` +
+    `${color} ${name}: *${oldPos}* → *${newPos}*${event}\n\n` +
+    `> 🎯 Turno de: @${nextPlayer.split("@")[0]}\n` +
+    `> ¡Escribí *girar*!`;
+
+  const turnOptions = boardImage ? { image: boardImage, caption: turnCaption } : { text: turnCaption };
+
+  await sock.sendMessage(m.chat, {
+    ...turnOptions,
+    contextInfo: getUTContextInfo("🎲 TURNO", PLAYER_NAMES[nextTurn], [
+      nextPlayer,
+    ]),
+  });
 
   return true;
 }
