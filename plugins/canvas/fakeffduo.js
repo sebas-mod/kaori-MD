@@ -2,13 +2,14 @@ import axios from "axios";
 import config from "../../config.js";
 import { uploadTo0x0 } from "../../src/lib/ourin-tmpfiles.js";
 import te from "../../src/lib/ourin-error.js";
+
 const pluginConfig = {
   name: "fakeffduo",
-  alias: ["fakefreefirduo"],
+  alias: ["fakefreefireduo", "ffduo"],
   category: "canvas",
-  description: "Membuat gambar ff",
-  usage: ".fakeffduo <text>",
-  example: ".fakeffduo Hai cantik",
+  description: "Crea una imagen de lobby de Free Fire con un dúo",
+  usage: ".fakeffduo <nombre1>|<nombre2>",
+  example: ".fakeffduo ProPlayer|NoviaReal",
   isOwner: false,
   isPremium: false,
   isGroup: false,
@@ -19,18 +20,21 @@ const pluginConfig = {
 };
 
 async function handler(m, { sock }) {
-  const nama = m.text?.split("|");
-  if (!nama || nama.length < 2) {
+  const nombres = m.text?.split("|");
+  if (!nombres || nombres.length < 2) {
     return m.reply(
-      `*FAKE FF DUO*\n\n> Contoh: ${m.prefix}fakeffduo nama1|nama2`,
+      `*FAKE FF DUO*\n\n> Por favor, ingresa dos nombres separados por un "|" (pipe).\n\n> Ejemplo: ${m.prefix}fakeffduo Jugador1|Jugador2`,
     );
   }
   m.react("🕕");
 
   try {
+    const name1 = nombres[0].trim();
+    const name2 = nombres[1].trim();
+    
     await sock.sendMedia(
       m.chat,
-      `https://api.ourin.my.id/api/fake-ff-duo-2?name1=${encodeURIComponent(nama[0])}&name2=${encodeURIComponent(nama[1])}&bg=random`,
+      `https://api.ourin.my.id/api/fake-ff-duo-2?name1=${encodeURIComponent(name1)}&name2=${encodeURIComponent(name2)}&bg=random`,
       null,
       m,
       {
