@@ -1,12 +1,12 @@
 import config from '../../config.js'
 import { getDatabase } from '../../src/lib/ourin-database.js'
 const pluginConfig = {
-    name: 'cekowner',
-    alias: ['ownerinfo'],
+    name: 'chequeowner',
+    alias: ['info-usuario', 'serowner', 'ownerinfo'],
     category: 'cek',
-    description: 'Cek apakah user adalah owner bot',
-    usage: '.cekowner @user',
-    example: '.cekowner',
+    description: 'Verifica si un usuario es owner del bot o sus estadísticas',
+    usage: '.chequeowner @usuario',
+    example: '.chequeowner',
     isOwner: false,
     isPremium: true,
     isGroup: false,
@@ -35,6 +35,8 @@ async function handler(m, { sock }) {
         targetJid = m.sender
     }
 
+    // Nota: Mantuve el prefijo 62 por compatibilidad de lógica, 
+    // pero si usás números locales podés ajustarlo.
     if (targetNumber.startsWith('0')) targetNumber = '62' + targetNumber.slice(1)
 
     const isOwnerUser = config.isOwner(targetNumber)
@@ -43,22 +45,22 @@ async function handler(m, { sock }) {
     const user = db.getUser(targetJid)
 
     const roles = []
-    if (isOwnerUser) roles.push('👑 Owner')
-    if (isPartnerUser) roles.push('🤝 Partner')
+    if (isOwnerUser) roles.push('👑 Dueño/Owner')
+    if (isPartnerUser) roles.push('🤝 Socio/Partner')
     if (isPremiumUser) roles.push('💎 Premium')
-    if (roles.length === 0) roles.push('👤 Free User')
+    if (roles.length === 0) roles.push('👤 Usuario Free')
 
     const ownerList = db.data.owner || []
     const isInOwnerDb = ownerList.includes(targetNumber)
 
-    let txt = `📋 *CEK USER INFO*\n\n`
-    txt += `👤 User: @${targetNumber}\n`
-    txt += `🏷️ Role: *${roles.join(' • ')}*\n`
-    txt += `📊 Owner DB: *${isInOwnerDb ? 'Ya' : 'Tidak'}*\n`
+    let txt = `📋 *INFO DE USUARIO*\n\n`
+    txt += `👤 Usuario: @${targetNumber}\n`
+    txt += `🏷️ Rango: *${roles.join(' • ')}*\n`
+    txt += `📊 Base de Datos Owner: *${isInOwnerDb ? 'Sí' : 'No'}*\n`
     if (user) {
-        txt += `⚡ Energi: *${user.energi === -1 ? '∞' : (user.energi ?? 0)}*\n`
-        txt += `💰 Koin: *${user.koin === -1 ? '∞' : (user.koin ?? 0).toLocaleString('id-ID')}*\n`
-        txt += `⭐ Level: *${user.level ?? 1}*\n`
+        txt += `⚡ Energía: *${user.energi === -1 ? '∞' : (user.energi ?? 0)}*\n`
+        txt += `💰 Monedas: *${user.koin === -1 ? '∞' : (user.koin ?? 0).toLocaleString('es-AR')}*\n`
+        txt += `⭐ Nivel: *${user.level ?? 1}*\n`
     }
 
     await m.reply(txt, { mentions: [targetJid] })
