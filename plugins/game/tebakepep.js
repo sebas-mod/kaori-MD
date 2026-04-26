@@ -1,10 +1,10 @@
 import { games } from '../../src/lib/ourin-games.js'
 
 games.register('tebakepep', {
-    alias: ['tebakff', 'tebakfreefire'],
+    alias: ['tebakff', 'tebakfreefire', 'freefire', 'personajeff'],
     emoji: '🔫',
-    title: 'TEBAK EPEP',
-    description: 'Tebak karakter Free Fire',
+    title: 'ADIVINA EL PERSONAJE DE FF',
+    description: 'Adiviná el personaje de Free Fire',
     hasImage: true
 })
 
