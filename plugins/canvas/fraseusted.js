@@ -2,13 +2,14 @@ import axios from 'axios'
 import config from '../../config.js'
 import { f } from '../../src/lib/ourin-http.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: 'ustadz',
-    alias: ['ustad', 'quoteustadz', 'canvasustadz'],
+    name: 'fraseusted',
+    alias: ['usted', 'fraseusted', 'canvasustadz'],
     category: 'canvas',
-    description: 'Buat quote gaya ustadz',
-    usage: '.ustadz <text>',
-    example: '.ustadz Jangan lupa sholat',
+    description: 'Crea una frase con el estilo de un Ustadz',
+    usage: '.usted <texto>',
+    example: '.usted No olvides agradecer',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -24,16 +25,15 @@ async function handler(m, { sock }) {
     if (!text) {
         return m.reply(
             `👲 *ᴄᴀɴᴠᴀs ᴜsᴛᴀᴅᴢ*\n\n` +
-            `> Masukkan teks untuk dijadikan quote.\n\n` +
-            `> Contoh: \`${m.prefix}ustadz Jangan lupa bersyukur\``
+            `> Ingresa el texto para convertirlo en una frase.\n\n` +
+            `> Ejemplo: \`${m.prefix}ustadz No olvides ser agradecido\``
         )
     }
     
     m.react('🕕')
     
     try {
-        const baseUrl = 'https://api.cuki.biz.id/api/canvas/ustadz?apikey=cuki-x&text=' + text
-        const apikey = 'cuki-x'
+        const baseUrl = 'https://api.cuki.biz.id/api/canvas/ustadz?apikey=cuki-x&text=' + encodeURIComponent(text)
         
         const response = await f(baseUrl)
         
