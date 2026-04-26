@@ -1,6 +1,6 @@
 {
-  "name": "ourin-md",
-  "version": "2.4.5",
+  "name": "KAORI-MD",
+  "version": "2.0.0",
   "description": "WhatsApp Multi-Device Bot dengan sistem plugin modular",
   "main": "index.js",
   "scripts": {
