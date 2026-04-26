@@ -2,78 +2,39 @@ import { getDatabase } from '../../src/lib/ourin-database.js'
 import config from '../../config.js'
 import path from 'path'
 import fs from 'fs'
+
 const pluginConfig = {
-    name: 'tembak',
-    alias: ['nembak', 'propose'],
+    name: 'proponer',
+    alias: ['tembak', 'nembak', 'declararse', 'propose'],
     category: 'fun',
-    description: 'Menembak seseorang untuk pacaran',
-    usage: '.tembak @tag',
-    example: '.tembak @628xxx',
-    isOwner: false,
-    isPremium: false,
+    description: 'Declara tu amor a alguien para ser pareja',
+    usage: '.proponer @tag',
+    example: '.proponer @user',
     isGroup: true,
-    isPrivate: false,
-    cooldown: 30,
-    energi: 1,
     isEnabled: true
 }
 
 if (!global.tembakSessions) global.tembakSessions = {}
 
-const SESSION_TIMEOUT = 3600000
+const SESSION_TIMEOUT = 3600000 // 1 hora
 const romanticQuotes = [
-    'Aku bukan pilot, tapi aku bisa buat hatimu terbang tinggi bersamaku 💕',
-    'Kamu tau kenapa aku suka hujan? Karena hujan itu seperti kamu, sejuk di hati 🌧️',
-    'Kamu adalah alasan kenapa aku senyum tanpa sebab 😊',
-    'Kalau kamu bintang, aku mau jadi langit yang selalu nemenin kamu ✨',
-    'Aku gak butuh GPS, karena hatiku udah nunjuk ke arahmu 💘',
-    'Kamu tau bedanya kamu sama kopi? Kopi bikin melek, kamu bikin aku nggak bisa tidur mikirin kamu ☕',
-    'Boleh pinjam hatimu? Janji bakal dijaga selamanya 💖',
-    'Kalau cinta itu adalah lagu, kamu adalah melodi terindahnya 🎵',
-    'Aku butuh 3 hal: Matahari, Bulan, dan Kamu. Matahari untuk siang, Bulan untuk malam, Kamu untuk selamanya 🌙',
-    'Kamu adalah puzzle terakhir yang kubutuhkan untuk melengkapi hidupku 🧩'
+    'No soy piloto, pero puedo hacer que tu corazón vuele conmigo 💕',
+    '¿Sabés por qué me gusta la lluvia? Porque es como vos, refresca mi corazón 🌧️',
+    'Sos la razón por la que sonrío sin motivo alguno 😊',
+    'Si fueras una estrella, yo sería el cielo para acompañarte siempre ✨',
+    'No necesito GPS, porque mi corazón ya marca tu dirección 💘',
+    '¿Sabés la diferencia entre vos y el café? El café me quita el sueño, vos me hacés soñar despierto ☕',
+    '¿Me prestás tu corazón? Prometo cuidarlo para siempre 💖',
+    'Si el amor fuera una canción, vos serías mi melodía favorita 🎵',
+    'Necesito 3 cosas: el Sol, la Luna y a Vos. El Sol para el día, la Luna para la noche y a Vos para siempre 🌙',
+    'Sos la última pieza del puzzle que necesitaba para completar mi vida 🧩'
 ]
-
-let thumbFun = null
-try {
-    const thumbPath = path.join(process.cwd(), 'assets', 'images', 'ourin-games.jpg')
-    if (fs.existsSync(thumbPath)) thumbFun = fs.readFileSync(thumbPath)
-} catch (e) {}
-
-function getContextInfo(title = '💘 *ᴛᴇᴍʙᴀᴋ*', body = 'Confess your love!') {
-    const saluranId = config.saluran?.id || '120363208449943317@newsletter'
-    const saluranName = config.saluran?.name || config.bot?.name || 'Ourin-AI'
-    
-    const contextInfo = {
-        forwardingScore: 9999,
-        isForwarded: true,
-        forwardedNewsletterMessageInfo: {
-            newsletterJid: saluranId,
-            newsletterName: saluranName,
-            serverMessageId: 127
-        }
-    }
-    
-    if (thumbFun) {
-        contextInfo.externalAdReply = {
-            title: title,
-            body: body,
-            thumbnail: thumbFun,
-            mediaType: 1,
-            renderLargerThumbnail: true,
-            sourceUrl: config.saluran?.link || ''
-        }
-    }
-    
-    return contextInfo
-}
 
 async function handler(m, { sock }) {
     const db = getDatabase()
     const args = m.args || []
-    
     let targetJid = null
-    
+
     if (m.quoted) {
         targetJid = m.quoted.sender
     } else if (m.mentionedJid?.[0]) {
@@ -84,74 +45,45 @@ async function handler(m, { sock }) {
             targetJid = num + '@s.whatsapp.net'
         }
     }
-    
+
     if (!targetJid) {
         return m.reply(
-            `⚠️ *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ*\n\n` +
-            `> \`${m.prefix}tembak @tag\`\n\n` +
-            `> Contoh:\n` +
-            `> \`${m.prefix}tembak @628xxx\`\n` +
-            `> Reply pesan + \`${m.prefix}tembak\``
+            `⚠️ *ᴍᴏᴅᴏ ᴅᴇ ᴜsᴏ*\n\n` +
+            `> \`${m.prefix}proponer @tag\`\n\n` +
+            `> Ejemplo:\n` +
+            `> \`${m.prefix}proponer @user\`\n` +
+            `> O respondé a un mensaje con \`${m.prefix}proponer\``
         )
     }
-    
-    if (targetJid === m.sender) {
-        return m.reply(`Tidak bisa menembak diri sendiri!`)
-    }
-    
-    if (targetJid === m.botNumber) {
-        return m.reply(`Bot tidak bisa pacaran!`)
-    }
-    
+
+    if (targetJid === m.sender) return m.reply(`¡No podés declararte a vos mismo!`)
+    if (targetJid === m.botNumber) return m.reply(`¡El bot no puede tener novix!`)
+
     let senderData = db.getUser(m.sender) || {}
     let targetData = db.getUser(targetJid) || {}
-    
+
     if (!senderData.fun) senderData.fun = {}
     if (!targetData.fun) targetData.fun = {}
-    
+
+    // Verificar si el emisor ya tiene pareja
     if (senderData.fun.pasangan) {
-        const partnerData = db.getUser(senderData.fun.pasangan)
-        if (partnerData?.fun?.pasangan === m.sender) {
-            return m.reply(
-                `❌ *sᴜᴅᴀʜ ᴘᴜɴʏᴀ ᴘᴀsᴀɴɢᴀɴ*\n\n` +
-                `Pasanganmu: @${senderData.fun.pasangan.split('@')[0]}\n` +
-                `Putus dulu sama ${partnerData.name} dengan cara: \`${m.prefix}putus\``,
-                { mentions: [senderData.fun.pasangan] }
-            )
-        }
+        return m.reply(
+            `❌ *ʏᴀ ᴛɪᴇɴᴇs ᴘᴀʀᴇᴊᴀ*\n\n` +
+            `Tu pareja es: @${senderData.fun.pasangan.split('@')[0]}\n` +
+            `Tenés que terminar primero con \`${m.prefix}terminar\``,
+            { mentions: [senderData.fun.pasangan] }
+        )
     }
-    
-    if (targetData.fun.pasangan && targetData.fun.pasangan !== m.sender) {
-        const targetPartner = db.getUser(targetData.fun.pasangan)
-        if (targetPartner?.fun?.pasangan === targetJid) {
-            return m.reply(
-                `💔 *ᴅɪᴀ sᴜᴅᴀʜ ᴘᴀᴄᴀʀᴀɴ*\n\n` +
-                `Pasangannya: @${targetData.fun.pasangan.split('@')[0]}`,
-                { mentions: [targetData.fun.pasangan] }
-            )
-        }
+
+    // Verificar si el objetivo ya tiene pareja
+    if (targetData.fun.pasangan) {
+        return m.reply(
+            `💔 *ᴇsᴀ ᴘᴇʀsᴏɴᴀ ʏᴀ ᴛɪᴇɴᴇ ᴘᴀʀᴇᴊᴀ*\n\n` +
+            `Su pareja es: @${targetData.fun.pasangan.split('@')[0]}`,
+            { mentions: [targetData.fun.pasangan] }
+        )
     }
-    
-    if (targetData.fun.tembakTarget === m.sender || targetData.fun.pasangan === m.sender) {
-        senderData.fun.pasangan = targetJid
-        targetData.fun.pasangan = m.sender
-        
-        db.setUser(m.sender, senderData)
-        db.setUser(targetJid, targetData)
-        
-        delete global.tembakSessions[`${m.chat}_${targetJid}`]
-        
-        await m.react('💕')
-        return m.reply(`💕 *CIE CIEE :3*\n\n` +
-                `@${m.sender.split('@')[0]} dan @${targetJid.split('@')[0]} resmi pacaran !\n\n` +
-                `Semoga langgeng yak! 💍`, { mentions: [m.sender, targetJid] })
-    }
-    
-    senderData.fun.tembakTarget = targetJid
-    if (!senderData.fun.tembakCount) senderData.fun.tembakCount = 0
-    senderData.fun.tembakCount++
-    db.setUser(m.sender, senderData)
-    
+
     global.tembakSessions[`${m.chat}_${targetJid}`] = {
         shooter: m.sender,
         target: targetJid,
@@ -160,87 +92,76 @@ async function handler(m, { sock }) {
     }
 
     await m.react('💘')
+    const quote = romanticQuotes[Math.floor(Math.random() * romanticQuotes.length)]
 
-    const sentMsg = await m.reply(`💘 *ADA YANG NEMBAK NIHH*\n\n` +
-            `Hei @${targetJid.split('@')[0]} , kamu ditembak oleh @${m.sender.split('@')[0]} nichh\n\n` +
-            `⏱️ Berlaku *1 jam* dari sekarang\n` +
-            `gunakan: \`${m.prefix}terima\` / \`${m.prefix}tolak\``,
-        { mentions: [targetJid, m.sender] })
-    
-    if (sentMsg?.key?.id) {
-        global.tembakSessions[`${m.chat}_${targetJid}`].messageId = sentMsg.key.id
-    }
+    await m.reply(
+        `💘 *¡ATENCIÓN! ALGUIEN SE ESTÁ DECLARANDO*\n\n` +
+        `Ey @${targetJid.split('@')[0]}, @${m.sender.split('@')[0]} te acaba de proponer ser su pareja.\n\n` +
+        `_"${quote}"_\n\n` +
+        `⏱️ Tenés *1 hora* para responder.\n` +
+        `Escribí: *aceptar* o *rechazar* respondiendo a este mensaje.`,
+        { mentions: [targetJid, m.sender] }
+    )
 }
 
 async function answerHandler(m, sock) {
     if (!m.body) return false
-    
     const text = m.body.trim().toLowerCase()
-    if (text !== 'terima' && text !== 'tolak') return false
+    
+    // Traducción de comandos de respuesta
+    const isAccept = ['aceptar', 'terima', 'si', 'acepto'].includes(text)
+    const isReject = ['rechazar', 'tolak', 'no'].includes(text)
+    
+    if (!isAccept && !isReject) return false
     if (!m.quoted) return false
-    
+
     const db = getDatabase()
-    
     const allSessions = Object.entries(global.tembakSessions || {}).filter(
         ([key, val]) => val.target === m.sender && val.chat === m.chat
     )
-    
+
     if (allSessions.length === 0) return false
-    
-    const validSession = allSessions.find(([key, val]) => {
-        return Date.now() - val.timestamp < 3600000
-    })
-    
+    const validSession = allSessions.find(([key, val]) => Date.now() - val.timestamp < SESSION_TIMEOUT)
     if (!validSession) return false
-    
+
     const [sessKey, sessData] = validSession
-    
-    if (text === 'terima') {
+
+    if (isAccept) {
         let shooterData = db.getUser(sessData.shooter) || {}
         let targetData = db.getUser(m.sender) || {}
-        
+
         if (!shooterData.fun) shooterData.fun = {}
         if (!targetData.fun) targetData.fun = {}
-        
+
         shooterData.fun.pasangan = m.sender
         targetData.fun.pasangan = sessData.shooter
-        
+
         db.setUser(sessData.shooter, shooterData)
         db.setUser(m.sender, targetData)
-        
         delete global.tembakSessions[sessKey]
-        
+
         await m.react('💕')
-        await m.reply(`💕 *WIDIHHHH, CIE CIE DITERIMA* @${sessData.shooter.split('@')[0]}\n\n` +
-                `@${m.sender.split('@')[0]} dan @${sessData.shooter.split('@')[0]} resmi pacaran\n\n` +
-                `Semoga langgeng dan bahagia 💍`, { mentions: [m.sender, sessData.shooter] })
-        
+        await m.reply(
+            `💕 *¡WIIIIII, DIJO QUE SÍ!* @${sessData.shooter.split('@')[0]}\n\n` +
+            `@${m.sender.split('@')[0]} y @${sessData.shooter.split('@')[0]} son oficialmente pareja.\n\n` +
+            `¡Que vivan los novios! 💍`, 
+            { mentions: [m.sender, sessData.shooter] }
+        )
         return true
     }
-    
-    if (text === 'tolak') {
-        let shooterData = db.getUser(sessData.shooter) || {}
-        let targetData = db.getUser(m.sender) || {}
-        
-        if (!shooterData.fun) shooterData.fun = {}
-        if (!targetData.fun) targetData.fun = {}
-        
-        delete shooterData.fun.pasangan
-        delete shooterData.fun.tembakTarget
-        delete targetData.fun.pasangan
-        
-        db.setUser(sessData.shooter, shooterData)
-        db.setUser(m.sender, targetData)
-        
+
+    if (isReject) {
         delete global.tembakSessions[sessKey]
-        
         await m.react('💔')
-        await m.reply(`💔 *WADUHH, YANG SABAR YAK* @${sessData.shooter.split('@')[0]}\n\n` +
-                `@${m.sender.split('@')[0]} menolak @${sessData.shooter.split('@')[0]} sebagai pacarnya\n\n` +
-                `Sabar ya, masih banyak yang lain! 😢`, { mentions: [m.sender, sessData.shooter] })
+        await m.reply(
+            `💔 *UFFF, SOLDADO CAÍDO...* @${sessData.shooter.split('@')[0]}\n\n` +
+            `@${m.sender.split('@')[0]} rechazó la propuesta de @${sessData.shooter.split('@')[0]}.\n\n` +
+            `No te preocupes, ¡hay muchos peces en el mar! 😢`, 
+            { mentions: [m.sender, sessData.shooter] }
+        )
         return true
     }
-    
+
     return false
 }
 
