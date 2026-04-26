@@ -413,9 +413,7 @@ async function handleSmartTriggers(m, sock, db) {
 
     if (isMentioned) {
       await m.reply(
-        `¿Alguien llamó a ${botName}?
-        
-¿Qué necesitas, @${m.sender.split("@")[0]}?`,
+        `Alguien llamo a ${botName}?\n\nQue necesitas, @${m.sender.split("@")[0]}?`,
         { mentions: [m.sender] },
       );
       return true;
@@ -423,14 +421,14 @@ async function handleSmartTriggers(m, sock, db) {
 
     if (text?.toLowerCase() === "p") {
       await m.reply(
-        `Hola @${m.sender.split("@")[0]}, saluda primero 😊`,
+        `Hola @${m.sender.split("@")[0]}, saluda primero :)`,
         { mentions: [m.sender] },
       );
       return true;
     }
 
     if (text?.toLowerCase() === "bot") {
-      await m.reply(`Hola @${m.sender.split("@")[0]}, ${botName} está activo ✅`, {
+      await m.reply(`Hola @${m.sender.split("@")[0]}, ${botName} esta activo ✅`, {
         mentions: [m.sender],
       });
       return true;
@@ -444,7 +442,7 @@ async function handleSmartTriggers(m, sock, db) {
     }
 
     if (text?.toLowerCase()?.includes("hallo")) {
-      await m.reply(`Hola también @${m.sender.split("@")[0]}`, {
+      await m.reply(`Hola tambien @${m.sender.split("@")[0]}`, {
         mentions: [m.sender],
       });
       return true;
@@ -457,9 +455,9 @@ async function handleSmartTriggers(m, sock, db) {
 }
 
 /**
- * Verificar si el usuario está haciendo spam
+ * Verificar si el usuario esta haciendo spam
  * @param {string} jid - JID del usuario
- * @returns {boolean} True si está haciendo spam
+ * @returns {boolean} True si esta haciendo spam
  */
 async function isSpamming(jid) {
   if (!config.features?.antiSpam) return false;
@@ -475,7 +473,7 @@ async function isSpamming(jid) {
 /**
  * Handler principal para procesar mensajes
  * @param {Object} msg - Mensaje crudo de Baileys
- * @param {Object} sock - Conexión socket
+ * @param {Object} sock - Conexion socket
  * @returns {Promise<void>}
  * @example
  * sock.ev.on('messages.upsert', async ({ messages }) => {
@@ -662,7 +660,7 @@ async function messageHandler(msg, sock, options = {}) {
             contextInfo: {
               mentionedJid: modeCheck.jadibotMentions,
               externalAdReply: {
-                title: `A C C E S O  D E N E G A D O`,
+                title: `ACCESO DENEGADO`,
                 body: null,
                 thumbnailUrl:
                   "https://cdn.gimita.id/download/unnamed%20(8)_1769331052275_d19c28da.jpg",
@@ -683,7 +681,7 @@ async function messageHandler(msg, sock, options = {}) {
         await m
           .reply(
             config.messages?.banned ||
-              "🚫 *Estás baneado de usar este bot.*",
+              "🚫 *Estas baneado de usar este bot.*",
           )
           .catch(() => {});
       }
@@ -694,7 +692,7 @@ async function messageHandler(msg, sock, options = {}) {
     if (m.isGroup && m.isCommand && !m.isOwner) {
       const groupData = db.getGroup(m.chat) || {};
       if (groupData.isBanned) {
-        // si quieres agregar texto también está bien, usa m.reply o sendMessage
+        // si quieres agregar texto usa m.reply o sendMessage
         return;
       }
     }
@@ -938,13 +936,13 @@ async function messageHandler(msg, sock, options = {}) {
 
           if (output.length > 0) {
             await m.reply(
-              `✅ *ʀᴇsᴜʟᴛᴀᴅᴏ ᴅᴇ ᴇᴊᴇᴄᴜᴄɪóɴ*\n\n\`\`\`\n${output.substring(0, 4000)}\n\`\`\``,
+              `✅ *ʀᴇsᴜʟᴛᴀᴅᴏ ᴅᴇ ᴇᴊᴇᴄᴜᴄɪᴏɴ*\n\n\`\`\`\n${output.substring(0, 4000)}\n\`\`\``,
             );
           }
         }
       } catch (execError) {
         await m.reply(
-          `❌ *ᴇʀʀᴏʀ ᴅᴇ ᴇᴊᴇᴄᴜᴄɪóɴ*\n\n\`\`\`\n${execError.message}\n\nStack:\n${execError.stack?.substring(0, 1000) || "N/A"}\n\`\`\``,
+          `❌ *ᴇʀʀᴏʀ ᴅᴇ ᴇᴊᴇᴄᴜᴄɪᴏɴ*\n\n\`\`\`\n${execError.message}\n\nStack:\n${execError.stack?.substring(0, 1000) || "N/A"}\n\`\`\``,
         );
       }
       return;
@@ -1086,7 +1084,7 @@ async function messageHandler(msg, sock, options = {}) {
           `📦 *${m.command.toUpperCase()}*\n\n` +
           `${storeCommand.content}\n\n` +
           `───────────────\n` +
-          `> 👁️ Vistas: ${storeData[m.command.toLowerCase()].views}\n` +
+          `> 👁 Vistas: ${storeData[m.command.toLowerCase()].views}\n` +
           `> 💳 Escribe \`${m.prefix}payment\` para pagar`;
 
         if (storeCommand.hasImage && storeCommand.imagePath) {
@@ -1137,7 +1135,7 @@ async function messageHandler(msg, sock, options = {}) {
           `📦 *${m.command.toUpperCase()}*\n\n` +
           `${storeCommand.content}\n\n` +
           `───────────────\n` +
-          `> 👁️ Vistas: ${storeData[m.command.toLowerCase()].views}\n` +
+          `> 👁 Vistas: ${storeData[m.command.toLowerCase()].views}\n` +
           `> 💳 Escribe \`${m.prefix}payment\` para pagar`;
 
         if (storeCommand.hasImage && storeCommand.imagePath) {
@@ -1184,10 +1182,10 @@ async function messageHandler(msg, sock, options = {}) {
             {
               interactiveMessage: {
                 title: message.message,
-                footer: `Quizás quisiste decir este comando`,
+                footer: `Quizas quisiste decir este comando`,
                 document: getCachedThumb("./assets/images/ourin.jpg"),
                 mimetype: "application/pdf",
-                fileName: "¿Quisiste decir?",
+                fileName: "Quisiste decir?",
                 fileLength: 999999999999,
                 contextInfo: {
                   isForwarded: true,
@@ -1199,7 +1197,7 @@ async function messageHandler(msg, sock, options = {}) {
                 },
                 externalAdReply: {
                   title: `Comando ${m.command || ""} no encontrado`,
-                  body: "¿Necesitas ayuda? escribe: " + m.prefix + "menu",
+                  body: "Necesitas ayuda? escribe: " + m.prefix + "menu",
                   thumbnailUrl:
                     "https://cdn.gimita.id/download/3a48a5a23251c8849f9a38a861392849_1771038665065_a85b23f6.jpg",
                   sourceUrl: null,
@@ -1268,9 +1266,9 @@ async function messageHandler(msg, sock, options = {}) {
         ) {
           return m.reply(
             `⚠️ *ᴀᴄᴄᴇsᴏ ʀᴇsᴛʀɪɴɢɪᴅᴏ*\n\n` +
-              `Esta función solo está disponible en el bot principal.\n` +
-              `Jadibot no puede acceder a esta función.\n\n` +
-              `> Contacta al owner del bot principal para más información.`,
+              `Esta funcion solo esta disponible en el bot principal.\n` +
+              `Jadibot no puede acceder a esta funcion.\n\n` +
+              `> Contacta al owner del bot principal para mas informacion.`,
           );
         }
       }
@@ -1339,8 +1337,8 @@ async function messageHandler(msg, sock, options = {}) {
 
           await m.reply(
             `🔒 *ᴄᴏᴍᴀɴᴅᴏ ɴᴏ ᴅɪsᴘᴏɴɪʙʟᴇ*\n\n` +
-              `> El bot está en modo *${currentConfig.name}*\n` +
-              `> El comando \`${m.prefix}${m.command}\` está disponible en el modo *${suggestedModeName}*\n\n` +
+              `> El bot esta en modo *${currentConfig.name}*\n` +
+              `> El comando \`${m.prefix}${m.command}\` esta disponible en el modo *${suggestedModeName}*\n\n` +
               `💡 Contacta al admin del grupo para cambiar el modo:\n` +
               `\`${m.prefix}botmode ${suggestedMode}\``,
           );
@@ -1364,7 +1362,7 @@ async function messageHandler(msg, sock, options = {}) {
       if (!m.isOwner && !m.isPartner && !m.isPremium && !user?.isRegistered) {
         await m.reply(
           `📝 *ʀᴇɢɪsᴛʀᴏ ʀᴇQᴜᴇʀɪᴅᴏ*\n\n` +
-            `¡Debes registrarte primero!\n\n` +
+            `Debes registrarte primero!\n\n` +
             `> Escribe: \`${m.prefix}daftar <nombre>\`\n\n` +
             `*Ejemplo:* \`${m.prefix}daftar ${m.pushName || "TuNombre"}\``,
         );
@@ -1410,7 +1408,7 @@ async function messageHandler(msg, sock, options = {}) {
               ? premiumEnergi
               : defaultEnergi);
         if (currentEnergi < plugin.config.energi) {
-          await m.reply(config.messages?.energiExceeded || "⚡ ¡Energía agotada!");
+          await m.reply(config.messages?.energiExceeded || "⚡ Energia agotada!");
           return;
         }
         db.updateEnergi(m.sender, -plugin.config.energi);
@@ -1478,8 +1476,8 @@ async function messageHandler(msg, sock, options = {}) {
 
 /**
  * Handler para actualizar participantes del grupo
- * @param {Object} update - Datos de actualización
- * @param {Object} sock - Conexión socket
+ * @param {Object} update - Datos de actualizacion
+ * @param {Object} sock - Conexion socket
  * @returns {Promise<void>}
  */
 async function groupHandler(update, sock) {
@@ -1536,7 +1534,7 @@ async function groupHandler(update, sock) {
         e.message?.includes("rate-overlimit") ||
         e?.output?.statusCode === 429
       ) {
-        logger.warn("GroupHandler", "límite de tasa alcanzado, omitiendo evento");
+        logger.warn("GroupHandler", "limite de tasa alcanzado, omitiendo evento");
         return;
       }
       throw e;
@@ -1622,7 +1620,7 @@ async function groupHandler(update, sock) {
                 isForwarded: true,
                 externalAdReply: {
                   title: "🎉 PROMOVIDO",
-                  body: `Notificación de grupo`,
+                  body: `Notificacion de grupo`,
                   thumbnailUrl: groupPpUrl,
                   mediaType: 1,
                   renderLargerThumbnail: false,
@@ -1660,7 +1658,7 @@ async function groupHandler(update, sock) {
                 isForwarded: true,
                 externalAdReply: {
                   title: "📉 DEGRADADO",
-                  body: `Notificación de grupo`,
+                  body: `Notificacion de grupo`,
                   thumbnailUrl: groupPpUrl,
                   mediaType: 1,
                   renderLargerThumbnail: false,
@@ -1707,13 +1705,13 @@ async function messageUpdateHandler(updates, sock) {
 
       await messageHandler(newMsg, sock);
     } catch (error) {
-      console.error("[ActualizaciónMensaje] Error:", error.message);
+      console.error("[ActualizacionMensaje] Error:", error.message);
     }
   }
 }
 
 /**
- * Caché para guardar el último estado del grupo
+ * Cache para guardar el ultimo estado del grupo
  * Formato: { groupId: { announce: boolean, restrict: boolean, lastUpdate: timestamp } }
  */
 const groupSettingsCache = new Map();
@@ -1766,7 +1764,7 @@ async function groupSettingsHandler(update, sock) {
         isForwarded: true,
         externalAdReply: {
           showAdAttribution: false,
-          title: "NOTIFICACIÓN DE GRUPO",
+          title: "NOTIFICACION DE GRUPO",
           body: config.bot?.name,
           thumbnailUrl: groupPpUrl,
           mediaType: 1,
@@ -1835,7 +1833,7 @@ async function groupSettingsHandler(update, sock) {
       groupSettingsCache.set(groupId, cached);
     }
   } catch (error) {
-    console.error("[ConfiguraciónGrupo] Error:", error.message);
+    console.error("[ConfiguracionGrupo] Error:", error.message);
   }
 }
 
