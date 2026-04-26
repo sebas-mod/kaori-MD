@@ -2,13 +2,14 @@ import FormData from 'form-data'
 import axios from 'axios'
 import config from '../../config.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: 'wanted',
-    alias: ['wantedposter'],
+    name: 'posterbuscado',
+    alias: ['buscado', 'posterwanted'],
     category: 'canvas',
-    description: 'Membuat poster wanted dari gambar',
-    usage: '.wanted (reply gambar)',
-    example: '.wanted',
+    description: 'Crea un póster de "Buscado" a partir de una imagen',
+    usage: '.buscado (responde a una imagen)',
+    example: '.buscado',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -17,6 +18,7 @@ const pluginConfig = {
     energi: 1,
     isEnabled: true
 }
+
 async function uploadTo0x0(buffer) {
     const formData = new FormData()
     formData.append('file', buffer, { filename: 'image.jpg' })
@@ -27,20 +29,24 @@ async function uploadTo0x0(buffer) {
     if (res.data?.status && res.data?.path) {
         return res.data.path
     }
-    throw new Error('Upload gagal')
+    throw new Error('Fallo al subir la imagen')
 }
+
 async function handler(m, { sock }) {
     const isImage = m.isImage || (m.quoted && m.quoted.type === 'imageMessage')
+    
     if (!isImage) {
         return m.reply(
             `🤠 *ᴡᴀɴᴛᴇᴅ ᴘᴏsᴛᴇʀ*\n\n` +
-            `╭┈┈⬡「 📋 *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ* 」\n` +
-            `┃ ◦ Reply gambar dengan \`${m.prefix}wanted\`\n` +
-            `┃ ◦ Kirim gambar dengan caption \`${m.prefix}wanted\`\n` +
+            `╭┈┈⬡「 📋 *MODO DE USO* 」\n` +
+            `┃ ◦ Responde a una imagen con \`${m.prefix}wanted\`\n` +
+            `┃ ◦ Envía una imagen con el texto \`${m.prefix}wanted\`\n` +
             `╰┈┈⬡`
         )
     }
+    
     m.react('🕕')
+    
     try {
         let buffer
         if (m.quoted && m.quoted.isMedia) {
@@ -48,22 +54,30 @@ async function handler(m, { sock }) {
         } else if (m.isMedia) {
             buffer = await m.download()
         }
+        
         if (!buffer || buffer.length === 0) {
-            throw new Error('Gagal download gambar')
+            throw new Error('No se pudo descargar la imagen')
         }
+        
         const imageUrl = await uploadTo0x0(buffer)
         const apiKey = config.APIkey?.lolhuman
+        
         if (!apiKey) {
-            throw new Error('API Key tidak ditemukan di config')
+            throw new Error('API Key no encontrada en la configuración')
         }
+        
         const apiUrl = `https://api.lolhuman.xyz/api/creator1/wanted?apikey=${apiKey}&img=${encodeURIComponent(imageUrl)}`
+        
         await sock.sendMedia(m.chat, apiUrl, null, m, {
             type: 'image',
         })
+        
         m.react('✅')
+        
     } catch (error) {
         m.react('☢')
         m.reply(te(m.prefix, m.command, m.pushName))
     }
 }
+
 export { pluginConfig as config, handler }
