@@ -1,11 +1,12 @@
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'add',
-    alias: ['addmember', 'invite'],
+    alias: ['agregar', 'invitar', 'añadir'],
     category: 'group',
-    description: 'Menambahkan member ke grup (support multiple)',
-    usage: '.add <nomor1> [nomor2] [nomor3]... [link_grup]',
-    example: '.add 6281234567890 6281234567890',
+    description: 'Añadir miembros al grupo (soporta varios números a la vez)',
+    usage: '.add <número1> [número2]... [link_grupo]',
+    example: '.add 5491122334455',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -13,33 +14,31 @@ const pluginConfig = {
     cooldown: 10,
     energi: 0,
     isEnabled: true,
-    isAdmin: true,
-    isBotAdmin: true
+    isAdmin: true, // Solo admins pueden usarlo
+    isBotAdmin: true // El bot debe ser admin
 }
 
 async function handler(m, { sock }) {
     const args = m.args || []
-    
+
     if (args.length === 0) {
         return m.reply(
-            `👥 *ᴀᴅᴅ ᴍᴇᴍʙᴇʀ*\n\n` +
-            `> Cara pakai:\n` +
-            `> 1. Di grup: \`${m.prefix}add <nomor>\`\n` +
-            `> 2. Multiple: \`${m.prefix}add <nomor1> <nomor2> ...\`\n` +
-            `> 3. Di private: \`${m.prefix}add <nomor> <link_grup>\`\n\n` +
-            `> Contoh:\n` +
-            `> \`${m.prefix}add 6281234567890\`\n` +
-            `> \`${m.prefix}add 628123 628456 628789\`\n` +
-            `> \`${m.prefix}add 628123 https://chat.whatsapp.com/xxx\`\n\n` +
-            `> Syarat:\n` +
-            `> - Bot harus admin di grup target\n` +
-            `> - Yang jalankan command harus admin`
+            `👥 *AGREGAR MIEMBROS*\n\n` +
+            `> *Modo de uso:*\n` +
+            `> 1. En el grupo: \`${m.prefix}add <número>\`\n` +
+            `> 2. Múltiples: \`${m.prefix}add <n1> <n2> <n3>\`\n` +
+            `> 3. Por privado: \`${m.prefix}add <número> <link_del_grupo>\`\n\n` +
+            `> *Ejemplo:*\n` +
+            `> \`${m.prefix}add 5491122334455\`\n` +
+            `> \`${m.prefix}add https://chat.whatsapp.com/xxx 5491122334455\`\n\n` +
+            `> *Requisitos:*\n` +
+            `> - El bot y quien usa el comando deben ser admins.`
         )
     }
-    
+
     let targetGroup = m.isGroup ? m.chat : null
     let targetNumbers = []
-    
+
     for (const arg of args) {
         const linkMatch = arg.match(/chat\.whatsapp\.com\/([a-zA-Z0-9]+)/)
         if (linkMatch) {
@@ -47,125 +46,127 @@ async function handler(m, { sock }) {
                 const groupInfo = await sock.groupGetInviteInfo(linkMatch[1])
                 targetGroup = groupInfo.id
             } catch (e) {
-                return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Link grup tidak valid atau sudah expired!`)
+                return m.reply(`❌ *ERROR*\n\n> ¡El link del grupo no es válido o expiró!`)
             }
         } else if (arg.includes('@g.us')) {
             targetGroup = arg
         } else {
             let num = arg.replace(/[^0-9]/g, '')
+            // Si el número empieza con 0 o 11 (típico de acá), intentamos ponerle el 549
             if (num.startsWith('0')) {
-                num = '62' + num.slice(1)
+                num = '54' + num.slice(1)
+            } else if (num.length === 10) {
+                num = '54' + num
             }
+            
             if (num.length >= 10) {
                 targetNumbers.push(num)
             }
         }
     }
-    
+
     if (targetNumbers.length === 0) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Masukkan nomor yang valid!`)
+        return m.reply(`❌ *ERROR*\n\n> ¡Ingresá números válidos!`)
     }
-    
+
     if (!targetGroup) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Jalankan di grup atau sertakan link grup!\n\n\`${m.prefix}add <nomor> <link_grup>\``)
+        return m.reply(`❌ *ERROR*\n\n> Usalo en un grupo o pasame el link de uno.\n\n\`${m.prefix}add <número> <link>\``)
     }
-    
+
     try {
         const groupMeta = await sock.groupMetadata(targetGroup)
         const botId = sock.user?.id?.split(':')[0] + '@s.whatsapp.net'
         const botParticipant = groupMeta.participants.find(p => 
             p.id === botId || p.jid === botId || p.id?.includes(sock.user?.id?.split(':')[0])
         )
-        
+
         if (!botParticipant || !['admin', 'superadmin'].includes(botParticipant.admin)) {
-            return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Bot bukan admin di grup *${groupMeta.subject}*!`)
+            return m.reply(`❌ *ERROR*\n\n> ¡El bot no es admin en *${groupMeta.subject}*!`)
         }
-        
+
+        // Si se usa por privado, verificamos que el usuario sea admin en ese grupo
         if (!m.isGroup) {
-            const senderId = m.sender?.split('@')[0]
-            const senderParticipant = groupMeta.participants.find(p => 
-                p.id?.includes(senderId) || p.jid?.includes(senderId)
-            )
-            
+            const senderParticipant = groupMeta.participants.find(p => p.id === m.sender)
             if (!senderParticipant || !['admin', 'superadmin'].includes(senderParticipant.admin)) {
-                return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Kamu bukan admin di grup *${groupMeta.subject}*!`)
+                return m.reply(`❌ *ERROR*\n\n> No sos admin en *${groupMeta.subject}* para agregar gente.`)
             }
         }
-        
+
         const validNumbers = []
         const alreadyInGroup = []
-        
+
         for (const num of targetNumbers) {
-            const existingMember = groupMeta.participants.find(p => 
-                p.id?.includes(num) || p.jid?.includes(num)
-            )
-            
+            const jid = num + '@s.whatsapp.net'
+            const existingMember = groupMeta.participants.find(p => p.id === jid)
+
             if (existingMember) {
                 alreadyInGroup.push(num)
             } else {
-                validNumbers.push(num + '@s.whatsapp.net')
+                validNumbers.push(jid)
             }
         }
-        
+
         if (validNumbers.length === 0) {
-            return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Semua nomor sudah ada di grup!`)
+            return m.reply(`❌ *AVISO*\n\n> Todos esos números ya están en el grupo.`)
         }
-        
-        m.react('🕕')
-        
+
+        await m.react('🕕')
+
         const results = await sock.groupParticipantsUpdate(targetGroup, validNumbers, 'add')
-        
+
         let successList = []
         let invitedList = []
         let failedList = []
-        
+
         for (const res of results) {
-            const num = res.content?.attrs?.phone_number?.replace('@s.whatsapp.net', '') || ''
+            const num = res.jid?.split('@')[0] || res.content?.attrs?.phone_number || 'Número'
             
-            if (res.status === '200') {
+            if (res.status === '200' || res.status === 200) {
                 successList.push(num)
-            } else if (res.status === '408') {
-                invitedList.push(num)
+            } else if (res.status === '408' || res.status === 408) {
+                invitedList.push(num) // Status 408 suele ser invitación enviada por privacidad del usuario
             } else {
                 failedList.push({ num, status: res.status })
             }
         }
-        
-        let resultText = `🥗 @${m.sender.split('@')[0]} telah menambahkan member ke grup\n\n`
-        
+
+        let resultText = `✅ *RESULTADOS DE LA OPERACIÓN*\n\n`
+
         if (successList.length > 0) {
-            resultText += `Ada *${successList.length}* member yang berhasil ditambahkan:\n`
+            resultText += `*Agregados directamente (${successList.length}):*\n`
             successList.forEach(n => resultText += `• @${n}\n`)
             resultText += `\n`
         }
-        
+
         if (invitedList.length > 0) {
-            resultText += `📨 *Dan ada juga *${invitedList.length}* member yang diundang:*\n`
+            resultText += `📨 *Invitación enviada por privado (${invitedList.length}):*\n`
             invitedList.forEach(n => resultText += `• @${n}\n`)
             resultText += `\n`
         }
-        
+
         if (failedList.length > 0) {
-            resultText += `❌ *ɢᴀɢᴀʟ (${failedList.length}):*\n`
-            failedList.forEach(f => resultText += `• @${f.num} (${f.status})\n`)
+            resultText += `❌ *Errores (${failedList.length}):*\n`
+            failedList.forEach(f => resultText += `• @${f.num} (Error: ${f.status})\n`)
             resultText += `\n`
         }
-        
+
         if (alreadyInGroup.length > 0) {
-            resultText += `⏭️ *sᴜᴅᴀʜ ᴅɪ ɢʀᴜᴘ (${alreadyInGroup.length}):*\n`
+            resultText += `⏭️ *Ya eran miembros (${alreadyInGroup.length}):*\n`
             alreadyInGroup.forEach(n => resultText += `• @${n}\n`)
         }
+
+        await m.react(successList.length > 0 || invitedList.length > 0 ? '✅' : '❌')
         
-        m.react(successList.length > 0 || invitedList.length > 0 ? '✅' : '❌')
-        await m.reply(resultText, { mentions: [ ...successList.map(n => n + '@s.whatsapp.net'), ...invitedList.map(n => n + '@s.whatsapp.net'), ...failedList.map(f => f.num + '@s.whatsapp.net'), ...alreadyInGroup.map(n => n + '@s.whatsapp.net'), m.sender ] })
-        
+        const allMentions = [...successList, ...invitedList, ...alreadyInGroup].map(n => n + '@s.whatsapp.net')
+        allMentions.push(m.sender)
+
+        await m.reply(resultText, { mentions: allMentions })
+
     } catch (error) {
-        m.react('❌')
-        
+        await m.react('❌')
+        console.error(error)
         if (error.message?.includes('not-authorized')) {
-            await m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Bot tidak memiliki izin untuk menambah member!`)
-        } else if (error.message?.includes('forbidden')) {
-            await m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Bot tidak memiliki akses ke grup ini!`)
+            await m.reply(`❌ *ERROR*\n\n> El bot perdió los permisos de admin o no está autorizado.`)
         } else {
             m.reply(te(m.prefix, m.command, m.pushName))
         }
