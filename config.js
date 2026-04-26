@@ -10,7 +10,7 @@ const config = {
 
   owner: {
   name: "sebas", // ✅ correcto
-  number: ["5491138403093",
+   number: ["5491138403093`],
 },
 
   session: {
