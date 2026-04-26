@@ -23,7 +23,7 @@ const pluginConfig = {
   name: "menu",
   alias: ["help", "bantuan", "commands", "m"],
   category: "main",
-  description: "Menampilkan menu utama bot",
+  description: "Muestra el menu principal del bot",
   usage: ".menu",
   example: ".menu",
   isOwner: false,
@@ -233,40 +233,42 @@ async function buildMenuText(m, botConfig, db, uptime, botMode = "md") {
       : greeting.includes("sore")
         ? "🌇"
         : "🌙";
-  let txt = `Hai *@${m.pushName || "User"}* 🪸
-Aku ${botConfig.bot?.name || "Ourin-AI"}, bot WhatsApp yang siap bantu kamu.  
-Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana langsung lewat WhatsApp — praktis tanpa ribet.`;
-  txt += `\n\n╭─〔 🤖 *ʙᴏᴛ ɪɴꜰᴏ* 〕\n`;
-  txt += `*│* 🖐 ɴᴀᴍᴀ     : *${botConfig.bot?.name || "Ourin-AI"}*\n`;
-  txt += `*│* 🔑 ᴠᴇʀsɪ    : *v${botConfig.bot?.version || "1.2.0"}*\n`;
-  txt += `*│* ⚙️ ᴍᴏᴅᴇ     : *${(botConfig.mode || "public").toUpperCase()}*\n`;
-  txt += `*│* 🧶 ᴘʀᴇꜰɪx    : *[ ${prefix} ]*\n`;
-  txt += `*│* ⏱ ᴜᴘᴛɪᴍᴇ   : *${uptimeFormatted}*\n`;
-  txt += `*│* 👥 ᴛᴏᴛᴀʟ    : *${totalUsers} Users*\n`;
-  txt += `*│* 🏷 ɢʀᴏᴜᴘ     : *${botMode.toUpperCase()}*\n`;
-  txt += `*│* 👑 ᴏᴡɴᴇʀ    : *${botConfig.owner?.name || "Ourin-AI"}*\n`;
+    let txt = `Hola *@${m.pushName || "Usuario"}* 🪸
+Soy *KAORI MD*, un bot de WhatsApp listo para ayudarte.  
+Puedes usarme para buscar información, obtener datos o realizar tareas sencillas directamente por WhatsApp — práctico y sin complicaciones.`;
+  txt += `\n\n╭─〔 🤖 *ɪɴꜰᴏ ᴅᴇʟ ʙᴏᴛ* 〕\n`;
+  txt += `*│* 🖐 ɴᴏᴍʙʀᴇ    : *KAORI MD*\n`;
+  txt += `*│* 🔑 ᴠᴇʀsɪóɴ   : *v${botConfig.bot?.version || "1.2.0"}*\n`;
+  txt += `*│* ⚙️ ᴍᴏᴅᴏ      : *${(botConfig.mode || "público").toUpperCase()}*\n`;
+  txt += `*│* 🧶 ᴘʀᴇꜰɪᴊᴏ   : *[ ${prefix} ]*\n`;
+  txt += `*│* ⏱ ᴀᴄᴛɪᴠᴏ     : *${uptimeFormatted}*\n`;
+  txt += `*│* 👥 ᴛᴏᴛᴀʟ     : *${totalUsers} Usuarios*\n`;
+  txt += `*│* 🏷 ɢʀᴜᴘᴏ     : *${botMode.toUpperCase()}*\n`;
+  txt += `*│* 👑 ᴅᴜᴇñᴏ     : *${botConfig.owner?.name || "KAORI MD"}*\n`;
   txt += `╰────────────────⬣\n\n`;
-  txt += `╭─〔 👤 *ᴜsᴇʀ ɪɴꜰᴏ* 〕\n`;
-  txt += `*│* 🙋 ɴᴀᴍᴀ     : *${m.pushName}*\n`;
-  txt += `*│* 🎭 ʀᴏʟᴇ     : *${roleEmoji} ${userRole}*\n`;
-  txt += `*│* 🎟 ᴇɴᴇʀɢɪ   : *${m.isOwner || m.isPremium ? "∞ Unlimited" : (user?.energi ?? 25)}*\n`;
-  txt += `*│* ⚡ ʟᴇᴠᴇʟ    : *${(Math.floor((user?.exp || 0) / 20000) + 1)}*\n`;
+  txt += `╭─〔 👤 *ɪɴꜰᴏ ᴅᴇ ᴜsᴜᴀʀɪᴏ* 〕\n`;
+  txt += `*│* 🙋 ɴᴏᴍʙʀᴇ    : *${m.pushName}*\n`;
+  txt += `*│* 🎭 ʀᴏʟ       : *${roleEmoji} ${userRole}*\n`;
+  txt += `*│* 🎟 ᴇɴᴇʀɢíᴀ   : *${m.isOwner || m.isPremium ? "∞ Ilimitada" : (user?.energi ?? 25)}*\n`;
+  txt += `*│* ⚡ ɴɪᴠᴇʟ     : *${(Math.floor((user?.exp || 0) / 20000) + 1)}*\n`;
   txt += `*│* ✨ ᴇxᴘ       : *${(user?.exp ?? 0).toLocaleString()}*\n`;
-  txt += `*│* 💰 ᴋᴏɪɴ      : *${(user?.koin ?? 0).toLocaleString()}*\n`;
+  txt += `*│* 💰 ᴍᴏɴᴇᴅᴀs   : *${(user?.koin ?? 0).toLocaleString()}*\n`;
+  
   const rpg = user?.rpg || {};
   if (rpg.health !== undefined) {
-    txt += `*│* ❤️ ʜᴘ        : *${rpg.health}/${rpg.maxHealth || rpg.health}*\n`;
-    txt += `*│* 🔮 ᴍᴀɴᴀ      : *${rpg.mana}/${rpg.maxMana || rpg.mana}*\n`;
-    txt += `*│* 🏃 sᴛᴀᴍɪɴᴀ   : *${rpg.stamina}/${rpg.maxStamina || rpg.stamina}*\n`;
+    txt += `*│* ❤️ sᴀʟᴜᴅ     : *${rpg.health}/${rpg.maxHealth || rpg.health}*\n`;
+    txt += `*│* 🔮 ᴍᴀɴá      : *${rpg.mana}/${rpg.maxMana || rpg.mana}*\n`;
+    txt += `*│* 🏃 ᴇsᴛᴀᴍɪɴᴀ  : *${rpg.stamina}/${rpg.maxStamina || rpg.stamina}*\n`;
   }
+  
   const inv = user?.inventory || {};
   const invCount = Object.values(inv).reduce(
     (a, b) => a + (typeof b === "number" ? b : 0),
     0,
   );
-  if (invCount > 0) txt += `*│* 🎒 ɪɴᴠᴇɴᴛᴏʀʏ : *${invCount} items*\n`;
-  txt += `*│* 🕒 ᴡᴀᴋᴛᴜ    : *${timeStr} WIB*\n`;
-  txt += `*│* 📅 ᴛᴀɴɢɢᴀʟ  : *${dateStr}*\n`;
+  if (invCount > 0) txt += `*│* 🎒 ɪɴᴠᴇɴᴛᴀʀɪᴏ : *${invCount} objetos*\n`;
+  txt += `*│* 🕒 ʜᴏʀᴀ      : *${timeStr}*\n`;
+  txt += `*│* 📅 ꜰᴇᴄʜᴀ      : *${dateStr}*\n`;
   txt += `╰────────────────⬣\n\n`;
   const categoryOrder = [
     "owner",
@@ -544,26 +546,27 @@ async function handler(m, { sock, config: botConfig, db, uptime }) {
           id: `${prefix}menucat ${cat}`,
           description: `${cmds.length} commands`,
         }));
-        let headerText = `*@${m.pushName || "User"}* 🪸
-Aku ${botConfig.bot?.name || "Ourin-AI"}, bot WhatsApp yang siap bantu kamu.  
-Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana langsung lewat WhatsApp — praktis tanpa ribet.\n\n`;
-        headerText += `╭┈┈⬡「 🤖 *ʙᴏᴛ ɪɴꜰᴏ* 」\n`;
-        headerText += `┃ \`◦\` ɴᴀᴍᴀ: *${botConfig.bot?.name || "Ourin-AI"}*\n`;
-        headerText += `┃ \`◦\` ᴠᴇʀsɪ: *v${botConfig.bot?.version || "1.2.0"}*\n`;
-        headerText += `┃ \`◦\` ᴍᴏᴅᴇ: *${(botConfig.mode || "public").toUpperCase()}*\n`;
-        headerText += `┃ \`◦\` ᴜᴘᴛɪᴍᴇ: *${uptimeFormatted}*\n`;
-        headerText += `┃ \`◦\` ᴛᴏᴛᴀʟ ᴄᴍᴅ: *${totalCmds}*\n`;
+        let headerText = `*@${m.pushName || "Usuario"}* 🪸
+Soy *KAORI MD*, un bot de WhatsApp listo para ayudarte.  
+Puedes usarme para buscar información, obtener datos o realizar tareas sencillas directamente por WhatsApp — práctico y sin complicaciones.\n\n`;
+        headerText += `╭┈┈⬡「 🤖 *ɪɴꜰᴏ ᴅᴇʟ ʙᴏᴛ* 」\n`;
+        headerText += `┃ \`◦\` ɴᴏᴍʙʀᴇ: *KAORI MD*\n`;
+        headerText += `┃ \`◦\` ᴠᴇʀsɪóɴ: *v${botConfig.bot?.version || "1.2.0"}*\n`;
+        headerText += `┃ \`◦\` ᴍᴏᴅᴏ: *${(botConfig.mode || "público").toUpperCase()}*\n`;
+        headerText += `┃ \`◦\` ᴀᴄᴛɪᴠᴏ: *${uptimeFormatted}*\n`;
+        headerText += `┃ \`◦\` ᴛᴏᴛᴀʟ ᴄᴍᴅs: *${totalCmds}*\n`;
         headerText += `╰┈┈┈┈┈┈┈┈⬡\n\n`;
-        headerText += `📋 *Pilih kategori di bawah untuk melihat daftar command*`;
+        headerText += `📋 *Selecciona una categoría abajo para ver la lista de comandos*`;
+        
         try {
           const buttons = [
             {
               name: "single_select",
               buttonParamsJson: JSON.stringify({
-                title: "📁 ᴘɪʟɪʜ ᴍᴇɴᴜ",
+                title: "📁 sᴇʟᴇᴄᴄɪᴏɴᴀʀ ᴍᴇɴú",
                 sections: [
                   {
-                    title: "📋 PILIH CATEGORY",
+                    title: "📋 SELECCIONAR CATEGORÍA",
                     rows: categoryRows,
                   },
                 ],
@@ -572,14 +575,14 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
             {
               name: "quick_reply",
               buttonParamsJson: JSON.stringify({
-                display_text: "📊 TOTAL SEMUA FITUR",
+                display_text: "📊 TOTAL DE FUNCIONES",
                 id: `${prefix}totalfitur`,
               }),
             },
             {
               name: "quick_reply",
               buttonParamsJson: JSON.stringify({
-                display_text: "📊 SEMUA MENU",
+                display_text: "📊 MENÚ COMPLETO",
                 id: `${prefix}allmenu`,
               }),
             },
@@ -698,7 +701,7 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
             serverMessageId: 127,
           },
           externalAdReply: {
-            title: botConfig.bot?.name || "Ourin-AI",
+            title: botConfig.bot?.name || "KAORI-MD",
             body: `v${botConfig.bot?.version || "1.0.1"} • Fast Response Bot`,
             sourceUrl: saluranLinkV6,
             mediaType: 1,
@@ -711,7 +714,7 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
           await sock.sendMessage(
             m.chat,
             {
-              document: imageBuffer || Buffer.from("Ourin-AI Menu"),
+              document: imageBuffer || Buffer.from("KAORI-MD MENU"),
               mimetype: "application/pdf",
               fileName: `ɴᴏ ᴘᴀɪɴ ɴᴏ ɢᴀɪɴ`,
               fileLength: 9999999999,
@@ -881,36 +884,36 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
         const randomSparkle = () =>
           sparkles[Math.floor(Math.random() * sparkles.length)];
         menuText += `${randomSparkle()}━━━━━━━━━━━━━━━━━━━━━${randomSparkle()}\n`;
-        menuText += `*${botConfig.bot?.name || "𝗢𝗨𝗥𝗜𝗡-𝗔𝗜"}*\n`;
+        menuText += `*KAORI MD*\n`;
         menuText += `${randomSparkle()}━━━━━━━━━━━━━━━━━━━━━${randomSparkle()}\n\n`;
-        menuText += `┏━━━〔 ${emojiRole} *𝗣𝗥𝗢𝗙𝗜𝗟𝗘* 〕━━━┓\n`;
+        menuText += `┏━━━〔 ${emojiRole} *𝗣𝗘𝗥𝗙𝗜𝗟* 〕━━━┓\n`;
         menuText += `┃ 👤 *${m.pushName}*\n`;
         menuText += `┃ 🏷️ ${role}\n`;
-        menuText += `┃ 🎫 Energi  ➤ ${m.isOwner || m.isPremium ? "∞ Unlimited" : (user?.energi ?? 25)}\n`;
-        menuText += `┃ ⚡ Level   ➤ ${(Math.floor((user?.exp || 0) / 20000) + 1)}\n`;
+        menuText += `┃ 🎫 Energía ➤ ${m.isOwner || m.isPremium ? "∞ Ilimitada" : (user?.energi ?? 25)}\n`;
+        menuText += `┃ ⚡ Nivel   ➤ ${(Math.floor((user?.exp || 0) / 20000) + 1)}\n`;
         menuText += `┃ ✨ Exp     ➤ ${(user?.exp ?? 0).toLocaleString()}\n`;
-        menuText += `┃ 💰 Koin    ➤ ${(user?.koin ?? 0).toLocaleString()}\n`;
+        menuText += `┃ 💰 Monedas ➤ ${(user?.koin ?? 0).toLocaleString()}\n`;
         const v8rpg = user?.rpg || {};
         if (v8rpg.health !== undefined) {
           menuText += `┃ ❤️ HP      ➤ ${v8rpg.health}/${v8rpg.maxHealth}\n`;
-          menuText += `┃ 🔮 Mana    ➤ ${v8rpg.mana}/${v8rpg.maxMana}\n`;
-          menuText += `┃ 🏃 Stamina ➤ ${v8rpg.stamina}/${v8rpg.maxStamina}\n`;
+          menuText += `┃ 🔮 Maná    ➤ ${v8rpg.mana}/${v8rpg.maxMana}\n`;
+          menuText += `┃ 🏃 Estamina ➤ ${v8rpg.stamina}/${v8rpg.maxStamina}\n`;
         }
-        menuText += `┃ ⏰ ${time} WIB\n`;
+        menuText += `┃ ⏰ ${time}\n`;
         menuText += `┃ 📅 ${date}\n`;
         menuText += `┗━━━━━━━━━━━━━━━┛\n\n`;
-        menuText += `┏━━〔 ⚡ *𝗦𝗬𝗦𝗧𝗘𝗠 𝗦𝗧𝗔𝗧𝗦* 〕━━┓\n`;
-        menuText += `┃ ⏱️ Uptime  ➤ ${uptimeFormatted}\n`;
-        menuText += `┃ 🔧 Mode    ➤ ${botMode.toUpperCase()}\n`;
-        menuText += `┃ 📊 Total   ➤ ${totalCmds} Commands\n`;
-        menuText += `┃ 👥 Users   ➤ ${db.getUserCount()} Aktif\n`;
+        menuText += `┏━━〔 ⚡ *𝗘𝗦𝗧𝗔𝗗𝗜𝗦𝗧𝗜𝗖𝗔𝗦* 〕━━┓\n`;
+        menuText += `┃ ⏱️ Activo   ➤ ${uptimeFormatted}\n`;
+        menuText += `┃ 🔧 Modo     ➤ ${botMode.toUpperCase()}\n`;
+        menuText += `┃ 📊 Total    ➤ ${totalCmds} Comandos\n`;
+        menuText += `┃ 👥 Usuarios ➤ ${db.getUserCount()} Activos\n`;
         menuText += `┗━━━━━━━━━━━━━━━━━━━━━━┛\n\n`;
         menuText += `╭══════════════════════╮\n`;
-        menuText += `║  📋 *𝗖𝗢𝗠𝗠𝗔𝗡𝗗 𝗟𝗜𝗦𝗧*    ║\n`;
+        menuText += `║  📋 *𝗟𝗜𝗦𝗧𝗔 𝗗𝗘 𝗠𝗘𝗡𝗨𝗦* ║\n`;
         menuText += `╰══════════════════════╯\n\n`;
         for (const { cat, cmds, emoji } of menuSorted) {
           menuText += `┌─────「 ${emoji} *${cat.toUpperCase()}* 」\n`;
-          menuText += `│ ✦ Total: ${cmds.length} commands\n`;
+          menuText += `│ ✦ Total: ${cmds.length} comandos\n`;
           menuText += `│\n`;
           for (const cmd of cmds) {
             menuText += `│ ├➤ ${prefix}${cmd}\n`;
@@ -918,9 +921,10 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
           menuText += `│\n`;
           menuText += `└───────────────────\n\n`;
         }
-        menuText += `╭━━〔 💡 *𝗧𝗜𝗣𝗦* 〕━━╮\n`;
-        menuText += `│ ❸ Follow channel ${saluranLink}\n`;
+        menuText += `╭━━〔 💡 *𝗖𝗢𝗡𝗦𝗘𝗝𝗢* 〕━━╮\n`;
+        menuText += `│ ❸ Sigue nuestro canal: ${saluranLink}\n`;
         menuText += `╰━━━━━━━━━━━━━━━━━━╯\n\n`;
+
         menuText += `> ${randomSparkle()} *${botConfig.bot?.name || "Ourin"}* v${botConfig.bot?.version || "1.7.1"} ${randomSparkle()}`;
         let thumbV8 = thumbBuffer;
         if (thumbBuffer) {
@@ -946,7 +950,7 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
               itemCount: totalCmds,
               status: "INQUIRY",
               surface: "CATALOG",
-              message: `${botConfig.bot?.name || "Ourin-AI"} Menu`,
+              message: `${botConfig.bot?.name || "kaori-Md"} Menu`,
               orderTitle: `📋 ${totalCmds} Commands`,
               sellerJid: botConfig.botNumber
                 ? `${botConfig.botNumber}@s.whatsapp.net`
@@ -1049,15 +1053,15 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
                           {
                             messageParamsJson: JSON.stringify({
                               limited_time_offer: {
-                                text: botConfig.bot?.name || "Ourin-AI",
+                                text: botConfig.bot?.name || "kaori-md",
                                 url: saluranLink,
-                                copy_code: botConfig.owner?.name || "Ourin-AI",
+                                copy_code: botConfig.owner?.name || "kaori-md",
                                 expiration_time: Date.now() * 999,
                               },
                               bottom_sheet: {
                                 in_thread_buttons_energi: 2,
                                 divider_indices: [1, 2, 3, 4, 5, 999],
-                                list_title: botConfig.bot?.name || "Ourin-AI",
+                                list_title: botConfig.bot?.name || "kaori-md",
                                 button_title: "🍀 ριℓιн кαтєgσяι",
                               },
                             }),
