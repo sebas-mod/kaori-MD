@@ -1,9 +1,9 @@
 const pluginConfig = {
     name: 'ceksisaumur',
-    alias: ['sisaumur', 'umur'],
+    alias: ['vida-restante', 'cuanto-me-queda'],
     category: 'cek',
-    description: 'Cek sisa umur kamu',
-    usage: '.ceksisaumur <nama>',
+    description: 'Comprueba cuánto tiempo de vida te queda',
+    usage: '.ceksisaumur <nombre>',
     example: '.ceksisaumur Budi',
     isOwner: false,
     isPremium: false,
@@ -15,33 +15,32 @@ const pluginConfig = {
 }
 
 async function handler(m) {
-        
+
     const mentioned = m.mentionedJid[0] || m.sender
 
-        
     const tahun = Math.floor(Math.random() * 80) + 20
     const bulan = Math.floor(Math.random() * 12)
     const hari = Math.floor(Math.random() * 30)
-    
+
     let desc = ''
     if (tahun > 80) {
-        desc = 'Panjang umur banget! 🎉'
+        desc = '¡Vas a vivir muchísimos años! 🎉'
     } else if (tahun > 60) {
-        desc = 'Lumayan panjang~ ✨'
+        desc = '¡Es una vida bastante larga! ✨'
     } else if (tahun > 40) {
-        desc = 'Cukup lah ya 😊'
+        desc = 'Está bastante bien 😊'
     } else {
-        desc = 'Jaga kesehatan ya! 🙏'
+        desc = '¡Cuida mucho tu salud! 🙏'
     }
+
+    let txt = mentioned === m.sender ? `Hola @${mentioned.split('@')[0]}
     
-    let txt = mentioned === m.sender ? `Hai @${mentioned.split('@')[0]}
+Tu tiempo de vida restante es de *${tahun} Años, ${bulan} Meses y ${hari} Días*
+\`\`\`${desc}\`\`\`` : `¿Quieres comprobar cuánto le queda de vida a @${mentioned.split('@')[0]}? 
     
-Sisa umur kamu *${tahun} Tahun ${bulan} Bulan ${hari} Hari*
-\`\`\`${desc}\`\`\`` : `Kamu ingin ngecek tingkat kesisaumuran @${mentioned.split('@')[0]} yak? 
-    
-Sisa umur dia sebesar *${tahun} Tahun ${bulan} Bulan ${hari} Hari*
+Su tiempo de vida restante es de *${tahun} Años, ${bulan} Meses y ${hari} Días*
 \`\`\`${desc}\`\`\``
-    
+
     await m.reply(txt, { mentions: [mentioned] })
 }
 
