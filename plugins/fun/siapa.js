@@ -1,19 +1,19 @@
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: [
-        'bego', 'goblok', 'janda', 'perawan', 'babi', 'tolol', 'pekok', 
-        'jancok', 'pinter', 'pintar', 'asu', 'bodoh', 'gay', 'lesby',
-        'bajingan', 'anjing', 'anjg', 'anjj', 'anj', 'ngentod', 'ngentot',
-        'monyet', 'mastah', 'newbie', 'bangsat', 'bangke', 'sange', 'sangean',
-        'dakjal', 'horny', 'wibu', 'puki', 'puqi', 'peak', 'pantex', 'pantek',
-        'setan', 'iblis', 'cacat', 'yatim', 'piatu', 'ganteng', 'cantik',
-        'jelek', 'keren', 'cupu', 'noob', 'pro', 'sultan', 'miskin', 'kaya', 'siapa'
+        'tonto', 'boludo', 'idiota', 'estupido', 'gordo', 'flaco', 'pelotudo', 
+        'pro', 'inteligente', 'genio', 'perro', 'burro', 'gay', 'lesbi',
+        'hdp', 'mierda', 'rata', 'manco', 'noob', 'master', 'newbie', 
+        'sucio', 'pajero', 'pajera', 'horny', 'caliente', 'otaku', 'wibu', 
+        'diablo', 'demonio', 'lindo', 'linda', 'fachero', 'facha', 'hermoso',
+        'feo', 'fea', 'crack', 'pobre', 'millonario', 'cheto', 'sultan', 'quien'
     ],
     alias: [],
     category: 'fun',
-    description: 'Random pilih member untuk kategori tertentu',
-    usage: '.<kategori>',
-    example: '.ganteng',
+    description: 'Elige un miembro del grupo al azar para una categoría específica',
+    usage: '.<categoría>',
+    example: '.fachero',
     isOwner: false,
     isPremium: false,
     isGroup: true,
@@ -30,17 +30,29 @@ async function handler(m, { sock }) {
         const groupMeta = m.groupMetadata
         const participants = groupMeta.participants || []
         const members = participants
-            .map(p => p.jid)
+            .map(p => p.id || p.jid)
             .filter(id => id && id !== sock.user?.id?.split(':')[0] + '@s.whatsapp.net')
+
         if (members.length === 0) {
-            return m.reply(`❌ Tidak ada member di grup!`)
+            return m.reply(`❌ ¡No hay suficientes miembros en el grupo!`)
         }
+
         const randomMember = members[Math.floor(Math.random() * members.length)]
-        const positiveWords = ['ganteng', 'cantik', 'keren', 'pro', 'sultan', 'kaya', 'pinter', 'pintar', 'mastah']
+        
+        // Lista de palabras positivas para cambiar el tono del mensaje
+        const positiveWords = [
+            'lindo', 'linda', 'fachero', 'facha', 'hermoso', 'crack', 
+            'pro', 'master', 'genio', 'inteligente', 'millonario', 'cheto'
+        ]
+        
         const isPositive = positiveWords.includes(command)
         const emoji = isPositive ? '✨' : '😏'
-        const label = isPositive ? 'Yang paling' : 'Anak'
-        await m.reply(`*${label} ${command} di sini adalah* @${randomMember.split('@')[0]}`, { mentions: [randomMember] })
+        const label = isPositive ? 'El más' : 'El/La'
+        
+        await m.reply(`${emoji} *${label} ${command} de acá es:* @${randomMember.split('@')[0]}`, { 
+            mentions: [randomMember] 
+        })
+        
         m.react('✅')
     } catch (error) {
         m.react('☢')
