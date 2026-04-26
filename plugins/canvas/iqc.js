@@ -4,11 +4,11 @@ import moment from 'moment-timezone'
 
 const pluginConfig = {
     name: 'iqc',
-    alias: ['iqchat', 'iphonechat'],
+    alias: ['iqchat', 'iphonechat', 'chatig'],
     category: 'canvas',
-    description: 'Membuat gambar chat iPhone style',
-    usage: '.iqc <text>',
-    example: '.iqc Hai cantik',
+    description: 'Crea una imagen de chat con estilo de iPhone',
+    usage: '.iqc <texto>',
+    example: '.iqc Hola, ¿cómo estás?',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -21,14 +21,15 @@ const pluginConfig = {
 async function handler(m, { sock }) {
     const text = m.args.join(' ')
     if (!text) {
-        return m.reply(`📱 *ɪǫᴄ ᴄʜᴀᴛ*\n\n> Masukkan teks untuk chat\n\n\`Contoh: ${m.prefix}iqc Hai cantik\``)
+        return m.reply(`📱 *ɪǫᴄ ᴄʜᴀᴛ*\n\n> Ingresa un texto para el chat\n\n\`Ejemplo: ${m.prefix}iqc Hola, ¿cómo estás?\``)
     }
     
     m.react('🕕')
     
     try {
         const now = new Date()
-        const time = moment(now).tz("Asia/Jakarta").format("HH:mm")
+        // Ajustado a la zona horaria de Buenos Aires
+        const time = moment(now).tz("America/Argentina/Buenos_Aires").format("HH:mm")
 
         await sock.sendMedia(m.chat, `https://brat.siputzx.my.id/iphone-quoted?time=${encodeURIComponent(time)}&messageText=${encodeURIComponent(text)}`, null, m, {
             type: 'image',
