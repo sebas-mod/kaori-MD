@@ -1,11 +1,12 @@
 import { nightActionHandler } from './werewolf.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'wwsee',
-    alias: ['seer', 'vision', 'wse'],
+    alias: ['seer', 'vision', 'ver', 'vidente', 'wse'],
     category: 'game',
-    description: 'Seer night action - See target role',
-    usage: '.wwsee <nomor>',
+    description: 'Acción nocturna de la Vidente - Ver rol de un jugador',
+    usage: '.wwsee <número>',
     example: '.wwsee 1',
     isOwner: false,
     isPremium: false,
@@ -18,6 +19,7 @@ const pluginConfig = {
 
 async function handler(m, { sock }) {
     try {
+        // La lógica en werewolf.js se encarga de mostrar el rol del objetivo
         return await nightActionHandler(m, { sock })
     } catch (error) {
         console.error('[WWSEE ERROR]', error)
