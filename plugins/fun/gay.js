@@ -1,9 +1,10 @@
 import config from '../../config.js'
+
 const pluginConfig = {
     name: 'gay',
-    alias: ['howgay'],
+    alias: ['howgay', 'parejagay'],
     category: 'fun',
-    description: 'Menunjuk member paling gay di grup',
+    description: 'Señala a los miembros más gays del grupo',
     usage: '.gay',
     isGroup: true,
     isBotAdmin: false,
@@ -15,12 +16,16 @@ const pluginConfig = {
 
 async function handler(m, { sock }) {
     if (!m.isGroup) return m.reply(config.messages.groupOnly);
+    
     const groupMetadata = m.groupMetadata;
     const participants = groupMetadata.participants;
-    const member = participants.map(u => u.jid);
+    const member = participants.map(u => u.id || u.jid);
+    
     const orang1 = member[Math.floor(Math.random() * member.length)];
     const orang2 = member[Math.floor(Math.random() * member.length)];
-    const text = `@${orang1.split('@')[0]} *Nge gay sama* @${orang2.split('@')[0]}`;
+    
+    const text = `🌈 *ᴘᴀʀᴇᴊᴀ ɢᴀʏ ᴅᴇʟ ɢʀᴜᴘᴏ*\n\n@${orang1.split('@')[0]} ʜᴀᴄɪᴇɴᴅᴏ ɢᴀʏᴄᴇʀɪᴀs ᴄᴏɴ @${orang2.split('@')[0]} 🤭`;
+    
     await m.reply(text, { mentions: [orang1, orang2] })
 }
 
