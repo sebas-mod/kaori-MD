@@ -5,13 +5,14 @@ import path from 'path'
 import fs from 'fs'
 import { f } from '../../src/lib/ourin-http.js'
 import te from '../../src/lib/ourin-error.js'
+
 const NEOXR_APIKEY = config.APIkey?.neoxr || "Milik-Bot-OurinMD";
 
 const pluginConfig = {
   name: "pixeldraindl",
   alias: ["pddl", "pixeldrain", "pddownload"],
   category: "download",
-  description: "Download file dari Pixeldrain",
+  description: "Descargar archivos de Pixeldrain",
   usage: ".pixeldraindl <url>",
   example: ".pixeldraindl https://pixeldrain.com/u/xxxxx",
   cooldown: 15,
@@ -26,10 +27,10 @@ async function handler(m, { sock }) {
   if (!url || !url.includes("pixeldrain.com")) {
     return m.reply(
       `📥 *ᴘɪxᴇʟᴅʀᴀɪɴ ᴅᴏᴡɴʟᴏᴀᴅ*\n\n` +
-        `> Download file dari Pixeldrain\n\n` +
-        `*Format:*\n` +
+        `> Descarga archivos de Pixeldrain\n\n` +
+        `*Formato:*\n` +
         `> \`${m.prefix}pixeldraindl <url>\`\n\n` +
-        `*Contoh:*\n` +
+        `*Ejemplo:*\n` +
         `> \`${m.prefix}pixeldraindl https://pixeldrain.com/u/xxxxx\``,
     );
   }
@@ -43,7 +44,7 @@ async function handler(m, { sock }) {
     if (!data?.status || !data?.data) {
       m.react("❌");
       return m.reply(
-        "❌ *ɢᴀɢᴀʟ*\n\n> File tidak ditemukan atau link tidak valid",
+        "❌ *ꜰᴀʟʟᴏ*\n\n> Archivo no encontrado o enlace no válido",
       );
     }
 
@@ -60,7 +61,6 @@ async function handler(m, { sock }) {
     }
 
     if (sizeInMB > 0 && sizeInMB <= 100) {
-
       await sock.sendMedia(m.chat, file.url, null, m, {
         type: 'document',
         fileName: file.filename,
@@ -72,7 +72,7 @@ async function handler(m, { sock }) {
       })
     } else if (sizeInMB > 100) {
       await m.reply(
-        `⚠️ *ꜰɪʟᴇ ᴛᴇʀʟᴀʟᴜ ʙᴇsᴀʀ*\n\n> File ${file.size} terlalu besar untuk dikirim\n> Gunakan link download di atas`,
+        `⚠️ *ᴀʀᴄʜɪᴠᴏ ᴅᴇᴍᴀsɪᴀᴅᴏ ɢʀᴀɴᴅᴇ*\n\n> El archivo (${file.size}) es demasiado pesado para enviarlo por aquí\n> Usa el enlace de descarga directamente`,
       );
     }
 
