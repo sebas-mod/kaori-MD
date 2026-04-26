@@ -1,10 +1,10 @@
 const pluginConfig = {
-    name: 'kapan',
-    alias: ['when'],
+    name: 'cuando',
+    alias: ['cuando', 'when'],
     category: 'fun',
-    description: 'Tanya bot kapan sesuatu',
-    usage: '.kapan <pertanyaan>',
-    example: '.kapan aku nikah?',
+    description: 'Pregúntale al bot cuándo sucederá algo',
+    usage: '.cuando <pregunta>',
+    example: '.cuando ¿cuándo me voy a casar?',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -15,38 +15,39 @@ const pluginConfig = {
 };
 
 const answers = [
-    'Besok mungkin?',
-    'Tahun depan kayaknya.',
-    '3 hari lagi!',
-    'Hmm, masih lama sih.',
-    'Sebentar lagi kok!',
-    'Kalau sudah waktunya, pasti terjadi.',
-    'Bulan depan!',
-    'Entah kapan, yang penting sabar.',
-    'Dalam waktu dekat!',
-    '10 tahun lagi mungkin?',
-    'Nggak lama lagi!',
-    'Kalau jodoh, pasti ketemu.',
-    'Hmm, susah diprediksi.',
-    'Minggu depan!',
-    'Kalau usahanya lebih keras, lebih cepat!',
-    'Pas waktunya tepat.',
-    'Secepatnya, tenang aja.',
-    'Ntar kalo udah siap.',
-    'Dalam hitungan hari!',
-    'Saat kamu sudah siap menerimanya.'
+    '¿Mañana, tal vez?',
+    'Parece que el año que viene.',
+    '¡En 3 días!',
+    'Hmm, todavía falta bastante.',
+    '¡Falta poquito!',
+    'Cuando llegue el momento, pasará.',
+    '¡El mes que viene!',
+    'Quién sabe cuándo, lo importante es tener paciencia.',
+    '¡Dentro de poco!',
+    '¿En 10 años, quizás?',
+    '¡No falta mucho!',
+    'Si está destinado, pasará.',
+    'Hmm, es difícil de predecir.',
+    '¡La semana que viene!',
+    '¡Si te esforzás más, será más rápido!',
+    'Cuando sea el momento justo.',
+    'Lo antes posible, tranqui.',
+    'Cuando estés listo.',
+    '¡En cuestión de días!',
+    'Cuando estés preparado para recibirlo.'
 ];
 
 async function handler(m) {
     const text = m.text?.trim();
-    
+
     if (!text) {
-        return m.reply(`⏰ *ᴋᴀᴘᴀɴ*\n\n> Masukkan pertanyaan!\n\n*Contoh:*\n> .kapan aku nikah?`);
+        return m.reply(`⏰ *ᴄᴜᴀɴᴅᴏ*\n\n> ¡Ingresá una pregunta!\n\n*Ejemplo:*\n> .cuando ¿cuándo me voy a casar?`);
     }
-    
+
     const answer = answers[Math.floor(Math.random() * answers.length)];
-    
-    await m.reply(`${m.body.slice(1)}?\n*${answer}*`);
+
+    await m.reply(`${m.body.slice(1)}
+*${answer}*`);
 }
 
 export { pluginConfig as config, handler }
