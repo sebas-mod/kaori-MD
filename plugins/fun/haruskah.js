@@ -1,10 +1,10 @@
 const pluginConfig = {
-    name: 'haruskah',
-    alias: ['harus', 'should'],
+    name: 'debo',
+    alias: ['deberia', 'should', 'harus'],
     category: 'fun',
-    description: 'Tanya bot haruskah sesuatu',
-    usage: '.haruskah <pertanyaan>',
-    example: '.haruskah aku menyatakan cinta?',
+    description: 'Pregúntale al bot si deberías hacer algo',
+    usage: '.debo <pregunta>',
+    example: '.debo ¿debería declararle mi amor?',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -15,38 +15,38 @@ const pluginConfig = {
 };
 
 const answers = [
-    'Ya, harus!',
-    'Tidak usah.',
-    'Hmm, terserah kamu sih.',
-    'Harus banget! Jangan ragu!',
-    'Nggak harus juga.',
-    'Kalau menurutmu perlu, lakukan!',
-    'Pikir dulu baik-baik.',
-    'Harus! Sekarang!',
-    'Jangan, mending tunggu dulu.',
-    'Harus, tapi hati-hati.',
-    'Nggak harus, tapi boleh.',
-    'Wajib!',
-    'Hmm, skip aja deh.',
-    'Lakukan kalau sudah yakin.',
-    'Harus, demi masa depanmu!',
-    'Nggak harus, santai aja.',
-    'Go for it!',
-    'Jangan buru-buru, pikir lagi.',
-    'Tentu harus!',
-    'Lihat situasinya dulu.'
+    '¡Sí, de una!',
+    'No, mejor no.',
+    'Hmm, como vos quieras.',
+    '¡Totalmente! ¡Ni lo dudes!',
+    'No es necesario.',
+    '¡Si creés que hace falta, hacelo!',
+    'Pensalo bien primero.',
+    '¡Sí! ¡Ahora mismo!',
+    'No, mejor esperá un poco.',
+    'Sí, pero con cuidado.',
+    'No tenés por qué, pero podés.',
+    '¡Obligatorio!',
+    'Hmm, mejor pasá.',
+    'Hacelo cuando estés seguro.',
+    '¡Tenés que hacerlo, por tu futuro!',
+    'No hace falta, tranqui.',
+    '¡Mandate de una!',
+    'No te apures, pensalo otra vez.',
+    '¡Claro que sí!',
+    'Fijate cómo está la situación primero.'
 ];
 
 async function handler(m) {
     const text = m.text?.trim();
-    
+
     if (!text) {
-        return m.reply(`⚖️ *ʜᴀʀᴜsᴋᴀʜ*\n\n> Masukkan pertanyaan!\n\n*Contoh:*\n> .haruskah aku menyatakan cinta?`);
+        return m.reply(`⚖️ *ᴅᴇʙᴏ*\n\n> ¡Ingresá una pregunta!\n\n*Ejemplo:*\n> .debo ¿debería declararle mi amor?`);
     }
-    
+
     const answer = answers[Math.floor(Math.random() * answers.length)];
-    
-    await m.reply(`${m.body.slice(1)}?
+
+    await m.reply(`${m.body.slice(1)}
 *${answer}*`);
 }
 
