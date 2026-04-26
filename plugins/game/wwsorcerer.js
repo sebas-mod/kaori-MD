@@ -1,10 +1,12 @@
 import { nightActionHandler } from './werewolf.js'
+import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'wwsorcerer',
-    alias: ['sorcerer', 'wws'],
+    alias: ['sorcerer', 'hechicero', 'wws'],
     category: 'game',
-    description: 'Sorcerer night action - Check if target is Seer',
-    usage: '.wwsorcerer <nomor>',
+    description: 'Acción nocturna del Hechicero - Detectar si el objetivo es la Vidente',
+    usage: '.wwsorcerer <número>',
     example: '.wwsorcerer 3',
     isOwner: false,
     isPremium: false,
@@ -16,7 +18,13 @@ const pluginConfig = {
 }
 
 async function handler(m, { sock }) {
-    return await nightActionHandler(m, { sock })
+    try {
+        // Ejecuta la lógica centralizada para detectar a la vidente
+        return await nightActionHandler(m, { sock })
+    } catch (error) {
+        console.error('[WWSORCERER ERROR]', error)
+        m.reply(te(m.prefix, m.command, m.pushName))
+    }
 }
 
 export { pluginConfig as config, handler }
