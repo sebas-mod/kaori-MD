@@ -1,11 +1,12 @@
 import { getRandomItem } from '../../src/lib/ourin-game-data.js'
+
 const pluginConfig = {
-    name: 'bucin',
-    alias: ['gombal', 'love', 'romantis'],
+    name: 'romantico',
+    alias: ['piropo', 'amor', 'romance'],
     category: 'fun',
-    description: 'Random kata-kata bucin/romantis',
-    usage: '.bucin',
-    example: '.bucin',
+    description: 'Genera frases románticas o piropos al azar',
+    usage: '.romantico',
+    example: '.romantico',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -17,12 +18,12 @@ const pluginConfig = {
 
 async function handler(m) {
     const quote = getRandomItem('bucin.json');
-    
+
     if (!quote) {
-        await m.reply('❌ Data tidak tersedia!');
+        await m.reply('❌ ¡Datos no disponibles!');
         return;
     }
-    
+
     await m.reply(`\`\`\`"${quote}"\`\`\`\n\n`);
 }
 
