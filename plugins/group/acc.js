@@ -1,25 +1,26 @@
 import config from '../../config.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'acc',
-    alias: ['accall', 'joinrequest', 'reqjoin'],
+    alias: ['aceptar', 'rechazar', 'solicitudes', 'reqjoin'],
     category: 'group',
-    description: 'Kelola permintaan masuk grup (accept/reject)',
-    usage: '.acc <list|approve|reject> [all|nomor]',
+    description: 'Gestionar pedidos para entrar al grupo (aceptar/rechazar)',
+    usage: '.acc <list|approve|reject> [all|número]',
     example: '.acc approve all',
     isOwner: false,
     isPremium: false,
     isGroup: true,
     isPrivate: false,
-    isAdmin: true,
-    isBotAdmin: true,
+    isAdmin: true, // Solo para admins
+    isBotAdmin: true, // El bot debe ser admin para gestionar esto
     cooldown: 5,
     energi: 0,
     isEnabled: true
 }
 
 function formatDate(timestamp) {
-    return new Intl.DateTimeFormat('id-ID', {
+    return new Intl.DateTimeFormat('es-AR', {
         weekday: 'long',
         day: 'numeric',
         month: 'long',
@@ -34,13 +35,14 @@ async function handler(m, { sock }) {
     const sub = args[0]?.toLowerCase()
     const option = args.slice(1).join(' ')?.trim()
 
+    // Menú de ayuda si no hay subcomandos válidos
     if (!sub || !['list', 'approve', 'reject'].includes(sub)) {
         return m.reply(
-            `📋 *ᴊᴏɪɴ ʀᴇQᴜᴇsᴛ ᴍᴀɴᴀɢᴇʀ*\n\n` +
-            `╭┈┈⬡「 📌 *ᴄᴏᴍᴍᴀɴᴅ* 」\n` +
-            `┃ ${m.prefix}acc list\n` +
-            `┃ ${m.prefix}acc approve all\n` +
-            `┃ ${m.prefix}acc reject all\n` +
+            `📋 *GESTOR DE SOLICITUDES*\n\n` +
+            `╭┈┈⬡「 📌 *COMANDOS* 」\n` +
+            `┃ ${m.prefix}acc list (ver lista)\n` +
+            `┃ ${m.prefix}acc approve all (aceptar todos)\n` +
+            `┃ ${m.prefix}acc reject all (rechazar todos)\n` +
             `┃ ${m.prefix}acc approve 1|2|3\n` +
             `┃ ${m.prefix}acc reject 1|2|3\n` +
             `╰┈┈┈┈┈┈┈┈⬡`
@@ -54,26 +56,27 @@ async function handler(m, { sock }) {
 
         if (!pendingList?.length) {
             await m.react('📭')
-            return m.reply(`📭 Tidak ada permintaan masuk yang tertunda.`)
+            return m.reply(`📭 No hay solicitudes pendientes por ahora.`)
         }
 
+        // Subcomando: LIST
         if (sub === 'list') {
-            let text = `📋 *ᴅᴀꜰᴛᴀʀ ᴘᴇʀᴍɪɴᴛᴀᴀɴ ᴍᴀsᴜᴋ*\n\n`
-            text += `> Total: ${pendingList.length} permintaan\n\n`
+            let text = `📋 *SOLICITUDES PENDIENTES*\n\n`
+            text += `> Total: ${pendingList.length} pedidos\n\n`
 
             for (let i = 0; i < pendingList.length; i++) {
                 const req = pendingList[i]
-                const number = req.jid?.split('@')[0] || 'Unknown'
+                const number = req.jid?.split('@')[0] || 'Desconocido'
                 const method = req.request_method || '-'
                 const time = req.request_time ? formatDate(req.request_time) : '-'
 
                 text += `*${i + 1}.* @${number}\n`
-                text += `   📱 ${number}\n`
-                text += `   📨 ${method}\n`
-                text += `   🕐 ${time}\n\n`
+                text += `   📱 N°: ${number}\n`
+                text += `   📩 Vía: ${method}\n`
+                text += `   🕐 Fecha: ${time}\n\n`
             }
 
-            text += `> Gunakan \`${m.prefix}acc approve all\` atau \`${m.prefix}acc reject all\``
+            text += `> Usá \`${m.prefix}acc approve all\` o \`${m.prefix}acc reject all\``
 
             const mentions = pendingList.map(r => r.jid)
             await m.react('📋')
@@ -82,38 +85,39 @@ async function handler(m, { sock }) {
 
         const action = sub
 
+        // Subcomando: APPROVE ALL / REJECT ALL
         if (option === 'all') {
             const jids = pendingList.map(r => r.jid)
-
             const results = await sock.groupRequestParticipantsUpdate(m.chat, jids, action)
 
             const success = results.filter(r => r.status === '200' || !r.status || r.status === 200).length
             const failed = results.length - success
 
-            const label = action === 'approve' ? 'Diterima' : 'Ditolak'
+            const label = action === 'approve' ? 'ACEPTADOS' : 'RECHAZADOS'
             await m.react('✅')
             return m.reply(
-                `✅ *${label.toUpperCase()} SEMUA*\n\n` +
-                `> ✅ Berhasil: ${success}\n` +
-                `> ❌ Gagal: ${failed}\n` +
-                `> 📊 Total: ${results.length}`
+                `✅ *${label} TODOS*\n\n` +
+                `> ✅ Éxito: ${success}\n` +
+                `> ❌ Falló: ${failed}\n` +
+                `> 📊 Total procesado: ${results.length}`
             )
         }
 
+        // Subcomando: Selección por número (ej: 1|2|5)
         const indices = option.split('|').map(n => parseInt(n.trim()) - 1).filter(n => !isNaN(n) && n >= 0 && n < pendingList.length)
 
         if (!indices.length) {
             await m.react('❌')
             return m.reply(
-                `❌ Nomor tidak valid.\n\n` +
-                `> Gunakan \`${m.prefix}acc list\` untuk melihat daftar.\n` +
-                `> Contoh: \`${m.prefix}acc ${action} 1|2|3\``
+                `❌ Número de lista no válido.\n\n` +
+                `> Mirá la lista con \`${m.prefix}acc list\`\n` +
+                `> Ejemplo: \`${m.prefix}acc ${action} 1|2\``
             )
         }
 
         const targets = indices.map(i => pendingList[i])
         let text = ''
-        const label = action === 'approve' ? 'Diterima' : 'Ditolak'
+        const label = action === 'approve' ? 'Aceptado' : 'Rechazado'
         let successCount = 0
 
         for (const target of targets) {
@@ -123,7 +127,7 @@ async function handler(m, { sock }) {
                 const ok = status === '200' || !status || status === 200
 
                 const number = target.jid.split('@')[0]
-                text += `${ok ? '✅' : '❌'} ${number} — ${ok ? label : 'Gagal'}\n`
+                text += `${ok ? '✅' : '❌'} ${number} — ${ok ? label : 'Falló'}\n`
                 if (ok) successCount++
             } catch {
                 const number = target.jid.split('@')[0]
@@ -133,12 +137,13 @@ async function handler(m, { sock }) {
 
         await m.react('✅')
         return m.reply(
-            `📋 *ʜᴀsɪʟ ${label.toUpperCase()}*\n\n` +
+            `📋 *RESULTADOS ${label.toUpperCase()}*\n\n` +
             text + `\n` +
-            `> ✅ ${successCount}/${targets.length} berhasil`
+            `> ✅ ${successCount}/${targets.length} procesados correctamente`
         )
     } catch (error) {
         await m.react('☢')
+        console.error(error)
         m.reply(te(m.prefix, m.command, m.pushName))
     }
 }
