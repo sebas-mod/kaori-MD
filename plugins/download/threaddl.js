@@ -4,6 +4,7 @@ import FormData from 'form-data'
 import crypto from 'crypto'
 import te from '../../src/lib/ourin-error.js'
 import { generateWAMessage, generateWAMessageFromContent, jidNormalizedUser } from 'ourin'
+
 async function threadsdl(url) {
     const form = new FormData()
     form.append('search', url)
@@ -35,7 +36,7 @@ async function threadsdl(url) {
         }
     }
 
-    if (end === -1) throw new Error('JSON tidak valid')
+    if (end === -1) throw new Error('JSON no válido')
 
     const parsed = JSON.parse(jsonString.slice(0, end))
     return parsed.v[0][1]
@@ -45,7 +46,7 @@ const pluginConfig = {
     name: 'threaddl',
     alias: ['tdl', 'threads', 'threadsdl'],
     category: 'download',
-    description: 'Download foto Threads (album)',
+    description: 'Descargar fotos de Threads (álbum)',
     usage: '.tdl <url>',
     example: '.tdl https://www.threads.net/@xxx/post/xxx',
     cooldown: 10,
@@ -56,7 +57,7 @@ const pluginConfig = {
 async function handler(m, { sock }) {
     const url = m.text?.trim()
     if (!url || !/threads/i.test(url)) {
-        return m.reply(`❌ Gunakan URL Threads yang valid`)
+        return m.reply(`❌ Por favor, usa una URL de Threads válida`)
     }
 
     m.react('🕕')
@@ -67,18 +68,19 @@ async function handler(m, { sock }) {
         const captionText =
             result.caption ||
             result.text ||
-            'No description available.'
+            'Sin descripción disponible.'
 
         const username = result.user?.username || '-'
         const images = []
         for (const group of result.images || []) {
             if (!Array.isArray(group)) continue
+            // Selecciona la imagen con mayor ancho para mejor calidad
             const best = group.sort((a, b) => b.width - a.width)[0]
             if (best?.url) images.push(best.url)
         }
 
         if (images.length === 0) {
-            throw new Error('Tidak ada gambar ditemukan')
+            throw new Error('No se encontraron imágenes')
         }
 
         const mediaList = []
