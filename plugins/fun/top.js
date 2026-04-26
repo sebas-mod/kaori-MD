@@ -1,11 +1,12 @@
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'top',
-    alias: ['top5', 'toplist'],
+    alias: ['top5', 'toplist', 'ranking'],
     category: 'fun',
-    description: 'Random top 5 member untuk kategori tertentu',
-    usage: '.top <kategori>',
-    example: '.top orang pintar',
+    description: 'Genera un top 5 aleatorio de miembros para una categoría específica',
+    usage: '.top <categoría>',
+    example: '.top personas inteligentes',
     isOwner: false,
     isPremium: false,
     isGroup: true,
@@ -17,38 +18,41 @@ const pluginConfig = {
 
 async function handler(m, { sock }) {
     const kategori = m.args.join(' ')?.trim()
-    
+
     if (!kategori) {
         return m.reply(
-            `\`Contoh: ${m.prefix}top orang pintar\``
+            `⚠️ *ғᴀʟᴛᴀ ʟᴀ ᴄᴀᴛᴇɢᴏʀɪ́ᴀ*\n\n` +
+            `> Ejemplo: \`${m.prefix}top personas facheras\``
         )
     }
-    
+
     m.react('🕕')
-    
+
     try {
         const groupMeta = m.groupMetadata
         const participants = groupMeta.participants || []
-        
+
+        // Filtrar IDs válidos y excluir al bot
         const members = participants
-            .map(p => p.jid)
+            .map(p => p.id || p.jid)
             .filter(id => id && id !== sock.user?.id?.split(':')[0] + '@s.whatsapp.net')
-        
-        if (members.length < 2) {
-            return m.reply(`❌ Member grup kurang dari 5 orang!`)
+
+        if (members.length < 5) {
+            return m.reply(`❌ ¡Necesito al menos 5 personas en el grupo para hacer un Top 5!`)
         }
-        
+
+        // Mezclar aleatoriamente y tomar los primeros 5
         const shuffled = members.sort(() => Math.random() - 0.5)
         const top5 = shuffled.slice(0, 5)
-        
+
         const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣']
         let list = ''
-        
+
         top5.forEach((jid, index) => {
             list += `*${index + 1}* ${medals[index]} @${jid.split('@')[0]}\n`
         })
-        
-        await m.reply(`🏆 *ᴛᴏᴘ 5 ${kategori.toUpperCase()}*\n${list}`, { mentions: top5 })
+
+        await m.reply(`🏆 *ᴛᴏᴘ 5 ${kategori.toUpperCase()}*\n\n${list}`, { mentions: top5 })
         m.react('✅')
     } catch (error) {
         m.react('☢')
