@@ -1,11 +1,12 @@
 import axios from 'axios'
 import fs from 'fs'
 import path from 'path'
+
 const pluginConfig = {
     name: 'ukhty',
-    alias: ['ukht'],
+    alias: ['ukht', 'hijabvideo'],
     category: 'asupan',
-    description: 'Video ukhty',
+    description: 'Envía un video aleatorio de la categoría ukhty',
     usage: '.ukhty',
     example: '.ukhty',
     isOwner: false,
@@ -35,7 +36,7 @@ async function handler(m, { sock }) {
         
         if (data.length === 0) {
             m.react('❌')
-            return m.reply(`❌ Data tidak tersedia`)
+            return m.reply(`❌ Los datos no están disponibles`)
         }
         
         const item = data[Math.floor(Math.random() * data.length)]
@@ -47,7 +48,7 @@ async function handler(m, { sock }) {
         
     } catch (error) {
         m.react('❌')
-        m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> Video tidak ditemukan`)
+        m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> No se pudo encontrar el video`)
     }
 }
 
