@@ -1,12 +1,13 @@
 import axios from 'axios'
 import { f } from '../../src/lib/ourin-http.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'gura',
-    alias: ['gawr'],
+    alias: ['gawr', 'tiburon'],
     category: 'canvas',
-    description: 'Apply efek Gawr Gura ke gambar',
-    usage: '.gura (reply/caption gambar)',
+    description: 'Aplica el efecto de Gawr Gura a una imagen',
+    usage: '.gura (responde a una imagen)',
     example: '.gura',
     isOwner: false,
     isPremium: false,
@@ -30,7 +31,7 @@ async function handler(m, { sock }) {
     }
     
     if (!mediaMsg) {
-        return m.reply(`🦈 *ɢᴜʀᴀ ᴇғғᴇᴄᴛ*\n\n> Kirim/reply gambar dengan command ini`)
+        return m.reply(`🦈 *ᴇғᴇᴄᴛᴏ ɢᴜʀᴀ*\n\n> Envía o responde a una imagen con este comando`)
     }
     
     m.react('🕕')
