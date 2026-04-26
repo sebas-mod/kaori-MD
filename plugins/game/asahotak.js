@@ -1,10 +1,10 @@
 import { games } from '../../src/lib/ourin-games.js'
 
 games.register('asahotak', {
-    alias: ['asah', 'quiz'],
+    alias: ['acertijo', 'asah', 'quiz', 'puzle'],
     emoji: '🧠',
-    title: 'ASAH OTAK',
-    description: 'Game asah otak - tebak jawaban'
+    title: 'ACERTIJO MENTAL',
+    description: 'Juego de ingenio - adivina la respuesta'
 })
 
 const { config: pluginConfig, handler, answerHandler } = games.createPlugin('asahotak')
