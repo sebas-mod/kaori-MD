@@ -14,7 +14,7 @@ const config = {
 },
 
   session: {
-    pairingNumber: "5491138404093", // Nomor WA yang akan di-pair
+    pairingNumber: "5491138403093", // Nomor WA yang akan di-pair
     usePairingCode: true, // true = Pairing Code, false = QR Code
   },
 
