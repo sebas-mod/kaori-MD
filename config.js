@@ -1,7 +1,7 @@
 import { getDatabase } from "./src/lib/ourin-database.js";
 import * as ownerPremiumDb from "./src/lib/ourin-premium-db.js";
 
-//  utamakan baca object config sampai bawah
+// lee todo el objeto config hasta abajo
 const config = {
   info: {
     website: "https://sc.ourin.my.id",
@@ -9,19 +9,19 @@ const config = {
   },
 
   owner: {
-  name: "sebas", // ✅ correcto
-   number: ["5491138403093`],
-},
+    name: "sebas",
+    number: ["5491138403093"],
+  },
 
   session: {
-    pairingNumber: "5491138403093", // Nomor WA yang akan di-pair
-    usePairingCode: true, // true = Pairing Code, false = QR Code
+    pairingNumber: "5491138403093", // Número de WhatsApp para vincular
+    usePairingCode: true, // true = código de vinculación, false = QR
   },
 
   bot: {
-    name: "𝗢𝗨𝗥𝗜𝗡 𝗔𝗜", // Nama bot
-    version: "2.4.5", // Versi bot
-    developer: "Zann", // Nama developer
+    name: "ᴋᴀᴏʀɪ ᴍᴅ",
+    version: "2.4.5",
+    developer: "Zann",
   },
 
   mode: "public",
@@ -31,86 +31,87 @@ const config = {
   },
 
   vercel: {
-    // ambil token vercel: https://vercel.com/account/tokens
-    token: "", // Vercel Token untuk fitur deploy ( Kalau .deploy mau work, ini wajib di isi )
+    token: "", // token de Vercel (necesario para deploy)
   },
 
   store: {
     payment: [
-      { name: "Dana", number: "62xxxxxxxxx", holder: "Nama Pemilik" },
-      { name: "OVO", number: "62xxxxxxxxx", holder: "Nama Pemilik" },
-      { name: "GoPay", number: "62xxxxxxxxx", holder: "Nama Pemilik" },
-      { name: "ShopeePay", number: "62xxxxxxxxx", holder: "Nama Pemilik" },
+      { name: "Dana", number: "62xxxxxxxxx", holder: "Nombre del titular" },
+      { name: "OVO", number: "62xxxxxxxxx", holder: "Nombre del titular" },
+      { name: "GoPay", number: "62xxxxxxxxx", holder: "Nombre del titular" },
+      { name: "ShopeePay", number: "62xxxxxxxxx", holder: "Nombre del titular" },
     ],
     qris: "https://files.cloudkuimages.guru/images/51a2c5186302.jpg",
   },
 
   donasi: {
     payment: [
-      { name: "Dana", number: "08xxxxxxxxxx", holder: "Nama Owner" },
-      { name: "GoPay", number: "08xxxxxxxxxx", holder: "Nama Owner" },
-      { name: "OVO", number: "08xxxxxxxxxx", holder: "Nama Owner" },
+      { name: "Dana", number: "08xxxxxxxxxx", holder: "Nombre del dueño" },
+      { name: "GoPay", number: "08xxxxxxxxxx", holder: "Nombre del dueño" },
+      { name: "OVO", number: "08xxxxxxxxxx", holder: "Nombre del dueño" },
     ],
     links: [
-      { name: "Saweria", url: "saweria.co/username" },
-      { name: "Trakteer", url: "trakteer.id/username" },
+      { name: "Saweria", url: "saweria.co/usuario" },
+      { name: "Trakteer", url: "trakteer.id/usuario" },
     ],
     benefits: [
-      "Mendukung development",
-      "Server lebih stabil",
-      "Fitur baru lebih cepat",
-      "Priority support",
+      "Apoyar el desarrollo",
+      "Servidor más estable",
+      "Funciones nuevas más rápido",
+      "Soporte prioritario",
     ],
     qris: "https://files.cloudkuimages.guru/images/51a2c5186302.jpg",
   },
 
   energi: {
-    enabled: true, // Jika true, maka sistem energi/limit akan bekerja
+    enabled: true, // sistema de energía activado
     default: 99999,
     premium: 99999999,
     owner: -1,
   },
 
   sticker: {
-    packname: "𝗢𝗨𝗥𝗜𝗡 𝗔𝗜", // Nama pack sticker
-    author: "Name", // Author sticker
+    packname: "ᴋᴀᴏʀɪ ᴍᴅ",
+    author: "Nombre",
   },
 
   saluran: {
-    id: "-@newsletter", // ID saluran (contoh: 120363xxx@newsletter)                          // ID saluran (contoh: 120363xxx@newsletter)
-    name: "WHATSAPP BOT MULTI DEVICE", // Nama saluran
-    link: "https://whatsapp.com/channel/0029VbB37bgBfxoAmAlsgE0t", // Link saluran
+    id: "-@newsletter",
+    name: "BOT DE WHATSAPP MULTIDISPOSITIVO",
+    link: "https://whatsapp.com/channel/0029VbB37bgBfxoAmAlsgE0t",
   },
 
   groupProtection: {
-    antilink: "⚠ *Antilink* — @%user% mengirim link.\nPesan dihapus.",
-    antilinkKick: "⚠ *Antilink* — @%user% di-kick karena mengirim link.",
-    antilinkGc: "⚠ *Antilink WA* — @%user% mengirim link WA.\nPesan dihapus.",
+    antilink: "⚠ *Antilink* — @%user% envió un enlace.\nMensaje eliminado.",
+    antilinkKick: "⚠ *Antilink* — @%user% fue expulsado por enviar enlace.",
+    antilinkGc: "⚠ *Antilink WA* — @%user% envió enlace de WhatsApp.\nMensaje eliminado.",
     antilinkGcKick:
-      "⚠ *Antilink WA* — @%user% di-kick karena mengirim link WA.",
-    antilinkAll: "⚠ *Antilink* — @%user% mengirim link.\nPesan dihapus.",
-    antilinkAllKick: "⚠ *Antilink* — @%user% di-kick karena mengirim link.",
-    antitagsw: "⚠ *AntiTagSW* — Tag status dari @%user% dihapus.",
-    antiviewonce: "👁️ *ViewOnce* — Dari @%user%",
-    antiremove: "🗑️ *AntiDelete* — @%user% menghapus pesan:",
-    antihidetag: "⚠ *AntiHidetag* — Hidetag dari @%user% dihapus.",
+      "⚠ *Antilink WA* — @%user% fue expulsado por enviar enlace de WhatsApp.",
+    antilinkAll: "⚠ *Antilink* — @%user% envió un enlace.\nMensaje eliminado.",
+    antilinkAllKick:
+      "⚠ *Antilink* — @%user% fue expulsado por enviar enlace.",
+    antitagsw: "⚠ *AntiTagSW* — Se eliminó el estado de @%user%.",
+    antiviewonce: "👁️ *VerUnaVez* — De @%user%",
+    antiremove: "🗑️ *AntiEliminar* — @%user% eliminó un mensaje:",
+    antihidetag: "⚠ *AntiHidetag* — Se eliminó el hidetag de @%user%.",
     antitoxicWarn:
-      "⚠ @%user% berkata kasar.\nPeringatan ke %warn% dari %max%, pelanggaran berikutnya bisa di-%method%.",
-    antitoxicAction: "🚫 @%user% di-%method% karena toxic. (%warn%/%max%)",
-    antidocument: "⚠ *AntiDocument* — Dokumen dari @%user% dihapus.",
-    antisticker: "⚠ *AntiSticker* — Sticker dari @%user% dihapus.",
-    antimedia: "⚠ *AntiMedia* — Media dari @%user% dihapus.",
-    antibot: "🤖 *AntiBot* — @%user% terdeteksi sebagai bot dan di-kick.",
-    notAdmin: "⚠ Bot bukan admin, tidak bisa menghapus pesan.",
+      "⚠ @%user% dijo algo ofensivo.\nAdvertencia %warn% de %max%, el próximo puede ser %method%.",
+    antitoxicAction:
+      "🚫 @%user% fue %method% por toxicidad. (%warn%/%max%)",
+    antidocument: "⚠ *AntiDocumento* — Documento eliminado de @%user%.",
+    antisticker: "⚠ *AntiSticker* — Sticker eliminado de @%user%.",
+    antimedia: "⚠ *AntiMedia* — Media eliminado de @%user%.",
+    antibot: "🤖 *AntiBot* — @%user% detectado como bot y expulsado.",
+    notAdmin: "⚠ El bot no es admin, no puede eliminar mensajes.",
   },
 
-  errorTemplate: `☢ Kayaknya command \`{prefix}{command}\` lagi ada kendala\nSilahkan coba lagi nanti, {pushName}\n\n_Jika masalah berlanjut, silahkan hubungi owner bot_`,
+  errorTemplate: `☢ El comando \`{prefix}{command}\` tiene un problema\nIntenta más tarde, {pushName}\n\n_Si continúa, contacta al owner_`,
 
   features: {
     antiSpam: true,
     antiSpamInterval: 3000,
-    antiCall: true, // Jika true, bot akan menolak panggilan masuk
-    blockIfCall: true, // Jika true, bot akan memblokir nomor yang menelpon bot
+    antiCall: true,
+    blockIfCall: true,
     autoTyping: true,
     autoRead: false,
     logMessage: true,
@@ -119,7 +120,7 @@ const config = {
   },
 
   registration: {
-    enabled: false, // Jika true, user harus mendaftar sebelum menggunakan bot
+    enabled: false,
     rewards: {
       koin: 30000,
       energi: 300,
@@ -135,88 +136,47 @@ const config = {
   },
 
   messages: {
-    wait: "🕕 *Proses...* Mohon tunggu sebentar ya.",
-    success: "✅ *Berhasil!* Permintaan kamu sudah selesai.",
-    error: "❌ *Error!* Ada masalah pada sistem, coba lagi nanti.",
+    wait: "🕕 *Procesando...* Espera un momento.",
+    success: "✅ *Listo!* Tu solicitud fue completada.",
+    error: "❌ *Error!* Hubo un problema, intenta luego.",
 
-    ownerOnly: "*Akses Ditolak!* Fitur ini khusus untuk Owner bot.",
+    ownerOnly: "*Acceso denegado!* Solo para el owner.",
     premiumOnly:
-      "💎 *Premium Only!* Fitur ini khusus member Premium. Ketik *.benefitpremium* untuk info upgrade.",
+      "💎 *Solo Premium!* Usa *.benefitpremium* para info.",
 
-    groupOnly: "👥 *Group Only!* Fitur ini hanya bisa digunakan di dalam grup.",
-    privateOnly:
-      "� *Private Only!* Fitur ini hanya bisa digunakan di chat pribadi bot.",
+    groupOnly: "👥 *Solo grupos!*",
+    privateOnly: "👤 *Solo privado!*",
 
-    adminOnly:
-      "�️ *Admin Only!* Kamu harus jadi Admin grup untuk pakai fitur ini.",
-    botAdminOnly:
-      "🤖 *Bot Bukan Admin!* Jadikan bot sebagai Admin grup dulu biar bisa kerja.",
+    adminOnly: "🛡️ *Solo admins!*",
+    botAdminOnly: "🤖 El bot debe ser admin.",
 
-    cooldown:
-      "🕕 *Tunggu Dulu!* Kamu masih dalam cooldown. Tunggu %time% detik lagi ya.",
+    cooldown: "🕕 Espera %time% segundos.",
     energiExceeded:
-      "⚡ *Energi Habis!* Energi kamu sudah habis. Tunggu reset besok atau beli Premium.",
+      "⚡ Energía agotada. Espera o compra premium.",
 
     banned:
-      "🚫 *Kamu Dibanned!* Kamu tidak bisa menggunakan bot ini karena telah melanggar aturan.",
+      "🚫 Estás baneado por incumplir reglas.",
 
-    rejectCall: "🚫 JANGAN TELPON NOMOR INI WEH",
+    rejectCall: "🚫 NO LLAMES A ESTE NÚMERO",
   },
 
   database: { path: "./database/main" },
   backup: { enabled: false, intervalHours: 24, retainDays: 7 },
   scheduler: { resetHour: 0, resetMinute: 0 },
 
-  // Dev mode settings (auto-enabled jika NODE_ENV=development)
   dev: {
     enabled: process.env.NODE_ENV === "development",
-    watchPlugins: true, // Hot reload plugins (SAFE)
-    watchSrc: false, // DISABLED - src reload causes connection conflict 440
-    debugLog: false, // Show stack traces
+    watchPlugins: true,
+    watchSrc: false,
+    debugLog: false,
   },
 
-  // bisa dikosongin
   pterodactyl: {
-    server1: {
-      domain: "",
-      apikey: "",
-      capikey: "",
-      egg: "15",
-      nestid: "5",
-      location: "1",
-    },
-    server2: {
-      domain: "",
-      apikey: "",
-      capikey: "",
-      egg: "15",
-      nestid: "5",
-      location: "1",
-    },
-    server3: {
-      domain: "",
-      apikey: "",
-      capikey: "",
-      egg: "15",
-      nestid: "5",
-      location: "1",
-    },
-    server4: {
-      domain: "",
-      apikey: "",
-      capikey: "",
-      egg: "15",
-      nestid: "5",
-      location: "1",
-    },
-    server5: {
-      domain: "",
-      apikey: "",
-      capikey: "",
-      egg: "15",
-      nestid: "5",
-      location: "1",
-    },
+    server1: { domain: "", apikey: "", capikey: "", egg: "15", nestid: "5", location: "1" },
+    server2: { domain: "", apikey: "", capikey: "", egg: "15", nestid: "5", location: "1" },
+    server3: { domain: "", apikey: "", capikey: "", egg: "15", nestid: "5", location: "1" },
+    server4: { domain: "", apikey: "", capikey: "", egg: "15", nestid: "5", location: "1" },
+    server5: { domain: "", apikey: "", capikey: "", egg: "15", nestid: "5", location: "1" },
   },
 
   digitalocean: {
@@ -226,8 +186,6 @@ const config = {
     ownerPanels: [],
   },
 
-  // NOTE: ini di versi free gak ada yak, adanya cuma di sc pt doang
-  //  daftar di: https://pakasir.com/
   pakasir: {
     enabled: true,
     slug: "",
@@ -237,302 +195,24 @@ const config = {
     pollingInterval: 5000,
   },
 
-  // NOTE: ini di versi free gak ada yak, adanya cuma di sc pt doang
-  // Ambil apikey di: https://ditznesia.id -> Daftar -> Masuk ke Profile -> AMbile Apikey
   jasaotp: {
     apiKey: "",
     markup: 2000,
     timeout: 300,
   },
 
-  // NOTE: kalau mau command "autoai" nya berfungsi, ini gak wajib di isi yak
-  // ambil apikey di: https://aistudio.google.com/apikey
   geminiApiKey: "",
 
-  //  APIkey
   APIkey: {
-    // kalian bisa daftar di https://api.lolhuman.xyz, lalu ambil apikeynya
     lolhuman: "APIKey-Milik-Bot-OurinMD(Zann,HyuuSATANN,Keisya,Danzz)",
-    // kalian bisa daftar di https://api.neoxr.eu, lalu ambil apikeynya
     neoxr: "Milik-Bot-OurinMD",
     fgsi: "fgsiapi-20c1605c-6d",
     google: "AIzaSyAS-KiW0SrwiYKwexeBcGPijBVHFg2R_vo",
-    groq: "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", // API Key Groq untuk fitur transkrip (gratis di console.groq.com)
+    groq: "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",
     betabotz: "Btz-67YfP",
-    // kalian bisa daftar di https://covenant.sbs, dan ambil apikeynya
     covenant: "cov_live_bb660c9e5f735e46d808b7ae362914cfe35c2936739ee2b2",
   },
 };
 
-// ═══════════════════════════════════════════════════════════════════════════
-// HELPER FUNCTIONS
-// ═══════════════════════════════════════════════════════════════════════════
-
-function isOwner(number) {
-  if (!number) return false;
-  const cleanNumber = number.split(":")[0].replace(/[^0-9]/g, "");
-  if (!cleanNumber) return false;
-
-  if (config.bot?.number) {
-    const botNum = config.bot.number.replace(/[^0-9]/g, "");
-    if (
-      botNum &&
-      (cleanNumber.includes(botNum) || botNum.includes(cleanNumber))
-    )
-      return true;
-  }
-
-  try {
-    const db = getDatabase();
-
-    if (config.owner?.number) {
-      const match = config.owner.number.some((own) => {
-        const c = own.replace(/[^0-9]/g, "");
-        return (
-          c &&
-          (cleanNumber === c ||
-            cleanNumber.endsWith(c) ||
-            c.endsWith(cleanNumber))
-        );
-      });
-      if (match) return true;
-    }
-
-    if (db?.data && Array.isArray(db.data.owner)) {
-      const match = db.data.owner.some((own) => {
-        const c = String(own).replace(/[^0-9]/g, "");
-        return (
-          c &&
-          (cleanNumber === c ||
-            cleanNumber.endsWith(c) ||
-            c.endsWith(cleanNumber))
-        );
-      });
-      if (match) return true;
-    }
-    if (db) {
-      const definedOwner = db.setting("ownerNumbers");
-      if (Array.isArray(definedOwner)) {
-        const match = definedOwner.some((own) => {
-          const c = String(own).replace(/[^0-9]/g, "");
-          return (
-            c &&
-            (cleanNumber === c ||
-              cleanNumber.endsWith(c) ||
-              c.endsWith(cleanNumber))
-          );
-        });
-        if (match) return true;
-      }
-    }
-
-    return false;
-  } catch {
-    return false;
-  }
-}
-
-function isPremium(number) {
-  if (!number) return false;
-  if (isOwner(number)) return true;
-
-  const cleanNumber = number
-    .split(":")[0]
-    .split("@")[0]
-    .replace(/[^0-9]/g, "");
-  const premiumList = config.premiumUsers || [];
-
-  const inConfig = premiumList.some((premium) => {
-    if (!premium) return false;
-    const cleanPremium = premium
-      .split(":")[0]
-      .split("@")[0]
-      .replace(/[^0-9]/g, "");
-    return (
-      cleanNumber === cleanPremium ||
-      cleanNumber.endsWith(cleanPremium) ||
-      cleanPremium.endsWith(cleanNumber)
-    );
-  });
-
-  if (inConfig) return true;
-
-  try {
-    if (ownerPremiumDb && ownerPremiumDb.isPremium(cleanNumber)) return true;
-  } catch {}
-
-  try {
-    const db = getDatabase();
-    if (db && db.data && Array.isArray(db.data.premium)) {
-      const now = Date.now();
-      const foundIndex = db.data.premium.findIndex((p) => {
-        if (typeof p === "string") return p === cleanNumber;
-        if (p.id) return p.id === cleanNumber;
-        return false;
-      });
-
-      if (foundIndex !== -1) {
-        const found = db.data.premium[foundIndex];
-        if (typeof found === "string") return true;
-
-        const expireTime =
-          found.expired ||
-          (found.expiredAt ? new Date(found.expiredAt).getTime() : 0);
-        if (expireTime && expireTime < now) {
-          db.data.premium.splice(foundIndex, 1);
-          const jid = cleanNumber + "@s.whatsapp.net";
-          const user = db.getUser(jid);
-          if (user) {
-            user.isPremium = false;
-            db.setUser(jid, user);
-          }
-          db.save();
-          return false;
-        }
-        return true;
-      }
-    }
-    if (db) {
-      const savedPremium = db.setting("premiumUsers") || [];
-      const inDb = savedPremium.some((premium) => {
-        if (!premium) return false;
-        const cleanPremium = premium
-          .split(":")[0]
-          .split("@")[0]
-          .replace(/[^0-9]/g, "");
-        return (
-          cleanNumber === cleanPremium ||
-          cleanNumber.endsWith(cleanPremium) ||
-          cleanPremium.endsWith(cleanNumber)
-        );
-      });
-      if (inDb) return true;
-    }
-  } catch {}
-
-  return false;
-}
-
-function isPartner(number) {
-  if (!number) return false;
-  if (isOwner(number)) return true;
-
-  const cleanNumber = number
-    .split(":")[0]
-    .split("@")[0]
-    .replace(/[^0-9]/g, "");
-  const partnerList = config.partnerUsers || [];
-
-  const inConfig = partnerList.some((partner) => {
-    if (!partner) return false;
-    const cleanPartner = partner
-      .split(":")[0]
-      .split("@")[0]
-      .replace(/[^0-9]/g, "");
-    return (
-      cleanNumber === cleanPartner ||
-      cleanNumber.endsWith(cleanPartner) ||
-      cleanPartner.endsWith(cleanNumber)
-    );
-  });
-
-  if (inConfig) return true;
-
-  try {
-    if (ownerPremiumDb && ownerPremiumDb.isPartner(cleanNumber)) return true;
-  } catch {}
-
-  try {
-    const db = getDatabase();
-    if (db && db.data && Array.isArray(db.data.partner)) {
-      const now = Date.now();
-      const foundIndex = db.data.partner.findIndex((p) => {
-        if (typeof p === "string") return p === cleanNumber;
-        if (p.id) return p.id === cleanNumber;
-        return false;
-      });
-
-      if (foundIndex !== -1) {
-        const found = db.data.partner[foundIndex];
-        if (typeof found === "string") return true;
-
-        const expireTime =
-          found.expired ||
-          (found.expiredAt ? new Date(found.expiredAt).getTime() : 0);
-        if (expireTime && expireTime < now) {
-          db.data.partner.splice(foundIndex, 1);
-          db.save();
-          return false;
-        }
-        return true;
-      }
-    }
-  } catch {}
-
-  return false;
-}
-
-function isBanned(number) {
-  if (!number) return false;
-  if (isOwner(number)) return false;
-
-  const cleanNumber = number
-    .split(":")[0]
-    .split("@")[0]
-    .replace(/[^0-9]/g, "");
-
-  let bannedList = [];
-  try {
-    const db = getDatabase();
-    if (db) {
-      bannedList = db.setting("bannedUsers") || [];
-      config.bannedUsers = bannedList;
-    }
-  } catch {}
-
-  return bannedList.some((banned) => {
-    const cleanBanned = String(banned)
-      .split(":")[0]
-      .split("@")[0]
-      .replace(/[^0-9]/g, "");
-    return (
-      cleanNumber === cleanBanned ||
-      cleanNumber.endsWith(cleanBanned) ||
-      cleanBanned.endsWith(cleanNumber)
-    );
-  });
-}
-
-function setBotNumber(number) {
-  if (number) config.bot.number = number.replace(/[^0-9]/g, "");
-}
-
-function isSelf(number) {
-  if (!number || !config.bot.number) return false;
-  const cleanNumber = number.replace(/[^0-9]/g, "");
-  const botNumber = config.bot.number.replace(/[^0-9]/g, "");
-  return cleanNumber.includes(botNumber) || botNumber.includes(cleanNumber);
-}
-
-function getConfig() {
-  return config;
-}
-
-config.isOwner = isOwner;
-config.isPremium = isPremium;
-config.isPartner = isPartner;
-config.isBanned = isBanned;
-config.setBotNumber = setBotNumber;
-config.isSelf = isSelf;
-
 export default config;
-export {
-  config,
-  getConfig,
-  isOwner,
-  isPartner,
-  isPremium,
-  isBanned,
-  setBotNumber,
-  isSelf,
-};
+export { config };
