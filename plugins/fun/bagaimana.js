@@ -1,10 +1,10 @@
 const pluginConfig = {
-    name: 'bagaimana',
-    alias: ['gimana', 'how'],
+    name: 'como',
+    alias: ['como', 'how'],
     category: 'fun',
-    description: 'Tanya bot bagaimana sesuatu',
-    usage: '.bagaimana <pertanyaan>',
-    example: '.bagaimana cara jadi sukses?',
+    description: 'Pregúntale al bot cómo hacer algo',
+    usage: '.como <pregunta>',
+    example: '.como ¿cómo ser exitoso?',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -15,38 +15,38 @@ const pluginConfig = {
 };
 
 const answers = [
-    'Caranya gampang, ya tinggal dilakuin aja!',
-    'Hmm, susah dijelasin sih. Coba aja dulu!',
-    'Dengan usaha dan doa pastinya.',
-    'Ya begitulah caranya.',
-    'Aku kurang tau sih, coba cari referensi lain.',
-    'Pelan-pelan aja, nanti juga bisa.',
-    'Dengan kerja keras dan pantang menyerah!',
-    'Pertama, percaya sama diri sendiri dulu.',
-    'Hmm, tiap orang beda-beda sih caranya.',
-    'Ikutin kata hatimu aja.',
-    'Belajar dari yang sudah berpengalaman.',
-    'Step by step, jangan terburu-buru.',
-    'Dengan tekad yang kuat!',
-    'Mulai dari yang kecil dulu.',
-    'Konsisten aja, nanti juga bisa.',
-    'Jangan overthinking, langsung action!',
-    'Gampang! Tinggal mulai aja!',
-    'Caranya? Ya dicoba dulu!',
-    'Dengan strategi yang tepat.',
-    'Hmm, aku juga masih belajar sih.'
+    '¡Es fácil, solo hazlo!',
+    'Hmm, es difícil de explicar. ¡Inténtalo primero!',
+    'Con esfuerzo y un poco de suerte, seguro.',
+    'Bueno, así es como se hace.',
+    'No estoy muy seguro, busca otra referencia.',
+    'Ve despacio, con el tiempo lo lograrás.',
+    '¡Con trabajo duro y sin rendirse!',
+    'Primero, empieza por creer en ti mismo.',
+    'Hmm, cada persona tiene su propia forma de hacerlo.',
+    'Solo sigue a tu corazón.',
+    'Aprende de los que ya tienen experiencia.',
+    'Paso a paso, no te apures.',
+    '¡Con una voluntad de hierro!',
+    'Empieza por las cosas pequeñas.',
+    'Sé constante y verás los resultados.',
+    '¡No lo pienses tanto y pasa a la acción!',
+    '¡Fácil! ¡Solo tienes que empezar!',
+    '¿Cómo? ¡Pues probando!',
+    'Con la estrategia adecuada.',
+    'Hmm, yo también sigo aprendiendo sobre eso.'
 ];
 
 async function handler(m) {
     const text = m.text?.trim();
-    
+
     if (!text) {
-        return m.reply(`📋 *ʙᴀɢᴀɪᴍᴀɴᴀ*\n\n> Masukkan pertanyaan!\n\n*Contoh:*\n> .bagaimana cara jadi sukses?`);
+        return m.reply(`📋 *ᴄᴏᴍᴏ*\n\n> ¡Ingresa una pregunta!\n\n*Ejemplo:*\n> .como ¿cómo ser exitoso?`);
     }
-    
+
     const answer = answers[Math.floor(Math.random() * answers.length)];
-    
-    await m.reply(`${m.body.slice(1)}?
+
+    await m.reply(`${m.body.slice(1)}
 *${answer}*`);
 }
 
