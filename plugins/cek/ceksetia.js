@@ -1,9 +1,9 @@
 const pluginConfig = {
     name: 'ceksetia',
-    alias: ['setia', 'loyal'],
+    alias: ['fiel', 'leal', 'setia'],
     category: 'cek',
-    description: 'Cek tingkat kesetiaan kamu',
-    usage: '.ceksetia <nama>',
+    description: 'Comprueba tu nivel de fidelidad',
+    usage: '.ceksetia <nombre>',
     example: '.ceksetia Budi',
     isOwner: false,
     isPremium: false,
@@ -15,24 +15,24 @@ const pluginConfig = {
 }
 
 async function handler(m) {
-        const percent = Math.floor(Math.random() * 101)
+    const percent = Math.floor(Math.random() * 101)
     const mentioned = m.mentionedJid[0] || m.sender
-                    
+
     let desc = ''
-    if (percent >= 90) desc = 'Setia sampai mati! 💍💕'
-    else if (percent >= 70) desc = 'Sangat setia dan tulus! ❤️'
-    else if (percent >= 50) desc = 'Cukup setia~ 😊'
-    else if (percent >= 30) desc = 'Hmm... kadang goyah 😅'
-    else desc = 'Playboy/Playgirl mode? 😏'
+    if (percent >= 90) desc = '¡Fiel hasta la muerte! 💍💕'
+    else if (percent >= 70) desc = '¡Muy fiel y sincero! ❤️'
+    else if (percent >= 50) desc = 'Bastante fiel~ 😊'
+    else if (percent >= 30) desc = 'Hmm... a veces dudas 😅'
+    else desc = '¿Modo Playboy/Playgirl activado? 😏'
+
+    let txt = mentioned === m.sender ? `Hola @${mentioned.split('@')[0]}
     
-    let txt = mentioned === m.sender ? `Hai @${mentioned.split('@')[0]}
+Tu nivel de fidelidad es del *${percent}%*
+\`\`\`${desc}\`\`\`` : `¿Quieres comprobar el nivel de fidelidad de @${mentioned.split('@')[0]}? 
     
-Tingkat kesetiaan kamu *${percent}%*
-\`\`\`${desc}\`\`\`` : `Kamu ingin ngecek tingkat kesetiaan @${mentioned.split('@')[0]} yak? 
-    
-Tingkat kesetiaan dia sebesar *${percent}%*
+Su nivel de fidelidad es del *${percent}%*
 \`\`\`${desc}\`\`\``
-    
+
     await m.reply(txt, { mentions: [mentioned] })
 }
 
