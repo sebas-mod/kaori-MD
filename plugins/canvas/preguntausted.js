@@ -2,7 +2,7 @@ import { f } from '../../src/lib/ourin-http.js'
 import te from '../../src/lib/ourin-error.js'
 
 const pluginConfig = {
-    name: 'preguntauztad',
+    name: 'preguntausted',
     alias: ['pakustad', 'tanyaustad', 'consejos'],
     category: 'fun',
     description: 'Hazle una pregunta al Ustad (genera imagen)',
