@@ -2,11 +2,12 @@ import axios from 'axios'
 import fs from 'fs'
 import path from 'path'
 import { f } from '../../src/lib/ourin-http.js'
+
 const pluginConfig = {
     name: 'asupan',
-    alias: ['asupanrandom'],
+    alias: ['asupanrandom', 'videoaleatorio'],
     category: 'asupan',
-    description: 'Random video asupan',
+    description: 'Envía un video aleatorio de la colección',
     usage: '.asupan',
     example: '.asupan',
     isOwner: false,
@@ -44,7 +45,7 @@ async function handler(m, { sock }) {
         
         if (urls.length === 0) {
             m.react('❌')
-            return m.reply(`❌ Data asupan tidak tersedia`)
+            return m.reply(`❌ Los datos de video no están disponibles`)
         }
         
         const url = urls[Math.floor(Math.random() * urls.length)]
@@ -59,7 +60,7 @@ async function handler(m, { sock }) {
         
     } catch (error) {
         m.react('❌')
-        m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> Video asupan tidak ditemukan`)
+        m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> No se pudo encontrar el video`)
     }
 }
 
