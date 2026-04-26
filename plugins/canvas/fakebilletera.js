@@ -2,6 +2,7 @@ import { Canvas, loadImage, FontLibrary } from 'skia-canvas'
 import fs from 'fs'
 import path from 'path'
 import te from '../../src/lib/ourin-error.js'
+
 async function ensureFile(url, file) {
   const dir = path.dirname(file)
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
@@ -46,7 +47,7 @@ async function generateImage(saldo, greet) {
 
   ctx.fillText(numberText, numberX, baseY)
 
-  const rpText = "Rp"
+  const rpText = "Rp" // Se mantiene Rp por el estilo de la interfaz original
   const rpWidth = ctx.measureText(rpText).width
   const rpX = numberX - rpWidth - 4
 
@@ -59,13 +60,14 @@ async function generateImage(saldo, greet) {
 
   return await canvas.png
 }
+
 const pluginConfig = {
-    name: 'fakebankjago',
-    alias: ['fakebankjago'],
+    name: 'fakebilletera',
+    alias: ['fakebank', 'bancofalso'],
     category: 'canvas',
-    description: 'Membuat gambar chat iPhone style',
-    usage: '.fakebankjago <text>',
-    example: '.fakebankjago Hai cantik',
+    description: 'Crea una imagen de saldo bancario falso',
+    usage: '.fakebilletera <nombre>,<monto>',
+    example: '.fakebilletera Juan,10000',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -76,22 +78,28 @@ const pluginConfig = {
 }
 
 async function handler(m, { sock }) {
-    const [nama,nominal] = m.text?.split(',')
+    const [nama, nominal] = m.text?.split(',')
     if (!nama || !nominal) {
-        return m.reply(`*FAKE BANK*\n\n> Masukkan teks untuk chat\n\n\`Contoh: ${m.prefix}fakebank Zann,10000\``)
+        return m.reply(`*BANCO FALSO*\n\n> Ingresa nombre y monto separados por coma\n\n\`Ejemplo: ${m.prefix}fakebank Zann,10000\``)
     }
-    if(isNaN(nominal)) return m.reply(`*HARAP MASUKKAN ANGKA*`)
+    
+    if (isNaN(nominal.replace(/[^0-9]/g, ''))) return m.reply(`*POR FAVOR INGRESA UN NÚMERO VÁLIDO*`)
+    
     m.react('🕕')
     
     try {
-        const saldo = Number(nominal.replace(/[^0-9]/g, '')).toLocaleString('id-ID')
-        const hour = new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta', hour: '2-digit', hour12: false })
-        const h = Number(hour)
-        let waktu = 'Malam'
-        if (h >= 4 && h < 11) waktu = 'Pagi'
-        else if (h >= 11 && h < 15) waktu = 'Siang'
-        else if (h >= 15 && h < 18) waktu = 'Sore'
-        const fake = await generateImage(saldo, `Selamat ${waktu}, ${nama}`)
+        // Formato de número local (puedes cambiar 'es-AR' o 'es-ES' según prefieras)
+        const saldo = Number(nominal.replace(/[^0-9]/g, '')).toLocaleString('es-AR')
+        
+        // Lógica de saludo basada en hora local
+        const hour = new Date().getHours()
+        let saludo = 'Buenas noches'
+        
+        if (hour >= 5 && hour < 12) saludo = 'Buenos días'
+        else if (hour >= 12 && hour < 19) saludo = 'Buenas tardes'
+        
+        const fake = await generateImage(saldo, `${saludo}, ${nama}`)
+        
         await sock.sendMedia(m.chat, fake, null, m, {
             type: 'image',
         })
