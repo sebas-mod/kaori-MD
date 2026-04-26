@@ -1,7 +1,6 @@
-const { execSync } = require('child_process')
-const { spawn } = require('child_process')
-const path = require('path')
-const fs = require('fs')
+import { execSync, spawn } from 'child_process'
+import path from 'path'
+import fs from 'fs'
 
 const pluginConfig = {
     name: 'up',
@@ -19,14 +18,20 @@ const pluginConfig = {
     isEnabled: true
 }
 
-const REPO_URL = 'https://github.com/sebas-mod/kaori-bot.2.0'
+const REPO_URL = 'https://github.com/sebas-mod/kaori-MD.git'
 const BRANCH = 'main'
 
 function execSafe(cmd, opts = {}) {
     try {
-        return { success: true, output: execSync(cmd, { stdio: 'pipe', timeout: 120000, ...opts }).toString().trim() }
+        return {
+            success: true,
+            output: execSync(cmd, { stdio: 'pipe', timeout: 120000, ...opts }).toString().trim()
+        }
     } catch (e) {
-        return { success: false, output: e.stderr?.toString().trim() || e.message }
+        return {
+            success: false,
+            output: e.stderr?.toString().trim() || e.message
+        }
     }
 }
 
@@ -39,7 +44,7 @@ async function handler(m, { sock }) {
         const gitCheck = execSafe('git --version')
         if (!gitCheck.success) {
             return m.reply(
-                `❌ *ᴇʀʀᴏʀ*\n\n` +
+                `❌ *ERROR*\n\n` +
                 `> Git no está instalado en este servidor\n` +
                 `> Instala git: \`apt install git\` / \`pkg install git\``
             )
@@ -48,7 +53,7 @@ async function handler(m, { sock }) {
         const isGitRepo = fs.existsSync(path.join(baseDir, '.git'))
         if (!isGitRepo) {
             await m.reply(
-                `⚙️ *ɪɴɪᴄɪᴀʟɪᴢᴀɴᴅᴏ ɢɪᴛ*\n\n` +
+                `⚙️ *INICIALIZANDO GIT*\n\n` +
                 `> El directorio aún no está conectado a git\n` +
                 `> Inicializando y conectando al repositorio...`
             )
@@ -61,28 +66,28 @@ async function handler(m, { sock }) {
             if (!resetResult.success) {
                 await m.react('❌')
                 return m.reply(
-                    `❌ *ᴇʀʀᴏʀ ᴀʟ ɪɴɪᴄɪᴀʟɪᴢᴀʀ ɢɪᴛ*\n\n` +
+                    `❌ *ERROR AL INICIALIZAR GIT*\n\n` +
                     `> ${resetResult.output?.slice(0, 300)}`
                 )
             }
 
             await m.react('✅')
             return m.reply(
-                `✅ *ɢɪᴛ ɪɴɪᴄɪᴀʟɪᴢᴀᴅᴏ*\n\n` +
+                `✅ *GIT INICIALIZADO*\n\n` +
                 `> ¡Repositorio conectado correctamente!\n` +
                 `> Ejecuta \`.up\` de nuevo para actualizar.`
             )
         }
 
         const remoteResult = execSafe('git remote get-url origin', { cwd: baseDir })
-        if (!remoteResult.success || !remoteResult.output.includes('sebas-mod/kaori-bot')) {
+        if (!remoteResult.success || !remoteResult.output.includes('sebas-mod/kaori-MD')) {
             execSafe('git remote remove origin', { cwd: baseDir })
             execSafe(`git remote add origin ${REPO_URL}`, { cwd: baseDir })
         }
 
         await m.reply(
-            `🔄 *ᴀᴄᴛᴜᴀʟɪᴢᴀɴᴅᴏ ʙᴏᴛ*\n\n` +
-            `> 📦 Repo: \`sebas-mod/kaori-bot.2.0\`\n` +
+            `🔄 *ACTUALIZANDO BOT*\n\n` +
+            `> 📦 Repo: \`sebas-mod/kaori-MD\`\n` +
             `> 🌿 Rama: \`${BRANCH}\`\n\n` +
             `📡 Paso 1/3 — Obteniendo cambios de GitHub...`
         )
@@ -91,7 +96,7 @@ async function handler(m, { sock }) {
         if (!fetchResult.success) {
             await m.react('❌')
             return m.reply(
-                `❌ *ᴇʀʀᴏʀ ᴀʟ ᴄᴏɴᴇᴄᴛᴀʀ*\n\n` +
+                `❌ *ERROR AL CONECTAR*\n\n` +
                 `> No se pudo contactar con GitHub\n` +
                 `> ${fetchResult.output?.slice(0, 200)}\n\n` +
                 `> Verifica tu conexión a internet`
@@ -104,7 +109,7 @@ async function handler(m, { sock }) {
         if (localHash === remoteHash) {
             await m.react('✅')
             return m.reply(
-                `✅ *ʙᴏᴛ ᴀᴄᴛᴜᴀʟɪᴢᴀᴅᴏ*\n\n` +
+                `✅ *BOT ACTUALIZADO*\n\n` +
                 `> No hay cambios nuevos en GitHub\n` +
                 `> Commit actual: \`${localHash.slice(0, 7)}\`\n\n` +
                 `> Vuelve a intentarlo después de hacer push al repo`
@@ -137,7 +142,7 @@ async function handler(m, { sock }) {
         const extra = changedCount > 10 ? `\n_...y ${changedCount - 10} archivos más_` : ''
 
         await m.reply(
-            `📋 *ᴄᴀᴍʙɪᴏs ᴅᴇᴛᴇᴄᴛᴀᴅᴏs*\n\n` +
+            `📋 *CAMBIOS DETECTADOS*\n\n` +
             `> 📁 Total de archivos cambiados: \`${changedCount}\`\n\n` +
             (preview ? `${preview}${extra}\n\n` : '') +
             `⬇️ Paso 2/3 — Aplicando actualización...`
@@ -152,7 +157,7 @@ async function handler(m, { sock }) {
             if (!forcePull.success) {
                 await m.react('❌')
                 return m.reply(
-                    `❌ *ᴇʀʀᴏʀ ᴀʟ ᴀᴄᴛᴜᴀʟɪᴢᴀʀ*\n\n` +
+                    `❌ *ERROR AL ACTUALIZAR*\n\n` +
                     `> ${pullResult.output?.slice(0, 300)}\n\n` +
                     `> Intenta manualmente: \`git pull origin ${BRANCH}\``
                 )
@@ -164,7 +169,7 @@ async function handler(m, { sock }) {
             const npmResult = execSafe('npm install --production', { cwd: baseDir, timeout: 300000 })
             if (!npmResult.success) {
                 await m.reply(
-                    `⚠️ *ᴇʀʀᴏʀ ᴇɴ ɴᴘᴍ ɪɴsᴛᴀʟʟ*\n\n` +
+                    `⚠️ *ERROR EN NPM INSTALL*\n\n` +
                     `> ${npmResult.output?.slice(0, 200)}\n` +
                     `> Ejecuta \`npm install\` manualmente si es necesario`
                 )
@@ -180,25 +185,31 @@ async function handler(m, { sock }) {
 
         await sock.sendMessage(m.chat, {
             text:
-                `✅ *¡ᴀᴄᴛᴜᴀʟɪᴢᴀᴄɪóɴ ᴄᴏᴍᴘʟᴇᴛᴀ!*\n\n` +
-                `╭┈┈⬡「 📊 *ʀᴇsᴜᴍᴇɴ* 」\n` +
+                `✅ *¡ACTUALIZACIÓN COMPLETA!*\n\n` +
+                `╭┈┈⬡「 📊 *RESUMEN* 」\n` +
                 `┃ 📁 Archivos actualizados: \`${changedCount}\`\n` +
                 `┃ 🔖 Commit: \`${newHash.slice(0, 7)}\`\n` +
                 `┃ 💬 Mensaje: ${commitMsg || '-'}\n` +
                 `┃ 👤 Autor: ${commitAuthor || '-'}\n` +
                 `┃ 🕐 Hace: ${commitDate || '-'}\n` +
-                `┃ 📦 Repo: \`sebas-mod/kaori-bot.2.0\`\n` +
+                `┃ 📦 Repo: \`sebas-mod/kaori-MD\`\n` +
                 `╰┈┈⬡\n\n` +
                 `> El bot se reiniciará en 3 segundos...`
         }, { quoted: m })
 
         setTimeout(() => {
-            const child = spawn('node', ['index.js'], {
+            const isWindows = process.platform === 'win32'
+            const command = isWindows ? 'cmd.exe' : 'node'
+            const args = isWindows ? ['/c', 'start', '/b', 'node', 'index.js'] : ['index.js']
+
+            const child = spawn(command, args, {
                 cwd: baseDir,
                 detached: true,
                 stdio: 'ignore',
+                shell: isWindows,
                 env: { ...process.env, RESTARTED: 'true' }
             })
+
             child.unref()
             process.exit(0)
         }, 3000)
@@ -206,13 +217,10 @@ async function handler(m, { sock }) {
     } catch (error) {
         await m.react('❌')
         return m.reply(
-            `❌ *ᴇʀʀᴏʀ ᴀʟ ᴀᴄᴛᴜᴀʟɪᴢᴀʀ*\n\n` +
+            `❌ *ERROR AL ACTUALIZAR*\n\n` +
             `> ${error.message?.slice(0, 300)}`
         )
     }
 }
 
-module.exports = {
-    config: pluginConfig,
-    handler
-}
+export { pluginConfig as config, handler }
