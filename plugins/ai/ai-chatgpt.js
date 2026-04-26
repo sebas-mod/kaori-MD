@@ -2,7 +2,7 @@ import axios from "axios";
 
 const plugin = {
   config: {
-    name: "ia",
+    name: "bot",
     alias: ["chatgpt"],
     category: "ai",
     desc: "Chat con IA o análisis de imágenes con personalidad de Luffy.",
