@@ -1,11 +1,12 @@
 import config from '../../config.js'
 import { f } from '../../src/lib/ourin-http.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'sfiledl',
     alias: ['sfile', 'sfiledownload'],
     category: 'download',
-    description: 'Download file dari Sfile.mobi',
+    description: 'Descargar archivos de Sfile.mobi',
     usage: '.sfiledl <url>',
     example: '.sfiledl https://sfile.mobi/xxx',
     isOwner: false,
@@ -22,14 +23,14 @@ async function handler(m, { sock }) {
 
     if (!url) {
         return m.reply(
-            `⚠️ *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ*\n\n` +
+            `⚠️ *MODO DE USO*\n\n` +
             `> \`${m.prefix}sfiledl <url_sfile>\`\n\n` +
-            `> Contoh: \`${m.prefix}sfiledl https://sfile.mobi/xxxxx\``
+            `> Ejemplo: \`${m.prefix}sfiledl https://sfile.mobi/xxxxx\``
         )
     }
 
     if (!url.includes('sfile.mobi') && !url.includes('sfile.co')) {
-        return m.reply(`❌ URL harus dari sfile.mobi atau sfile.co!`)
+        return m.reply(`❌ ¡La URL debe ser de sfile.mobi o sfile.co!`)
     }
 
     m.react('🕕')
@@ -39,7 +40,7 @@ async function handler(m, { sock }) {
 
         if (!data.url) {
             m.react('❌')
-            return m.reply(`❌ Gagal mendapatkan link download. File mungkin tidak tersedia.`)
+            return m.reply(`❌ Error al obtener el enlace de descarga. Es posible que el archivo no esté disponible.`)
         }
 
         await sock.sendMedia(m.chat, data.url, null, m, {
