@@ -1,12 +1,13 @@
 import axios from 'axios'
 import config from '../../config.js'
 import { f } from '../../src/lib/ourin-http.js'
+
 const pluginConfig = {
     name: 'asupantiktok',
-    alias: ['tiktokasupan', 'ttasupan'],
+    alias: ['tiktokasupan', 'ttasupan', 'tiktokrandom'],
     category: 'asupan',
-    description: 'Video TikTok dari username random atau spesifik',
-    usage: '.asupantiktok [username]',
+    description: 'Video de TikTok de un usuario aleatorio o específico',
+    usage: '.asupantiktok [usuario]',
     example: '.asupantiktok natajadeh',
     isOwner: false,
     isPremium: false,
@@ -38,11 +39,11 @@ async function handler(m, { sock }) {
     m.react('🕕')
     
     try {
-        const {data} = await f(`https://api.neoxr.eu/api/asupan?username=${query}&apikey=${config.APIkey.neoxr}`)
+        const {data} = await f(`https://api.neoxr.eu/api/asupan?username=${encodeURIComponent(query)}&apikey=${config.APIkey.neoxr}`)
         
         if (!data) {
             m.react('❌')
-            return m.reply(`🚩 *Username Tidak Ditemukan*\n\n> Username: ${query}`)
+            return m.reply(`🚩 *Usuario No Encontrado*\n\n> Usuario: ${query}`)
         }
         
         const video = data
@@ -58,7 +59,7 @@ async function handler(m, { sock }) {
                 forwardingScore: 99,
                 externalAdReply: {
                     title: video.author.nickname,
-                    body: video.author.signature || 'Video TikTok',
+                    body: video.author.signature || 'Video de TikTok',
                     mediaType: 1,
                     sourceUrl: 'https://vt.tiktok.com',
                     thumbnailUrl: video.author.avatarThumb,
@@ -70,7 +71,7 @@ async function handler(m, { sock }) {
         
     } catch (error) {
         m.react('❌')
-        m.reply(`🚩 *Username Tidak Ditemukan*\n\n> Username: ${query}`)
+        m.reply(`🚩 *Usuario No Encontrado*\n\n> Usuario: ${query}`)
     }
 }
 
