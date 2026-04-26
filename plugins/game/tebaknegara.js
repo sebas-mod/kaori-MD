@@ -1,10 +1,10 @@
 import { games } from '../../src/lib/ourin-games.js'
 
 games.register('tebaknegara', {
-    alias: ['tn', 'guesscountry'],
+    alias: ['tn', 'pais', 'guesscountry', 'nacion'],
     emoji: '🌍',
-    title: 'TEBAK NEGARA',
-    description: 'Tebak nama negara'
+    title: 'ADIVINA EL PAÍS',
+    description: 'Adiviná el nombre del país'
 })
 
 const { config: pluginConfig, handler, answerHandler } = games.createPlugin('tebaknegara')
