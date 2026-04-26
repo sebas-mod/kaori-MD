@@ -1,10 +1,10 @@
 const pluginConfig = {
-    name: 'ceklapar',
-    alias: ['lapar', 'hungry'],
+    name: 'chequehambre',
+    alias: ['hambre', 'hambriento', 'hungry', 'tengohambre'],
     category: 'cek',
-    description: 'Cek tingkat kelaparan kamu',
-    usage: '.ceklapar <nama>',
-    example: '.ceklapar Budi',
+    description: 'Verifica qué tan hambriento/a sos',
+    usage: '.chequehambre <nombre>',
+    example: '.chequehambre @usuario',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -15,22 +15,22 @@ const pluginConfig = {
 }
 
 async function handler(m) {
-        const percent = Math.floor(Math.random() * 101)
+    const percent = Math.floor(Math.random() * 101)
     const mentioned = m.mentionedJid[0] || m.sender
                     
     let desc = ''
-    if (percent >= 90) desc = 'LAPARRR! Makan sekarang! 🍔🍕🍜'
-    else if (percent >= 70) desc = 'Perut keroncongan~ 😋'
-    else if (percent >= 50) desc = 'Bisa lah ngemil 🍿'
-    else if (percent >= 30) desc = 'Masih kenyang 😊'
-    else desc = 'Kekenyangan! 🤰'
+    if (percent >= 90) desc = '¡TE MORÍS DE HAMBRE! ¡Andá a comer ya! 🍔🍕🍜'
+    else if (percent >= 70) desc = 'Te ruge la panza~ 😋'
+    else if (percent >= 50) desc = 'Estás para picar algo 🍿'
+    else if (percent >= 30) desc = 'Todavía estás lleno 😊'
+    else desc = '¡Estás explotado de comida! 🤰'
     
-    let txt = mentioned === m.sender ? `Hai @${mentioned.split('@')[0]}
+    let txt = mentioned === m.sender ? `Hola @${mentioned.split('@')[0]}
     
-Tingkat kelaparan kamu *${percent}%*
-\`\`\`${desc}\`\`\`` : `Kamu ingin ngecek tingkat kelaparan @${mentioned.split('@')[0]} yak? 
+Tu nivel de hambre es del *${percent}%*
+\`\`\`${desc}\`\`\`` : `¿Querés chequear el nivel de hambre de @${mentioned.split('@')[0]}? 
     
-Tingkat kelaparan dia sebesar *${percent}%*
+Su nivel de hambre es del *${percent}%*
 \`\`\`${desc}\`\`\``
     
     await m.reply(txt, { mentions: [mentioned] })
