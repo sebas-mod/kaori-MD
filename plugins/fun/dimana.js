@@ -1,10 +1,10 @@
 const pluginConfig = {
-    name: 'dimana',
-    alias: ['where', 'mana'],
+    name: 'donde',
+    alias: ['donde', 'where', 'mana'],
     category: 'fun',
-    description: 'Tanya bot dimana sesuatu',
-    usage: '.dimana <pertanyaan>',
-    example: '.dimana jodohku berada?',
+    description: 'Pregúntale al bot dónde está algo',
+    usage: '.donde <pregunta>',
+    example: '.donde ¿dónde está mi alma gemela?',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -15,38 +15,38 @@ const pluginConfig = {
 };
 
 const answers = [
-    'Di dekatmu!',
-    'Jauh di sana.',
-    'Di tempat yang tidak kamu duga.',
-    'Di hatimu.',
-    'Di sekitar sini.',
-    'Hmm, coba cari di kamar.',
-    'Di luar sana, menunggumu.',
-    'Di tempat yang sama denganmu.',
-    'Di suatu tempat yang indah.',
-    'Di balik pintu.',
-    'Di sebelah kirimu.',
-    'Di depan matamu!',
-    'Jauh banget, di luar negeri mungkin?',
-    'Di tempat yang penuh kenangan.',
-    'Di mana-mana!',
-    'Di dunia maya.',
-    'Di alam mimpi.',
-    'Di tempat rahasia.',
-    'Hmm, susah dijelaskan lokasinya.',
-    'Di tempat yang akan membuatmu bahagia.'
+    '¡Cerca tuyo!',
+    'Muy, muy lejos.',
+    'En el lugar que menos te esperás.',
+    'En tu corazón.',
+    'Por acá cerca.',
+    'Hmm, probá buscando en tu pieza.',
+    'Allá afuera, esperándote.',
+    'En el mismo lugar que vos.',
+    'En algún lugar hermoso.',
+    'Detrás de la puerta.',
+    'A tu izquierda.',
+    '¡Frente a tus ojos!',
+    'Lejísimos, ¿en el exterior tal vez?',
+    'En un lugar lleno de recuerdos.',
+    '¡En todas partes!',
+    'En el mundo virtual.',
+    'En el mundo de los sueños.',
+    'En un lugar secreto.',
+    'Hmm, es difícil explicar la ubicación.',
+    'En un lugar que te va a hacer muy feliz.'
 ];
 
 async function handler(m) {
     const text = m.text?.trim();
-    
+
     if (!text) {
-        return m.reply(`📍 *ᴅɪᴍᴀɴᴀ*\n\n> Masukkan pertanyaan!\n\n*Contoh:*\n> .dimana jodohku berada?`);
+        return m.reply(`📍 *ᴅᴏɴᴅᴇ*\n\n> ¡Ingresá una pregunta!\n\n*Ejemplo:*\n> .donde ¿dónde está mi alma gemela?`);
     }
-    
+
     const answer = answers[Math.floor(Math.random() * answers.length)];
-    
-    await m.reply(`${m.body.slice(1)}?
+
+    await m.reply(`${m.body.slice(1)}
 *${answer}*`);
 }
 
