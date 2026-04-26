@@ -4,12 +4,12 @@ import config from '../../config.js'
 import te from '../../src/lib/ourin-error.js'
 
 const pluginConfig = {
-    name: 'jail',
+    name: 'carcel',
     alias: ['carcel', 'prision', 'penjara'],
     category: 'canvas',
     description: 'Aplica un efecto de cárcel a una imagen',
-    usage: '.jail (responde a una imagen)',
-    example: '.jail',
+    usage: '.carcel (responde a una imagen)',
+    example: '.carcel',
     isOwner: false,
     isPremium: false,
     isGroup: false,
