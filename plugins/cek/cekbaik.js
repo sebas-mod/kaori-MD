@@ -1,10 +1,10 @@
 const pluginConfig = {
-    name: 'cekbaik',
-    alias: ['baik', 'kind'],
+    name: 'chequeobondad',
+    alias: ['bueno', 'bondad', 'kind'],
     category: 'cek',
-    description: 'Cek seberapa baik kamu',
-    usage: '.cekbaik <nama>',
-    example: '.cekbaik Budi',
+    description: 'Verifica qué tan buena persona eres',
+    usage: '.bondad <nombre/tag>',
+    example: '.bondad @usuario',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -20,23 +20,23 @@ async function handler(m) {
     
     let desc = ''
     if (percent >= 90) {
-        desc = 'Mantappp! kamu adalah orang paling Baik di dunia ini! 😇✨'
+        desc = '¡Increíble! ¡Eres la persona más buena de este mundo! 😇✨'
     } else if (percent >= 70) {
-        desc = 'Baik hati dan tidak sombong! 💝'
+        desc = '¡De buen corazón y para nada presumido! 💝'
     } else if (percent >= 50) {
-        desc = 'Lumayan baik 😊'
+        desc = 'Bastante bien 😊'
     } else if (percent >= 30) {
-        desc = 'Sedikit baik 🙂'
+        desc = 'Un poquito bueno 🙂'
     } else {
-        desc = 'Hmm, perlu introspeksi ?? 🤔'
+        desc = 'Mmm, ¿será hora de una introspección? 🤔'
     }
     
-    let txt = mentioned === m.sender ? `Hai @${mentioned.split('@')[0]}
+    let txt = mentioned === m.sender ? `Hola @${mentioned.split('@')[0]}
     
-Tingkat kebaikan kamu *${percent}%*
-\`\`\`${desc}\`\`\`` : `Kamu ingin ngecek tingkat kebaikan @${mentioned.split('@')[0]} yak? 
+Tu nivel de bondad es del *${percent}%*
+\`\`\`${desc}\`\`\`` : `¿Querés chequear el nivel de bondad de @${mentioned.split('@')[0]}? 
     
-Tingkat kebaikan dia sebesar *${percent}%*
+Su nivel de bondad es del *${percent}%*
 \`\`\`${desc}\`\`\``
     
     await m.reply(txt, { mentions: [mentioned] })
