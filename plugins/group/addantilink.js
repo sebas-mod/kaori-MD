@@ -1,7 +1,7 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 
 const pluginConfig = {
-    name: 'antilinkredes',
+    name: 'antilink',
     alias: ['bloquearlink', 'addalink', 'addblocklink'],
     category: 'group',
     description: 'Agrega un dominio o link a la lista negra del grupo',
