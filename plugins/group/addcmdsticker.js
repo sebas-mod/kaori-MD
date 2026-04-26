@@ -1,11 +1,12 @@
 import { getQuotedStickerHash, addStickerCommand, listStickerCommands } from '../../src/lib/ourin-sticker-command.js'
 import { getPlugin } from '../../src/lib/ourin-plugins.js'
+
 const pluginConfig = {
     name: 'addcmdsticker',
-    alias: ['addstickercmd', 'setsticker', 'stickeradd'],
+    alias: ['addscmd', 'setsticker', 'vincularsticker'],
     category: 'group',
-    description: 'Jadikan sticker sebagai shortcut command',
-    usage: '.addcmdsticker <command> (reply sticker)',
+    description: 'Convierte un sticker en un acceso directo a un comando',
+    usage: '.addcmdsticker <comando> (respondiendo a un sticker)',
     example: '.addcmdsticker menu',
     isOwner: false,
     isPremium: false,
@@ -20,64 +21,66 @@ const pluginConfig = {
 async function handler(m, { sock }) {
     const args = m.args || []
     const commandName = args[0]
-    
-    // Validasi command name
+
+    // Si no pone argumentos, mostramos la ayuda y la lista actual
     if (!commandName) {
         const existingCmds = listStickerCommands()
-        
-        let txt = `🖼️ *sᴛɪᴄᴋᴇʀ ᴛᴏ ᴄᴏᴍᴍᴀɴᴅ*\n\n`
-        txt += `> Reply sticker + ketik command yang ingin dijadikan shortcut.\n\n`
-        txt += `*Contoh:*\n`
-        txt += `> Reply sticker, lalu ketik:\n`
-        txt += `> \`.addcmdsticker menu\`\n\n`
-        
+
+        let txt = `🖼️ *STICKER A COMANDO*\n\n`
+        txt += `> Respondé a un sticker con este comando para crear un acceso directo.\n\n`
+        txt += `*Ejemplo:*\n`
+        txt += `> Respondé al sticker y escribí:\n`
+        txt += `> \`${m.prefix}addcmdsticker menu\`\n\n`
+
         if (existingCmds.length > 0) {
-            txt += `╭┈┈⬡「 📋 *ᴀᴋᴛɪꜰ* 」\n`
+            txt += `╭┈┈⬡「 📋 *VINCULADOS* 」\n`
+            // Mostramos los primeros 10 para no inundar el chat
             for (const cmd of existingCmds.slice(0, 10)) {
-                txt += `┃ 🖼️ → \`${cmd.command}\`\n`
+                txt += `┃ 🖼️ → \`.${cmd.command}\`\n`
             }
             if (existingCmds.length > 10) {
-                txt += `┃ ... dan ${existingCmds.length - 10} lainnya\n`
+                txt += `┃ ... y ${existingCmds.length - 10} más.\n`
             }
             txt += `╰┈┈┈┈┈┈┈┈⬡`
         }
-        
+
         return m.reply(txt)
     }
-    
-    // Validasi reply sticker
+
+    // Validación: debe responder a un mensaje
     if (!m.quoted) {
-        return m.reply('⚠️ *Reply sticker* yang ingin dijadikan command!')
+        return m.reply('⚠️ ¡Tenés que *responder a un sticker*!')
     }
-    
+
     const stickerHash = getQuotedStickerHash(m)
     if (!stickerHash) {
-        return m.reply('⚠️ Pesan yang di-reply bukan *sticker*!')
+        return m.reply('⚠️ El mensaje que respondiste no parece ser un *sticker*.')
     }
-    
-    // Validasi command exists
+
+    // Limpiamos el comando (sacamos el punto si lo puso)
     const cleanCmd = commandName.toLowerCase().replace(/^\./, '')
     const plugin = getPlugin(cleanCmd)
-    
+
+    // Verificamos que el comando que quiere vincular realmente exista en el bot
     if (!plugin) {
         return m.reply(
-            `❌ Command \`${cleanCmd}\` tidak ditemukan!\n\n` +
-            `> Pastikan command yang ingin dijadikan shortcut valid.`
+            `❌ ¡El comando \`${cleanCmd}\` no existe!\n\n` +
+            `> Solo podés vincular comandos válidos del bot.`
         )
     }
-    
-    // Add sticker command
+
+    // Intentamos guardar la vinculación
     const success = addStickerCommand(stickerHash, cleanCmd, m.sender)
-    
+
     if (success) {
         await m.react('✅')
         await m.reply(
-            `✅ *sᴛɪᴄᴋᴇʀ ᴄᴏᴍᴍᴀɴᴅ ᴅɪᴛᴀᴍʙᴀʜᴋᴀɴ*\n\n` +
+            `✅ *STICKER VINCULADO*\n\n` +
             `> 🖼️ Sticker → \`.${cleanCmd}\`\n\n` +
-            `_Kirim sticker tersebut untuk menjalankan command!_`
+            `_¡Ahora al mandar ese sticker, se ejecutará el comando automáticamente!_`
         )
     } else {
-        await m.reply('❌ Gagal menyimpan sticker command!')
+        await m.reply('❌ ¡Hubo un error al intentar guardar el sticker command!')
     }
 }
 
