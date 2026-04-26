@@ -1,10 +1,10 @@
 const pluginConfig = {
-    name: 'berapa',
-    alias: ['howmuch', 'howmany'],
+    name: 'cuanto',
+    alias: ['cuantos', 'howmuch', 'howmany'],
     category: 'fun',
-    description: 'Tanya bot berapa sesuatu',
-    usage: '.berapa <pertanyaan>',
-    example: '.berapa umur jodohku?',
+    description: 'Pregúntale al bot cuánto de algo',
+    usage: '.cuanto <pregunta>',
+    example: '.cuanto ¿cuántos años tendrá mi pareja?',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -29,25 +29,25 @@ const answers = [
     '17',
     '88',
     '33',
-    'nothing (jawabannya selalu nothing)',
-    'Banyak banget!',
-    'Cuma sedikit.',
-    'Tak terhitung!',
-    'Hmm, sekitar 10-an.',
-    'Lebih dari yang kamu kira!',
-    'Gak tau ah, males'
+    'Nada (la respuesta siempre es nada)',
+    '¡Muchísimo!',
+    'Solo un poco.',
+    '¡Incalculable!',
+    'Hmm, alrededor de 10.',
+    '¡Más de lo que crees!',
+    'No sé, me da pereza pensar.'
 ];
 
 async function handler(m) {
     const text = m.text?.trim();
-    
+
     if (!text) {
-        return m.reply(`🔢 *ʙᴇʀᴀᴘᴀ*\n\n> Masukkan pertanyaan!\n\n*Contoh:*\n> .berapa umur jodohku?`);
+        return m.reply(`🔢 *ᴄᴜᴀɴᴛᴏ*\n\n> ¡Ingresa una pregunta!\n\n*Ejemplo:*\n> .cuanto ¿cuántos años tendrá mi pareja?`);
     }
-    
+
     const answer = answers[Math.floor(Math.random() * answers.length)];
-    
-    await m.reply(`${m.body.slice(1)}?
+
+    await m.reply(`${m.body.slice(1)}
 *${answer}*`);
 }
 
