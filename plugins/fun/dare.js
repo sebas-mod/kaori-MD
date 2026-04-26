@@ -1,11 +1,12 @@
 import { getRandomItem } from '../../src/lib/ourin-game-data.js'
+
 const pluginConfig = {
-    name: 'dare',
-    alias: ['dareq', 'tantang'],
+    name: 'reto',
+    alias: ['dare', 'desafio', 'tantang'],
     category: 'fun',
-    description: 'Random tantangan dare',
-    usage: '.dare',
-    example: '.dare',
+    description: 'Genera un reto aleatorio (Dare)',
+    usage: '.reto',
+    example: '.reto',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -17,13 +18,16 @@ const pluginConfig = {
 
 async function handler(m) {
     const challenge = getRandomItem('dare.json');
-    
+
     if (!challenge) {
-        await m.reply('❌ Data tidak tersedia!');
+        await m.reply('❌ ¡Datos no disponibles!');
         return;
     }
-    
+
     await m.reply(`\`\`\`${challenge}\`\`\``);
 }
+
+export { pluginConfig as config, handler }
+
 
 export { pluginConfig as config, handler }
