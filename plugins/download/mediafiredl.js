@@ -1,11 +1,12 @@
 import config from '../../config.js'
 import { f } from './../../src/lib/ourin-http.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'mediafiredl',
     alias: ['mfdl', 'mediafire', 'mf'],
     category: 'download',
-    description: 'Download file dari MediaFire',
+    description: 'Descargar archivos de MediaFire',
     usage: '.mfdl <url>',
     example: '.mfdl https://www.mediafire.com/file/xxx',
     isOwner: false,
@@ -20,21 +21,21 @@ const pluginConfig = {
 
 async function handler(m, { sock }) {
     const url = m.text?.trim()
-    
+
     if (!url) {
         return m.reply(
-            `⚠️ *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ*\n\n` +
+            `⚠️ *MODO DE USO*\n\n` +
             `> \`${m.prefix}mfdl <url>\`\n\n` +
-            `> Contoh:\n` +
+            `> Ejemplo:\n` +
             `> \`${m.prefix}mfdl https://www.mediafire.com/file/xxx\``
         )
     }
-    
+
     if (!url.match(/mediafire\.com/i)) {
-        return m.reply(`❌ *URL tidak valid. Gunakan link MediaFire.*`)
+        return m.reply(`❌ *URL no válida. Por favor, usa un enlace de MediaFire.*`)
     }
     await m.react('🕕')
-    
+
     try {
         const { data } = await f(`https://api.neoxr.eu/api/mediafire?url=${encodeURIComponent(url)}&apikey=${config.APIkey.neoxr}`)
         await sock.sendMedia(m.chat, data.url, null, m, {
@@ -47,7 +48,7 @@ async function handler(m, { sock }) {
                 isForwarded: true
             }
         })
-        
+
     } catch (err) {
         return m.reply(te(m.prefix, m.command, m.pushName))
     }
