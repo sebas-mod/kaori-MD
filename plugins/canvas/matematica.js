@@ -5,12 +5,12 @@ import {
 import te from "../../src/lib/ourin-error.js";
 
 const pluginConfig = {
-  name: "math",
+  name: "matematica",
   alias: ["latex", "matematica", "formula"],
   category: "canvas",
   description: "Renderiza fórmulas matemáticas (LaTeX) en una imagen",
-  usage: ".math <latex>",
-  example: ".math E = mc^2 | \\frac{a}{b}",
+  usage: ".matematica <latex>",
+  example: ".matematica E = mc^2 | \\frac{a}{b}",
   isOwner: false,
   isPremium: false,
   isGroup: false,
