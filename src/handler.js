@@ -65,7 +65,6 @@ import path from "path";
 import { exec } from "child_process";
 import axios from "axios";
 import * as timeHelper from "./lib/ourin-time.js";
-
 const safe = (fn) => {
   try {
     return fn();
@@ -277,7 +276,7 @@ async function handleSmartTriggers(m, sock, db) {
     return false;
   }
 
-  if (text === "listo" || text === "done") {
+  if (text === "done") {
     const sessions = db.setting("transactionSessions") || {};
     if (sessions[m.sender]) {
       try {
@@ -290,7 +289,7 @@ async function handleSmartTriggers(m, sock, db) {
           return true;
         }
       } catch (e) {
-        console.error("[Handler] Error en trigger 'listo':", e.message);
+        console.error("[Handler] Error en trigger done:", e.message);
       }
     }
   }
@@ -311,8 +310,8 @@ async function handleSmartTriggers(m, sock, db) {
 
   try {
     const saluranId = config.saluran?.id || "120363208449943317@newsletter";
-    const saluranName = config.saluran?.name || "KAORI MD";
-    const botName = "KAORI MD";
+    const saluranName = config.saluran?.name || config.bot?.name || "KAORI MD";
+    const botName = config.bot?.name || "KAORI MD";
 
     let isAutoreplyEnabled = globalSmartTriggers;
 
@@ -321,7 +320,7 @@ async function handleSmartTriggers(m, sock, db) {
         .replace(/{name}/g, m.pushName || "Usuario")
         .replace(/{tag}/g, `@${m.sender.split("@")[0]}`)
         .replace(/{sender}/g, m.sender.split("@")[0])
-        .replace(/{botname}/g, botName)
+        .replace(/{botname}/g, config.bot?.name || "Bot")
         .replace(/{time}/g, timeHelper.formatTime("HH:mm:ss"))
         .replace(/{date}/g, timeHelper.formatDate("DD MMMM YYYY"));
 
@@ -391,11 +390,32 @@ async function handleSmartTriggers(m, sock, db) {
 
     const thumbBuffer = getSmartTriggerThumb();
 
+    const contextInfos = {
+      forwardingScore: 9999,
+      isForwarded: true,
+      forwardedNewsletterMessageInfo: {
+        newsletterJid: saluranId,
+        newsletterName: saluranName,
+        serverMessageId: 127,
+      },
+    };
+
+    if (thumbBuffer) {
+      contextInfos.externalAdReply = {
+        title: botName,
+        body: config.bot?.version ? `v${config.bot.version}` : null,
+        thumbnail: thumbBuffer,
+        mediaType: 1,
+        sourceUrl: config.saluran?.link || "https://wa.me/6281234567890",
+        renderLargerThumbnail: false,
+      };
+    }
+
     if (isMentioned) {
       await m.reply(
-        `¿Llamaste a ${botName}?
+        `¿Alguien llamó a ${botName}?
         
-¿En qué puedo ayudarte @${m.sender.split("@")[0]}?`,
+¿Qué necesitas, @${m.sender.split("@")[0]}?`,
         { mentions: [m.sender] },
       );
       return true;
@@ -403,28 +423,28 @@ async function handleSmartTriggers(m, sock, db) {
 
     if (text?.toLowerCase() === "p") {
       await m.reply(
-        `Hola @${m.sender.split("@")[0]}, por favor di hola o saluda primero.`,
+        `Hola @${m.sender.split("@")[0]}, saluda primero 😊`,
         { mentions: [m.sender] },
       );
       return true;
     }
 
     if (text?.toLowerCase() === "bot") {
-      await m.reply(`Hola @${m.sender.split("@")[0]}, ${botName} está en línea ✅`, {
+      await m.reply(`Hola @${m.sender.split("@")[0]}, ${botName} está activo ✅`, {
         mentions: [m.sender],
       });
       return true;
     }
 
-    if (text?.toLowerCase()?.includes("hola")) {
-      await m.reply(`Hola @${m.sender.split("@")[0]}, ¿cómo estás?`, {
+    if (text?.toLowerCase()?.includes("assalamualaikum")) {
+      await m.reply(`Wa alaikum salam @${m.sender.split("@")[0]}`, {
         mentions: [m.sender],
       });
       return true;
     }
-    
-    if (text?.toLowerCase()?.includes("assalamualaikum")) {
-      await m.reply(`Waalaikumussalam @${m.sender.split("@")[0]}`, {
+
+    if (text?.toLowerCase()?.includes("hallo")) {
+      await m.reply(`Hola también @${m.sender.split("@")[0]}`, {
         mentions: [m.sender],
       });
       return true;
@@ -436,6 +456,11 @@ async function handleSmartTriggers(m, sock, db) {
   return false;
 }
 
+/**
+ * Verificar si el usuario está haciendo spam
+ * @param {string} jid - JID del usuario
+ * @returns {boolean} True si está haciendo spam
+ */
 async function isSpamming(jid) {
   if (!config.features?.antiSpam) return false;
 
@@ -447,6 +472,16 @@ async function isSpamming(jid) {
   }
 }
 
+/**
+ * Handler principal para procesar mensajes
+ * @param {Object} msg - Mensaje crudo de Baileys
+ * @param {Object} sock - Conexión socket
+ * @returns {Promise<void>}
+ * @example
+ * sock.ev.on('messages.upsert', async ({ messages }) => {
+ *   await messageHandler(messages[0], sock);
+ * });
+ */
 async function messageHandler(msg, sock, options = {}) {
   const isJadibot = options.isJadibot || false;
   try {
@@ -460,7 +495,7 @@ async function messageHandler(msg, sock, options = {}) {
       try {
         const packMsg = m.message.stickerPackMessage;
         const packId = packMsg.stickerPackId || m.id;
-        const packName = packMsg.name || "Pack Desconocido";
+        const packName = packMsg.name || "Paquete Desconocido";
         sock.saveStickerPack(packId, { stickerPackMessage: packMsg }, packName);
       } catch (e) {}
     }
@@ -628,7 +663,7 @@ async function messageHandler(msg, sock, options = {}) {
               mentionedJid: modeCheck.jadibotMentions,
               externalAdReply: {
                 title: `A C C E S O  D E N E G A D O`,
-                body: "KAORI MD - Sistema de Seguridad",
+                body: null,
                 thumbnailUrl:
                   "https://cdn.gimita.id/download/unnamed%20(8)_1769331052275_d19c28da.jpg",
                 sourceUrl: null,
@@ -648,7 +683,7 @@ async function messageHandler(msg, sock, options = {}) {
         await m
           .reply(
             config.messages?.banned ||
-              "🚫 *Has sido baneado del uso de este bot.*",
+              "🚫 *Estás baneado de usar este bot.*",
           )
           .catch(() => {});
       }
@@ -659,6 +694,7 @@ async function messageHandler(msg, sock, options = {}) {
     if (m.isGroup && m.isCommand && !m.isOwner) {
       const groupData = db.getGroup(m.chat) || {};
       if (groupData.isBanned) {
+        // si quieres agregar texto también está bien, usa m.reply o sendMessage
         return;
       }
     }
@@ -734,7 +770,7 @@ async function messageHandler(msg, sock, options = {}) {
               contentType: "audio/wav",
             });
             form.append("model", "whisper-large-v3");
-            form.append("language", "es");
+            form.append("language", "id");
             form.append("response_format", "json");
 
             const { data } = await axios.post(
@@ -831,7 +867,7 @@ async function messageHandler(msg, sock, options = {}) {
           await levelHelper.addExpWithLevelCheck(sock, m, db, userObj, 5);
         }
       } catch (e) {
-        console.error("[Sistema de Nivel] Error:", e.message);
+        console.error("[Sistema de Niveles] Error:", e.message);
       }
     }
 
@@ -902,13 +938,13 @@ async function messageHandler(msg, sock, options = {}) {
 
           if (output.length > 0) {
             await m.reply(
-              `✅ *ʀᴇsᴜʟᴛᴀᴅᴏ ᴅᴇ ᴇxᴇᴄ*\n\n\`\`\`\n${output.substring(0, 4000)}\n\`\`\``,
+              `✅ *ʀᴇsᴜʟᴛᴀᴅᴏ ᴅᴇ ᴇᴊᴇᴄᴜᴄɪóɴ*\n\n\`\`\`\n${output.substring(0, 4000)}\n\`\`\``,
             );
           }
         }
       } catch (execError) {
         await m.reply(
-          `❌ *ᴇʀʀᴏʀ ᴅᴇ ᴇxᴇᴄ*\n\n\`\`\`\n${execError.message}\n\nStack:\n${execError.stack?.substring(0, 1000) || "N/A"}\n\`\`\``,
+          `❌ *ᴇʀʀᴏʀ ᴅᴇ ᴇᴊᴇᴄᴜᴄɪóɴ*\n\n\`\`\`\n${execError.message}\n\nStack:\n${execError.stack?.substring(0, 1000) || "N/A"}\n\`\`\``,
         );
       }
       return;
@@ -1054,52 +1090,761 @@ async function messageHandler(msg, sock, options = {}) {
           `> 💳 Escribe \`${m.prefix}payment\` para pagar`;
 
         if (storeCommand.hasImage && storeCommand.imagePath) {
-          await sock.sendMessage(m.chat, { image: { url: storeCommand.imagePath }, caption }, { quoted: m });
-        } else {
-          await m.reply(caption);
+          const { default: fs } = await import("fs");
+          if (fs.existsSync(storeCommand.imagePath)) {
+            const imageBuffer = getCachedThumb(storeCommand.imagePath);
+            await sock.sendMessage(
+              m.chat,
+              {
+                image: imageBuffer,
+                caption: caption,
+              },
+              { quoted: m },
+            );
+            return;
+          }
         }
+
+        await m.reply(caption);
         return;
       }
     }
 
-    const plugin = getPlugin(m.command);
-    if (plugin) {
-        try {
-            const context = {
-                sock,
-                m,
-                db,
-                config,
-                getDatabase,
-                isOwner: m.isOwner,
-                isPremium: m.isPremium,
-                isAdmin: m.isAdmin,
-                isBotAdmin: m.isBotAdmin,
-            };
-            
-            const permission = checkPermission(m, plugin);
-            if (!permission.allowed) {
-                if (permission.message) await m.reply(permission.message);
-                return;
-            }
-
-            await plugin.run(context);
-        } catch (pluginError) {
-            console.error(`[Error de Plugin: ${m.command}]`, pluginError);
-            await m.reply(createErrorMessage(pluginError));
+    try {
+      const caseResult = await handleCaseCommand(m, sock);
+      if (caseResult && caseResult.handled) {
+        if (config.dev?.debugLog) {
+          logger.success("Case", `Manejado: ${m.command}`);
         }
-    } else {
-        await handleCaseCommand(m, sock, db);
+        return;
+      }
+    } catch (caseError) {
+      logger.error("Sistema Case", caseError.message);
+      if (config.dev?.debugLog) {
+        console.error("[SistemaCase] Stack:", caseError.stack);
+      }
     }
 
-  } catch (error) {
-    console.error("[KAORI MD Handler] Error Crítico:", error);
-  } finally {
-      const db = getDatabase();
-      if (db?.ready) {
-          await db.save().catch(() => {});
+    let plugin = getPlugin(m.command);
+
+    if (!plugin) {
+      if (storeCommand) {
+        storeData[m.command.toLowerCase()].views =
+          (storeCommand.views || 0) + 1;
+        db.setting("storeList", storeData);
+
+        const caption =
+          `📦 *${m.command.toUpperCase()}*\n\n` +
+          `${storeCommand.content}\n\n` +
+          `───────────────\n` +
+          `> 👁️ Vistas: ${storeData[m.command.toLowerCase()].views}\n` +
+          `> 💳 Escribe \`${m.prefix}payment\` para pagar`;
+
+        if (storeCommand.hasImage && storeCommand.imagePath) {
+          const { default: fs } = await import("fs");
+          if (fs.existsSync(storeCommand.imagePath)) {
+            const imageBuffer = getCachedThumb(storeCommand.imagePath);
+            await sock.sendMessage(
+              m.chat,
+              {
+                image: imageBuffer,
+                caption: caption,
+              },
+              { quoted: m },
+            );
+            return;
+          }
+        }
+
+        await m.reply(caption);
+        return;
       }
+
+      const storeCommands = Object.keys(storeData);
+      const allCommands = [...getAllCommandNames(), ...storeCommands];
+
+      const similarityEnabled = db.setting("similarity") !== false;
+
+      if (similarityEnabled) {
+        const suggestions = findSimilarCommands(m.command, allCommands, {
+          maxResults: 1,
+          minSimilarity: 0.6,
+          maxDistance: 3,
+        });
+
+        if (suggestions.length > 0) {
+          const message = formatSuggestionMessage(
+            m.command,
+            suggestions,
+            m.prefix,
+            m,
+          );
+          await sock.sendMessage(
+            m.chat,
+            {
+              interactiveMessage: {
+                title: message.message,
+                footer: `Quizás quisiste decir este comando`,
+                document: getCachedThumb("./assets/images/ourin.jpg"),
+                mimetype: "application/pdf",
+                fileName: "¿Quisiste decir?",
+                fileLength: 999999999999,
+                contextInfo: {
+                  isForwarded: true,
+                  forwardingScore: 777,
+                  forwardedNewsletterMessageInfo: {
+                    newsletterJid: config.saluran?.id,
+                    newsletterName: config.saluran?.name,
+                  },
+                },
+                externalAdReply: {
+                  title: `Comando ${m.command || ""} no encontrado`,
+                  body: "¿Necesitas ayuda? escribe: " + m.prefix + "menu",
+                  thumbnailUrl:
+                    "https://cdn.gimita.id/download/3a48a5a23251c8849f9a38a861392849_1771038665065_a85b23f6.jpg",
+                  sourceUrl: null,
+                  mediaType: 1,
+                  renderLargerThumbnail: false,
+                },
+                buttons: message.interactiveButtons,
+              },
+            },
+            { quoted: m },
+          );
+        }
+      }
+
+      return;
+    }
+
+    if (!plugin.config.isEnabled) {
+      return;
+    }
+
+    if (m.isGroup) {
+      const groupData = db.getGroup(m.chat) || {};
+      let botMode = groupData.botMode || "md";
+      const pluginCategory = plugin.config.category?.toLowerCase();
+      const baseAllowed = ["main", "group", "sticker", "owner"];
+
+      if (isJadibot) {
+        botMode = "md";
+
+        const jadibotBlockedCategories = [
+          "owner",
+          "sewa",
+          "panel",
+          "store",
+          "pushkontak",
+        ];
+        const jadibotBlockedCommands = [
+          "sewa",
+          "sewabot",
+          "sewalist",
+          "listsewa",
+          "addsewa",
+          "delsewa",
+          "extendsewa",
+          "checksewa",
+          "sewainfo",
+          "sewagroup",
+          "stopsewa",
+          "jadibot",
+          "listjadibot",
+          "addowner",
+          "delowner",
+          "ownerlist",
+          "listowner",
+          "self",
+          "public",
+          "botmode",
+          "restart",
+          "shutdown",
+        ];
+
+        if (
+          jadibotBlockedCategories.includes(pluginCategory) ||
+          jadibotBlockedCommands.includes(m.command.toLowerCase())
+        ) {
+          return m.reply(
+            `⚠️ *ᴀᴄᴄᴇsᴏ ʀᴇsᴛʀɪɴɢɪᴅᴏ*\n\n` +
+              `Esta función solo está disponible en el bot principal.\n` +
+              `Jadibot no puede acceder a esta función.\n\n` +
+              `> Contacta al owner del bot principal para más información.`,
+          );
+        }
+      }
+
+      const modeConfig = {
+        all: { allowed: null, excluded: null, name: "Todas las funciones" },
+        md: {
+          allowed: null,
+          excluded: ["pushkontak", "store", "panel", "otp"],
+          name: "Multi Dispositivo",
+        },
+        cpanel: { allowed: [...baseAllowed, "tools", "panel"], name: "CPanel" },
+        pushkontak: {
+          allowed: [...baseAllowed, "pushkontak"],
+          name: "Push Contacto",
+        },
+        store: { allowed: [...baseAllowed, "store"], name: "Tienda" },
+        otp: { allowed: [...baseAllowed, "otp"], name: "OTP" },
+      };
+
+      const categoryModeMap = {
+        download: "md",
+        search: "md",
+        ai: "md",
+        fun: "md",
+        game: "md",
+        media: "md",
+        utility: "md",
+        tools: "md",
+        ephoto: "md",
+        religi: "md",
+        info: "md",
+        panel: "cpanel",
+        pushkontak: "pushkontak",
+        store: "store",
+        otp: "otp",
+        jpm: "md",
+      };
+
+      const currentConfig = modeConfig[botMode] || modeConfig.md;
+
+      if (
+        m.command !== "botmode" &&
+        m.command !== "menu" &&
+        m.command !== "menucat"
+      ) {
+        let isBlocked = false;
+
+        if (
+          currentConfig.allowed &&
+          !currentConfig.allowed.includes(pluginCategory)
+        ) {
+          isBlocked = true;
+        }
+        if (
+          currentConfig.excluded &&
+          currentConfig.excluded.includes(pluginCategory)
+        ) {
+          isBlocked = true;
+        }
+
+        if (isBlocked) {
+          const suggestedMode = categoryModeMap[pluginCategory] || "md";
+          const suggestedModeName =
+            modeConfig[suggestedMode]?.name || "Multi Dispositivo";
+
+          await m.reply(
+            `🔒 *ᴄᴏᴍᴀɴᴅᴏ ɴᴏ ᴅɪsᴘᴏɴɪʙʟᴇ*\n\n` +
+              `> El bot está en modo *${currentConfig.name}*\n` +
+              `> El comando \`${m.prefix}${m.command}\` está disponible en el modo *${suggestedModeName}*\n\n` +
+              `💡 Contacta al admin del grupo para cambiar el modo:\n` +
+              `\`${m.prefix}botmode ${suggestedMode}\``,
+          );
+          return;
+        }
+      }
+    }
+
+    const permission = checkPermission(m, plugin.config);
+    if (!permission.allowed) {
+      await m.reply(permission.reason);
+      return;
+    }
+
+    const registrationRequired =
+      db.setting("registrationRequired") ??
+      config.registration?.enabled ??
+      false;
+    if (registrationRequired && !plugin.config.skipRegistration) {
+      const user = db.getUser(m.sender);
+      if (!m.isOwner && !m.isPartner && !m.isPremium && !user?.isRegistered) {
+        await m.reply(
+          `📝 *ʀᴇɢɪsᴛʀᴏ ʀᴇQᴜᴇʀɪᴅᴏ*\n\n` +
+            `¡Debes registrarte primero!\n\n` +
+            `> Escribe: \`${m.prefix}daftar <nombre>\`\n\n` +
+            `*Ejemplo:* \`${m.prefix}daftar ${m.pushName || "TuNombre"}\``,
+        );
+        return;
+      }
+    }
+
+    const user = db.getUser(m.sender);
+
+    if (!m.isOwner && !m.isPartner && plugin.config.cooldown > 0) {
+      const cooldownRemaining = db.checkCooldown(
+        m.sender,
+        m.command,
+        plugin.config.cooldown,
+      );
+      if (cooldownRemaining) {
+        m.react("⏱️").catch(() => {});
+        return;
+      }
+    }
+
+    const energiEnabled =
+      db.setting("energi") !== undefined
+        ? db.setting("energi")
+        : config.energi?.enabled !== false;
+    if (energiEnabled && plugin.config.energi > 0) {
+      const ownerEnergi = config.energi?.owner ?? -1;
+      const premiumEnergi = config.energi?.premium ?? -1;
+      const defaultEnergi = config.energi?.default ?? 0;
+
+      let currentEnergi;
+      if (
+        (m.isOwner || m.isPartner) &&
+        (ownerEnergi === -1 || user?.energi === -1)
+      ) {
+      } else if (m.isPremium && (premiumEnergi === -1 || user?.energi === -1)) {
+      } else {
+        currentEnergi =
+          user?.energi ??
+          (m.isOwner || m.isPartner
+            ? ownerEnergi
+            : m.isPremium
+              ? premiumEnergi
+              : defaultEnergi);
+        if (currentEnergi < plugin.config.energi) {
+          await m.reply(config.messages?.energiExceeded || "⚡ ¡Energía agotada!");
+          return;
+        }
+        db.updateEnergi(m.sender, -plugin.config.energi);
+      }
+    }
+
+    if (config.features?.autoTyping) {
+      sock.sendPresenceUpdate("composing", m.chat).catch(() => {});
+    }
+
+    const context = {
+      sock,
+      m,
+      config,
+      db,
+      uptime: getUptime(),
+      plugins: {
+        count: getPluginCount(),
+      },
+      jadibotId: jadibotId,
+      isJadibot: isJadibot,
+    };
+
+    await plugin.handler(m, context);
+
+    if (!m.isOwner && !m.isPartner && plugin.config.cooldown > 0) {
+      db.setCooldown(m.sender, m.command, plugin.config.cooldown);
+    }
+
+    db.incrementStat("commandsExecuted");
+    db.incrementStat(`command_${m.command}`);
+
+    if (config.features?.autoTyping) {
+      sock.sendPresenceUpdate("paused", m.chat).catch(() => {});
+    }
+  } catch (error) {
+    logger.error("handler", `${error.message}`);
+    console.error("[Handler Stack]", error.stack);
+
+    try {
+      const db = getDatabase();
+      if (db) {
+        db.incrementStat("commandErrors");
+        const errorLog = db.setting("errorLog") || [];
+        errorLog.unshift({
+          cmd: "unknown",
+          err: error.message?.substring(0, 200),
+          at: Date.now(),
+        });
+        if (errorLog.length > 50) errorLog.length = 50;
+        db.setting("errorLog", errorLog);
+      }
+    } catch {}
+
+    try {
+      const m = await serialize(sock, msg);
+      if (m) {
+        await m.reply(`Parece que hubo un problema, intenta contactar al owner`);
+      }
+    } catch {
+      logger.error("No se pudo enviar el mensaje de error");
+    }
   }
 }
 
-export { messageHandler };
+/**
+ * Handler para actualizar participantes del grupo
+ * @param {Object} update - Datos de actualización
+ * @param {Object} sock - Conexión socket
+ * @returns {Promise<void>}
+ */
+async function groupHandler(update, sock) {
+  try {
+    if (global.sewaLeaving) return;
+
+    const { id: groupJid, participants, action } = update;
+
+    if (
+      !participants ||
+      !Array.isArray(participants) ||
+      participants.length === 0
+    ) {
+      return;
+    }
+
+    const db = getDatabase();
+
+    let groupData = db.getGroup(groupJid);
+    if (!groupData) {
+      db.setGroup(groupJid, {
+        welcome: config.welcome?.defaultEnabled ?? true,
+        goodbye: config.goodbye?.defaultEnabled ?? true,
+        leave: config.goodbye?.defaultEnabled ?? true,
+      });
+      groupData = db.getGroup(groupJid);
+    }
+
+    let groupMeta;
+    try {
+      const cached = global.groupMetadataCache?.get(groupJid);
+      if (cached && Date.now() - (cached._ts || 0) < 30000) {
+        groupMeta = cached;
+      } else {
+        groupMeta = await sock.groupMetadata(groupJid);
+        if (global.groupMetadataCache) {
+          groupMeta._ts = Date.now();
+          global.groupMetadataCache.set(groupJid, groupMeta);
+        }
+      }
+
+      if (groupMeta?.participants) {
+        cacheParticipantLids(groupMeta.participants);
+      }
+    } catch (e) {
+      if (
+        e.message?.includes("forbidden") ||
+        e.message?.includes("401") ||
+        e.message?.includes("403")
+      ) {
+        return;
+      }
+      if (
+        e.message?.includes("rate-overlimit") ||
+        e?.output?.statusCode === 429
+      ) {
+        logger.warn("GroupHandler", "límite de tasa alcanzado, omitiendo evento");
+        return;
+      }
+      throw e;
+    }
+
+    for (let participant of participants) {
+      let participantJid;
+
+      if (typeof participant === "object" && participant !== null) {
+        participantJid =
+          participant.jid || participant.id || participant.lid || "";
+      } else {
+        participantJid = participant;
+      }
+
+      if (!participantJid || typeof participantJid !== "string") continue;
+
+      if (isLid(participantJid) || isLidConverted(participantJid)) {
+        const found = groupMeta.participants?.find(
+          (p) =>
+            p.id === participantJid ||
+            p.lid === participantJid ||
+            p.lid === participantJid.replace("@s.whatsapp.net", "@lid"),
+        );
+        if (found) {
+          participantJid =
+            found.jid &&
+            !found.jid.endsWith("@lid") &&
+            !isLidConverted(found.jid)
+              ? found.jid
+              : found.id &&
+                  !found.id.endsWith("@lid") &&
+                  !isLidConverted(found.id)
+                ? found.id
+                : lidToJid(participantJid);
+        } else {
+          participantJid = lidToJid(participantJid);
+        }
+      }
+
+      participant = participantJid;
+
+      if (action === "add" && sendWelcomeMessage) {
+        await sendWelcomeMessage(sock, groupJid, participant, groupMeta);
+      }
+
+      if (action === "remove" && sendGoodbyeMessage) {
+        await sendGoodbyeMessage(sock, groupJid, participant, groupMeta);
+      }
+
+      const saluranId = config.saluran?.id || "120363208449943317@newsletter";
+      const saluranName =
+        config.saluran?.name || config.bot?.name || "KAORI MD";
+
+      let groupPpUrl = null;
+      try {
+        groupPpUrl = await sock.profilePictureUrl(groupJid, "image");
+      } catch {}
+
+      if (action === "promote" && groupData.notifPromote === true) {
+        const author = update.author || null;
+        if (!groupHandler._promoteImg) {
+          try {
+            groupHandler._promoteImg = fs.readFileSync(
+              "./assets/images/ourin-promote.jpg",
+            );
+          } catch {
+            groupHandler._promoteImg = null;
+          }
+        }
+        if (groupHandler._promoteImg) {
+          await sock.sendMedia(
+            groupJid,
+            groupHandler._promoteImg,
+            `🌿 @${participant.split("@")[0]} ahora es el nuevo admin 💕\nPromovido por: @${author?.split("@")[0] || "Desconocido"}`,
+            null,
+            {
+              type: "image",
+              mentions: author ? [participant, author] : [participant],
+              contextInfo: {
+                mentionedJid: author ? [participant, author] : [participant],
+                forwardingScore: 7,
+                isForwarded: true,
+                externalAdReply: {
+                  title: "🎉 PROMOVIDO",
+                  body: `Notificación de grupo`,
+                  thumbnailUrl: groupPpUrl,
+                  mediaType: 1,
+                  renderLargerThumbnail: false,
+                  sourceUrl: "",
+                },
+              },
+            },
+          );
+        }
+      }
+
+      if (action === "demote" && groupData.notifDemote === true) {
+        const author = update.author || null;
+        if (!groupHandler._demoteImg) {
+          try {
+            groupHandler._demoteImg = fs.readFileSync(
+              "./assets/images/ourin-demote.jpg",
+            );
+          } catch {
+            groupHandler._demoteImg = null;
+          }
+        }
+        if (groupHandler._demoteImg) {
+          await sock.sendMedia(
+            groupJid,
+            groupHandler._demoteImg,
+            `🌿 @${participant.split("@")[0]} ya no es administrador.\nDegradado por: @${author?.split("@")[0] || "Desconocido"}`,
+            null,
+            {
+              type: "image",
+              mentions: author ? [participant, author] : [participant],
+              contextInfo: {
+                mentionedJid: author ? [participant, author] : [participant],
+                forwardingScore: 7,
+                isForwarded: true,
+                externalAdReply: {
+                  title: "📉 DEGRADADO",
+                  body: `Notificación de grupo`,
+                  thumbnailUrl: groupPpUrl,
+                  mediaType: 1,
+                  renderLargerThumbnail: false,
+                  sourceUrl: "",
+                },
+              },
+            },
+          );
+        }
+      }
+    }
+  } catch (error) {
+    console.error("[GroupHandler] Error:", error.message);
+  }
+}
+
+async function messageUpdateHandler(updates, sock) {
+  const db = getDatabase();
+
+  for (const update of updates) {
+    try {
+      await handleAntiRemove(update, sock, db);
+    } catch (error) {
+      continue;
+    }
+
+    try {
+      const editedMsg = update.update?.message?.editedMessage?.message;
+      const regularMsg = update.update?.message;
+
+      const resolvedMessage =
+        editedMsg ||
+        (regularMsg && !regularMsg.protocolMessage ? regularMsg : null);
+
+      if (!resolvedMessage) continue;
+
+      const newMsg = {
+        key: update.key,
+        message: editedMsg ? { ...resolvedMessage } : regularMsg,
+        messageTimestamp:
+          update.messageTimestamp || Math.floor(Date.now() / 1000),
+        pushName: update.pushName || "Usuario",
+      };
+
+      await messageHandler(newMsg, sock);
+    } catch (error) {
+      console.error("[ActualizaciónMensaje] Error:", error.message);
+    }
+  }
+}
+
+/**
+ * Caché para guardar el último estado del grupo
+ * Formato: { groupId: { announce: boolean, restrict: boolean, lastUpdate: timestamp } }
+ */
+const groupSettingsCache = new Map();
+
+/**
+ * Debounce cooldown para prevenir spam (en ms)
+ */
+const GROUP_SETTINGS_COOLDOWN = 1000;
+
+async function groupSettingsHandler(update, sock) {
+  try {
+    if (global.sewaLeaving) return;
+    if (global.isFetchingGroups) return;
+
+    const groupId = update.id;
+    if (!groupId || !groupId.endsWith("@g.us")) return;
+
+    if (update.announce === undefined && update.restrict === undefined) {
+      return;
+    }
+
+    const cached = groupSettingsCache.get(groupId) || {};
+    const now = Date.now();
+
+    if (
+      cached.lastUpdate &&
+      now - cached.lastUpdate < GROUP_SETTINGS_COOLDOWN
+    ) {
+      return;
+    }
+
+    let hasRealChange = false;
+
+    let groupName = groupId;
+    let groupPpUrl = null;
+    try {
+      const meta = await sock.groupMetadata(groupId);
+      groupName = meta?.subject || groupId;
+    } catch {}
+    try {
+      groupPpUrl = await sock.profilePictureUrl(groupId, "image");
+    } catch {}
+
+    const db = getDatabase();
+    const groupData = db.getGroup(groupId) || {};
+
+    const zannContext = {
+      contextInfo: {
+        forwardingScore: 9,
+        isForwarded: true,
+        externalAdReply: {
+          showAdAttribution: false,
+          title: "NOTIFICACIÓN DE GRUPO",
+          body: config.bot?.name,
+          thumbnailUrl: groupPpUrl,
+          mediaType: 1,
+          renderLargerThumbnail: false,
+          sourceUrl: "",
+        },
+      },
+    };
+
+    if (update.announce !== undefined) {
+      if (cached.announce === undefined) {
+        cached.announce = update.announce;
+      } else if (cached.announce !== update.announce) {
+        hasRealChange = true;
+
+        if (update.announce === true && groupData.notifCloseGroup === true) {
+          await sock.sendText(
+            groupId,
+            `🥗 El grupo *${groupName}* fue cerrado por el admin`,
+            null,
+            zannContext,
+          );
+        }
+
+        if (update.announce === false && groupData.notifOpenGroup === true) {
+          await sock.sendText(
+            groupId,
+            `🎃 El grupo *${groupName}* fue abierto nuevamente por el admin`,
+            null,
+            zannContext,
+          );
+        }
+
+        cached.announce = update.announce;
+      }
+    }
+
+    if (update.restrict !== undefined) {
+      if (cached.restrict === undefined) {
+        cached.restrict = update.restrict;
+      } else if (cached.restrict !== update.restrict) {
+        hasRealChange = true;
+
+        if (update.restrict === true) {
+          await sock.sendText(
+            groupId,
+            `🥗 Info del grupo *${groupName}* restringida.\nSolo los admins pueden editar el grupo`,
+            null,
+            zannContext,
+          );
+        } else {
+          await sock.sendText(
+            groupId,
+            `🥗 Info del grupo *${groupName}* abierta.\nTodos los miembros pueden editar el grupo`,
+            null,
+            zannContext,
+          );
+        }
+        cached.restrict = update.restrict;
+      }
+    }
+    if (hasRealChange) {
+      cached.lastUpdate = now;
+    }
+    if (cached.announce !== undefined || cached.restrict !== undefined) {
+      groupSettingsCache.set(groupId, cached);
+    }
+  } catch (error) {
+    console.error("[ConfiguraciónGrupo] Error:", error.message);
+  }
+}
+
+export {
+  messageHandler,
+  groupHandler,
+  messageUpdateHandler,
+  groupSettingsHandler,
+  checkPermission,
+  checkMode,
+  isSpamming,
+};
