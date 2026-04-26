@@ -1,10 +1,10 @@
 const pluginConfig = {
-    name: 'cekyandere',
+    name: 'chequeoyandere',
     alias: ['yandere'],
     category: 'cek',
     description: 'Comprueba tu nivel de yandere',
-    usage: '.cekyandere <nombre>',
-    example: '.cekyandere Budi',
+    usage: '.yandere <nombre>',
+    example: '.yandere Budi',
     isOwner: false,
     isPremium: false,
     isGroup: false,
