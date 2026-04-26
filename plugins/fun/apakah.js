@@ -1,10 +1,10 @@
 const pluginConfig = {
-    name: 'apakah',
-    alias: ['apa'],
+    name: 'preguntar',
+    alias: ['sera', 'pregunta'],
     category: 'fun',
-    description: 'Tanya bot apakah sesuatu',
-    usage: '.apakah <pertanyaan>',
-    example: '.apakah aku bisa kaya?',
+    description: 'Pregúntale al bot si algo es cierto o posible',
+    usage: '.preguntar <pregunta>',
+    example: '.preguntar ¿puedo ser rico?',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -15,38 +15,38 @@ const pluginConfig = {
 };
 
 const answers = [
-    'Ya, tentu saja!',
-    'Tidak, sepertinya tidak.',
-    'Mungkin saja, coba lagi nanti.',
-    'Hmm... aku rasa iya.',
-    'Aku ragu, tapi bisa jadi.',
-    'Pasti! 100%!',
-    'Tidak mungkin.',
-    'Bisa jadi, siapa yang tau?',
-    'Menurutku sih iya.',
-    'Wah, kayaknya nggak deh.',
-    'Tentu, kenapa tidak?',
-    'Aku nggak tau, coba tanya yang lain.',
-    'Ya ampun, pasti lah!',
-    'Hmm... sepertinya tidak.',
-    'Aku yakin iya!',
-    'Nggak mungkin banget.',
-    'Mungkin, tapi jangan berharap terlalu tinggi.',
-    'Iya dong!',
-    'Nggak, maaf ya.',
-    'Bisa! Semangat!'
+    '¡Sí, por supuesto!',
+    'No, no lo creo.',
+    'Tal vez, inténtalo de nuevo más tarde.',
+    'Hmm... yo creo que sí.',
+    'Tengo mis dudas, pero podría ser.',
+    '¡Definitivamente! ¡100%!',
+    'Es imposible.',
+    'Podría ser, ¿quién sabe?',
+    'En mi opinión, sí.',
+    'Uff, me parece que no.',
+    'Claro, ¿por qué no?',
+    'No lo sé, pregúntale a alguien más.',
+    '¡Madre mía, por supuesto que sí!',
+    'Hmm... parece que no.',
+    '¡Estoy seguro de que sí!',
+    'Para nada, imposible.',
+    'Quizás, pero no te hagas muchas ilusiones.',
+    '¡Claro que sí!',
+    'No, lo siento.',
+    '¡Se puede! ¡Ánimo!'
 ];
 
 async function handler(m) {
     const text = m.text?.trim();
-    
+
     if (!text) {
-        return m.reply(`❓ *ᴀᴘᴀᴋᴀʜ*\n\n> Masukkan pertanyaan!\n\n*Contoh:*\n> .apakah aku bisa jadi kaya?`);
+        return m.reply(`❓ *ᴘʀᴇɢᴜɴᴛᴀʀ*\n\n> ¡Ingresa una pregunta!\n\n*Ejemplo:*\n> .preguntar ¿puedo ser rico?`);
     }
-    
+
     const answer = answers[Math.floor(Math.random() * answers.length)];
-    
-    await m.reply(`${m.body.slice(1)}?
+
+    await m.reply(`${m.body.slice(1)}
 *${answer}*`);
 }
 
