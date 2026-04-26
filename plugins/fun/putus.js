@@ -1,15 +1,12 @@
-/**
- * Putus - End relationship
- */
-
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
-    name: 'putus',
-    alias: ['breakup', 'cerai'],
+    name: 'terminar',
+    alias: ['breakup', 'separarse', 'putus'],
     category: 'fun',
-    description: 'Memutuskan hubungan dengan pasangan',
-    usage: '.putus',
-    example: '.putus',
+    description: 'Termina la relación con tu pareja actual',
+    usage: '.terminar',
+    example: '.terminar',
     isOwner: false,
     isPremium: false,
     isGroup: true,
@@ -22,27 +19,34 @@ const pluginConfig = {
 async function handler(m, { sock }) {
     const db = getDatabase()
     let senderData = db.getUser(m.sender) || {}
+    
     if (!senderData.fun) senderData.fun = {}
+    
     if (!senderData.fun.pasangan) {
         await m.react('❌')
         return m.reply(
-            `❌ *Kamu gak ada pacar wehh*\n\n` +
-            `Cari dulu dengan \`${m.prefix}tembak @tag\``
+            `❌ *¡Pero si estás más solo que un hongo!*\n\n` +
+            `Primero conseguí a alguien con \`${m.prefix}proponer @tag\``
         )
     }
+
     const exPartner = senderData.fun.pasangan
     let exData = db.getUser(exPartner) || {}
+
+    // Eliminar la relación de ambos lados en la DB
     delete senderData.fun.pasangan
     if (exData.fun?.pasangan === m.sender) {
         delete exData.fun.pasangan
         db.setUser(exPartner, exData)
     }
+    
     db.setUser(m.sender, senderData)
+
     await m.react('💔')
     await m.reply(
-        `💔 *PUTUS!*\n\n` +
-        `@${m.sender.split('@')[0]} dan @${exPartner.split('@')[0]} resmi putus !!\n\n` +
-        `Semoga mendapat yang lebih baik! 🙏`,
+        `💔 *¡SE ACABÓ EL AMOR!*\n\n` +
+        `@${m.sender.split('@')[0]} y @${exPartner.split('@')[0]} acaban de terminar su relación oficialmente.\n\n` +
+        `¡Ojalá encuentren a alguien mejor! 🙏`,
         { mentions: [m.sender, exPartner] }
     )
 }
