@@ -1,13 +1,14 @@
 import axios from 'axios'
 import config from '../../config.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'meme3',
-    alias: ['3panel'],
+    alias: ['3panel', 'meme-triple'],
     category: 'canvas',
-    description: 'Membuat meme 3 panel',
-    usage: '.meme3 <text1>|<text2>|<text3>',
-    example: '.meme3 Kemarin ada apa?|Gak tau mau tidur|Kemaren kan lu belom beli',
+    description: 'Crea un meme de 3 paneles con texto personalizado',
+    usage: '.meme3 <texto1>|<texto2>|<texto3>',
+    example: '.meme3 ¿Qué pasó ayer?|No sé, estaba durmiendo|Pero si te vi en la fiesta',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -24,8 +25,8 @@ async function handler(m, { sock }) {
     if (parts.length < 3 || !parts[0] || !parts[1] || !parts[2]) {
         return m.reply(
             `🎭 *ᴍᴇᴍᴇ 3 ᴘᴀɴᴇʟ*\n\n` +
-            `> Masukkan 3 teks dengan pemisah |\n\n` +
-            `> Contoh: \`${m.prefix}meme3 Text1|Text2|Text3\``
+            `> ¡Ingresa 3 textos separados por el símbolo | !\n\n` +
+            `> Ejemplo: \`${m.prefix}meme3 Texto1|Texto2|Texto3\``
         )
     }
     
@@ -35,7 +36,7 @@ async function handler(m, { sock }) {
     
     const apikey = config.APIkey?.lolhuman
     if (!apikey) {
-        return m.reply(`❌ API key lolhuman tidak dikonfigurasi!`)
+        return m.reply(`❌ ¡La API key de lolhuman no está configurada!`)
     }
     
     m.react('🕕')
