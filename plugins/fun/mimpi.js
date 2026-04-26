@@ -1,15 +1,10 @@
-/**
- * Mimpi / Dream World - Fun dream interpretation generator
- * Ported from RTXZY-MD-pro
- */
-
 const pluginConfig = {
-    name: 'mimpi',
-    alias: ['dream', 'dreamworld'],
+    name: 'sueño',
+    alias: ['dream', 'sueños', 'mundosueño'],
     category: 'fun',
-    description: 'Jelajahi dunia mimpimu berdasarkan nama',
-    usage: '.mimpi <nama>',
-    example: '.mimpi Keisya',
+    description: 'Explora tu mundo onírico basado en tu nombre',
+    usage: '.sueño <nombre>',
+    example: '.sueño Keisya',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -19,74 +14,79 @@ const pluginConfig = {
     isEnabled: true
 }
 
-const DREAM_LEVELS = ['Lucid ✨', 'Mystic 🌟', 'Ethereal 💫', 'Divine 🌙', 'Legendary 🎇']
-const DREAM_QUALITIES = ['Peaceful 😌', 'Adventure 🚀', 'Mystical 🔮', 'Prophecy 📖', 'Epic 🗺️']
+const DREAM_LEVELS = ['Lúcido ✨', 'Místico 🌟', 'Etéreo 💫', 'Divino 🌙', 'Legendario 🎇']
+const DREAM_QUALITIES = ['Pacífico 😌', 'Aventura 🚀', 'Misterioso 🔮', 'Profético 📖', 'Épico 🗺️']
 
 const ELEMENTS = [
-    '🌊 Lautan Kristal Bercahaya',
-    '🌈 Pelangi Mengambang',
-    '🌺 Taman Melayang',
-    '⭐ Konstelasi Hidup',
-    '🌙 Bulan Kembar',
-    '🏰 Kastil Awan',
-    '🌋 Gunung Prisma',
-    '🎭 Theater Bayangan'
+    '🌊 Océano de Cristal Brillante',
+    '🌈 Arcoíris Flotante',
+    '🌺 Jardín Colgante',
+    '⭐ Constelación Viviente',
+    '🌙 Lunas Gemelas',
+    '🏰 Castillo de Nubes',
+    '🌋 Montaña de Prisma',
+    '🎭 Teatro de Sombras'
 ]
 
 const EVENTS = [
-    '🦋 Kupu-kupu membawa pesan rahasia',
-    '🎭 Topeng menari sendiri',
-    '🌊 Hujan bintang jatuh ke laut',
-    '🎪 Parade makhluk ajaib',
-    '🌺 Bunga bernyanyi lagu kuno',
-    '🎨 Lukisan menjadi hidup',
-    '🎵 Musik terlihat sebagai warna',
-    '⚡ Petir membentuk tangga ke langit'
+    '🦋 Mariposas llevando mensajes secretos',
+    '🎭 Máscaras que bailan solas',
+    '🌊 Lluvia de estrellas cayendo al mar',
+    '🎪 Desfile de criaturas mágicas',
+    '🌺 Flores cantando canciones antiguas',
+    '🎨 Pinturas que cobran vida',
+    '🎵 Música que se ve como colores',
+    '⚡ Rayos formando una escalera al cielo'
 ]
 
 const ENCOUNTERS = [
-    '🐉 Naga Pelangi Bijaksana',
-    '🧙‍♂️ Penyihir Bintang',
-    '🦊 Rubah Spirit Sembilan Ekor',
-    '🧝‍♀️ Peri Pembawa Mimpi',
-    '🦁 Singa Kristal',
-    '🐋 Paus Terbang Mistis',
-    '🦅 Burung Phoenix Waktu',
-    '🐢 Kura-kura Pembawa Dunia',
-    '🦄 Unicorn Dimensi'
+    '🐉 Dragón Arcoíris Sabio',
+    '🧙‍♂️ Mago de las Estrellas',
+    '🦊 Zorro Espiritual de Nueve Colas',
+    '🧝‍♀️ Hada Guardiana de Sueños',
+    '🦁 León de Cristal',
+    ' Whale Ballena Voladora Mística',
+    '🦅 Fénix del Tiempo',
+    '🐢 Tortuga Ancestral del Mundo',
+    '🦄 Unicornio Dimensional'
 ]
 
 const POWERS = [
-    '✨ Mengendalikan Waktu',
-    '🌊 Berbicara dengan Elemen',
-    '🎭 Shapeshifting',
-    '🌈 Manipulasi Realitas',
-    '👁️ Penglihatan Masa Depan',
-    '🎪 Teleportasi Dimensi',
-    '🌙 Penyembuhan Spiritual',
-    '⚡ Energi Kosmik'
+    '✨ Control del Tiempo',
+    '🌊 Hablar con los Elementos',
+    '🎭 Cambio de Forma',
+    '🌈 Manipulación de la Realidad',
+    '👁️ Visión del Futuro',
+    '🎪 Teletransportación Dimensional',
+    '🌙 Sanación Espiritual',
+    '⚡ Energía Cósmica'
 ]
 
 const MESSAGES = [
-    'Perjalananmu akan membawa perubahan besar',
-    'Rahasia kuno akan terungkap dalam waktu dekat',
-    'Kekuatan tersembunyi akan segera bangkit',
-    'Takdir baru menanti di horizon',
-    'Koneksi spiritual akan menguat',
-    'Transformasi besar akan terjadi',
-    'Pencerahan akan datang dari arah tak terduga',
-    'Misi penting akan segera dimulai'
+    'Tu viaje traerá un gran cambio',
+    'Un secreto antiguo será revelado pronto',
+    'Un poder oculto despertará en ti',
+    'Un nuevo destino te espera en el horizonte',
+    'Tu conexión espiritual se fortalecerá',
+    'Una gran transformación está por ocurrir',
+    'La iluminación vendrá de donde menos lo esperas',
+    'Una misión importante comenzará pronto'
 ]
 
 function generateDream(seed) {
     const seedNum = Array.from(seed).reduce((acc, char) => acc + char.charCodeAt(0), 0)
-    
+
     const pick = (arr) => arr[seedNum % arr.length]
     const pickMulti = (arr, count) => {
-        const shuffled = [...arr].sort(() => Math.random() - 0.5)
+        // Mezclado basado en el seed para que siempre de el mismo resultado para el mismo nombre
+        const shuffled = [...arr].sort((a, b) => {
+            const valA = a.length + seedNum
+            const valB = b.length + seedNum
+            return (valA % 7) - (valB % 5)
+        })
         return shuffled.slice(0, count)
     }
-    
+
     return {
         level: pick(DREAM_LEVELS),
         quality: pick(DREAM_QUALITIES),
@@ -101,37 +101,37 @@ function generateDream(seed) {
 async function handler(m, { sock }) {
     const args = m.args || []
     let name = args.join(' ') || m.pushName || m.sender.split('@')[0]
-    
+
     await m.react('🌙')
-    await m.reply('🌙 *Memasuki alam mimpi...*')
+    await m.reply('🌙 *Entrando al mundo de los sueños...*')
     await new Promise(r => setTimeout(r, 1500))
-    
+
     const dream = generateDream(name)
-    
-    let txt = `╭═══❯ *🌙 DREAM WORLD* ❮═══\n`
-    txt += `│ 👤 *Explorer:* ${name}\n`
-    txt += `│ ⭐ *Level:* ${dream.level}\n`
-    txt += `│ 💫 *Quality:* ${dream.quality}\n`
-    txt += `│ 🌈 *Elements:*\n`
+
+    let txt = `╭═══❯ *🌙 MUNDO ONÍRICO* ❮═══\n`
+    txt += `│ 👤 *Explorador:* ${name}\n`
+    txt += `│ ⭐ *Nivel:* ${dream.level}\n`
+    txt += `│ 💫 *Calidad:* ${dream.quality}\n`
+    txt += `│ 🌈 *Elementos:*\n`
     for (const el of dream.elements) {
         txt += `│ ├ ${el}\n`
     }
-    txt += `│ 🎪 *Events:*\n`
+    txt += `│ 🎪 *Sucesos:*\n`
     for (const ev of dream.events) {
         txt += `│ ├ ${ev}\n`
     }
-    txt += `│ 🌟 *Encounters:*\n`
+    txt += `│ 🌟 *Encuentros:*\n`
     for (const enc of dream.encounters) {
         txt += `│ ├ ${enc}\n`
     }
-    txt += `│ 💫 *Powers:*\n`
+    txt += `│ 💫 *Poderes:*\n`
     for (const pow of dream.powers) {
         txt += `│ ├ ${pow}\n`
     }
-    txt += `│ 🔮 *Message:*\n`
+    txt += `│ 🔮 *Mensaje:*\n`
     txt += `│ ${dream.message}\n`
     txt += `╰════════════════════`
-    
+
     await m.reply(txt)
 }
 
