@@ -5,7 +5,7 @@ import fs from 'fs'
 
 const pluginConfig = {
     name: 'rechazar',
-    alias: ['reject', 'no', 'tolak', 'noup'],
+    alias: ['rechazar', 'no', 'tolak', 'noup'],
     category: 'fun',
     description: 'Rechaza la propuesta de alguien para ser pareja',
     usage: '.rechazar @tag',
