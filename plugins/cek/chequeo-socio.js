@@ -1,12 +1,12 @@
 import config from '../../config.js'
 import { getDatabase } from '../../src/lib/ourin-database.js'
 const pluginConfig = {
-    name: 'cekpartner',
-    alias: ['partnerinfo'],
+    name: 'chequepartner',
+    alias: ['infopartner', 'partnerinfo', 'socio'],
     category: 'cek',
-    description: 'Cek detail status partner user',
-    usage: '.cekpartner @user',
-    example: '.cekpartner',
+    description: 'Verifica el detalle del estado de socio/partner',
+    usage: '.chequepartner <nombre>',
+    example: '.chechequepartner @usuario',
     isOwner: false,
     isPremium: true,
     isGroup: false,
@@ -17,7 +17,8 @@ const pluginConfig = {
 }
 
 function formatDate(ts) {
-    return new Date(ts).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+    // Ajustado a formato local de Argentina
+    return new Date(ts).toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
 async function handler(m) {
@@ -41,7 +42,7 @@ async function handler(m) {
     const jid = targetNumber + '@s.whatsapp.net'
 
     if (!info) {
-        return m.reply(`❌ @${targetNumber} bukan partner`, { mentions: [jid] })
+        return m.reply(`❌ @${targetNumber} no es un socio activo`, { mentions: [jid] })
     }
 
     const now = Date.now()
@@ -49,16 +50,16 @@ async function handler(m) {
     const totalDays = info.addedAt ? Math.ceil((info.expired - info.addedAt) / (1000 * 60 * 60 * 24)) : '?'
     const user = db.getUser(jid)
 
-    let txt = `🤝 *DETAIL PARTNER*\n\n`
-    txt += `👤 User: @${targetNumber}\n`
-    txt += `📛 Nama: *${info.name || 'Unknown'}*\n`
-    txt += `📅 Mulai: *${info.addedAt ? formatDate(info.addedAt) : 'Unknown'}*\n`
-    txt += `⏳ Expired: *${formatDate(info.expired)}*\n`
-    txt += `🗓️ Durasi: *${totalDays} hari*\n`
-    txt += `📊 Sisa: *${remaining > 0 ? remaining + ' hari' : '⚠️ Expired'}*\n`
+    let txt = `🤝 *DETALLE DE SOCIO*\n\n`
+    txt += `👤 Usuario: @${targetNumber}\n`
+    txt += `📛 Nombre: *${info.name || 'Desconocido'}*\n`
+    txt += `📅 Inicio: *${info.addedAt ? formatDate(info.addedAt) : 'Desconocido'}*\n`
+    txt += `⏳ Vencimiento: *${formatDate(info.expired)}*\n`
+    txt += `🗓️ Duración Total: *${totalDays} días*\n`
+    txt += `📊 Restante: *${remaining > 0 ? remaining + ' días' : '⚠️ Expirado'}*\n`
     if (user) {
-        txt += `⚡ Energi: *${user.energi === -1 ? '∞' : (user.energi ?? 0)}*\n`
-        txt += `💰 Koin: *${user.koin === -1 ? '∞' : (user.koin ?? 0).toLocaleString('id-ID')}*\n`
+        txt += `⚡ Energía: *${user.energi === -1 ? '∞' : (user.energi ?? 0)}*\n`
+        txt += `💰 Monedas: *${user.koin === -1 ? '∞' : (user.koin ?? 0).toLocaleString('es-AR')}*\n`
     }
 
     await m.reply(txt, { mentions: [jid] })
