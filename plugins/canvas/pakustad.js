@@ -1,12 +1,13 @@
 import { f } from '../../src/lib/ourin-http.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: ['pakustad', 'pak-ustad', 'tanyaustad'],
-    alias: [],
+    name: 'preguntauztad',
+    alias: ['pakustad', 'tanyaustad', 'consejos'],
     category: 'fun',
-    description: 'Tanya pak ustad (gambar)',
-    usage: '.pakustad <pertanyaan>',
-    example: '.pakustad kenapa aku ganteng',
+    description: 'Hazle una pregunta al Ustad (genera imagen)',
+    usage: '.preguntauztad <pregunta>',
+    example: '.preguntauztad ¿por qué soy tan guapo?',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -21,9 +22,9 @@ async function handler(m, { sock }) {
     
     if (!text) {
         return m.reply(
-            `⚠️ *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ*\n\n` +
-            `> \`${m.prefix}pakustad <pertanyaan>\`\n\n` +
-            `> Contoh: \`${m.prefix}pakustad kenapa aku ganteng\``
+            `⚠️ *MODO DE USO*\n\n` +
+            `> \`${m.prefix}preguntauztad <pregunta>\`\n\n` +
+            `> Ejemplo: \`${m.prefix}preguntauztad ¿por qué no tengo novia?\``
         )
     }
     
@@ -32,6 +33,7 @@ async function handler(m, { sock }) {
     try {
         const apiUrl = `https://api.cuki.biz.id/api/canvas/ustadz?apikey=cuki-x&text=${encodeURIComponent(text)}`
         const { results } = await f(apiUrl)
+        
         await sock.sendMedia(m.chat, results.url, text, m, {
             type: 'image'
         })
