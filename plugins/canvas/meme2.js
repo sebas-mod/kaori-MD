@@ -1,13 +1,14 @@
 import axios from 'axios'
 import config from '../../config.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'meme2',
-    alias: ['changemymind'],
+    alias: ['changemymind', 'miopinion'],
     category: 'canvas',
-    description: 'Membuat meme change my mind',
-    usage: '.meme2 <teks>',
-    example: '.meme2 Tahu bacem enak banget',
+    description: 'Crea el meme de "Change My Mind"',
+    usage: '.meme2 <texto>',
+    example: '.meme2 El asado es la mejor comida',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -27,14 +28,14 @@ async function handler(m, { sock }) {
     if (!text) {
         return m.reply(
             `🎭 *ᴄʜᴀɴɢᴇ ᴍʏ ᴍɪɴᴅ*\n\n` +
-            `> Masukkan teks untuk meme\n\n` +
-            `> Contoh: \`${m.prefix}meme2 Tahu bacem enak\``
+            `> Ingresa un texto para el meme\n\n` +
+            `> Ejemplo: \`${m.prefix}meme2 Messi es el mejor de la historia\``
         )
     }
     
     const apikey = config.APIkey?.lolhuman
     if (!apikey) {
-        return m.reply(`❌ API key lolhuman tidak dikonfigurasi!`)
+        return m.reply(`❌ ¡La API key de lolhuman no está configurada!`)
     }
     
     m.react('🕕')
