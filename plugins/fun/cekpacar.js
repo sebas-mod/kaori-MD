@@ -1,11 +1,12 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
-    name: 'cekpacar',
-    alias: ['pacar', 'pasangan', 'gebetan'],
+    name: 'mipareja',
+    alias: ['pareja', 'novio', 'novia', 'estado'],
     category: 'fun',
-    description: 'Cek status hubungan seseorang',
-    usage: '.cekpacar atau .cekpacar @tag',
-    example: '.cekpacar',
+    description: 'Consulta el estado civil o la pareja de alguien',
+    usage: '.mipareja o .mipareja @tag',
+    example: '.mipareja',
     isOwner: false,
     isPremium: false,
     isGroup: true,
@@ -20,6 +21,8 @@ async function handler(m, { sock }) {
     const args = m.args || []
     let targetJid = m.sender
     let isOther = false
+
+    // Lógica para determinar el objetivo (reply, tag o número)
     if (m.quoted) {
         targetJid = m.quoted.sender
         isOther = true
@@ -33,38 +36,42 @@ async function handler(m, { sock }) {
             isOther = true
         }
     }
-    
+
     const userData = db.getUser(targetJid) || {}
-    
+
+    // Si no tiene a nadie registrado en la base de datos
     if (!userData.fun?.pasangan) {
-        const nama = isOther ? `@${targetJid.split('@')[0]}` : 'Kamu'
+        const nombre = isOther ? `@${targetJid.split('@')[0]}` : 'Vos'
         await m.react('💔')
         return m.reply(
-            `💔 *sᴛᴀᴛᴜs ʜᴜʙᴜɴɢᴀɴ*\n\n` +
-            `*${nama}* tidak punya pasangan.\n` +
-            `TIP: Cari pasangan dulu dengan \`${m.prefix}tembak @tag\``,
+            `💔 *ᴇsᴛᴀᴅᴏ sᴇɴᴛɪᴍᴇɴᴛᴀʟ*\n\n` +
+            `*${nombre}* no tiene pareja.\n` +
+            `TIP: ¡Buscá a alguien y usá \`${m.prefix}proponer @tag\`!`,
             { mentions: isOther ? [targetJid] : [] }
         )
     }
-    
+
     const partnerJid = userData.fun.pasangan
     const partnerData = db.getUser(partnerJid) || {}
+    
+    // Verificación de reciprocidad
     const isMutual = partnerData.fun?.pasangan === targetJid
-    const nama = isOther ? `@${targetJid.split('@')[0]}` : 'Kamu'
+    const nombre = isOther ? `@${targetJid.split('@')[0]}` : 'Vos'
+
     if (isMutual) {
         await m.react('💕')
         await m.reply(
-            `💕 *sᴛᴀᴛᴜs ʜᴜʙᴜɴɢᴀɴ*\n\n` +
-            `*${nama}* sedang pacaran dengan @${partnerJid.split('@')[0]}! 🥳`,
+            `💕 *ᴇsᴛᴀᴅᴏ sᴇɴᴛɪᴍᴇɴᴛᴀʟ*\n\n` +
+            `¡*${nombre}* está en una relación con @${partnerJid.split('@')[0]}! 🥳`,
             { mentions: [targetJid, partnerJid] }
         )
     } else {
         await m.react('💭')
         await m.reply(
-            `💭 *sᴛᴀᴛᴜs ʜᴜʙᴜɴɢᴀɴ*\n\n` +
-            `*${nama}* lagi pdkt sama @${partnerJid.split('@')[0]}\n` +
-            `Status: *Digantung* 😅\n\n` +
-            `Menunggu jawaban...`,
+            `💭 *ᴇsᴛᴀᴅᴏ sᴇɴᴛɪᴍᴇɴᴛᴀʟ*\n\n` +
+            `*${nombre}* le tiene ganas a @${partnerJid.split('@')[0]}\n` +
+            `Estado: *En la Friendzone* 😅\n\n` +
+            `Esperando una respuesta...`,
             { mentions: [targetJid, partnerJid] }
         )
     }
