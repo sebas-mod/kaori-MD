@@ -3,15 +3,15 @@ import axios from "axios";
 import path from "path";
 import fs from "fs";
 
-
 import { uploadTo0x0 } from "../../src/lib/ourin-tmpfiles.js";
 import te from "../../src/lib/ourin-error.js";
+
 const pluginConfig = {
   name: "fakedev3",
-  alias: [],
+  alias: ["fakeperfil3", "devcard3"],
   category: "canvas",
-  description: "Membuat fake developer profile card",
-  usage: ".fakedev3 <nama> (reply/kirim foto)",
+  description: "Crea una tarjeta de perfil de desarrollador falsa (Versión 3)",
+  usage: ".fakedev3 <nombre> (responde/envía foto)",
   example: ".fakedev3 Misaki",
   isOwner: false,
   isPremium: false,
@@ -21,18 +21,22 @@ const pluginConfig = {
   energi: 1,
   isEnabled: true,
 };
+
 let fontRegistered = false;
+
 async function handler(m, { sock }) {
   const name = m.text?.trim();
+  
   if (!name) {
     return m.reply(
       `🎮 *ꜰᴀᴋᴇ ᴅᴇᴠᴇʟᴏᴘᴇʀ 3*\n\n` +
-        `> Masukkan nama untuk profile\n\n` +
-        `*ᴄᴀʀᴀ ᴘᴀᴋᴀɪ:*\n` +
-        `> 1. Kirim foto + caption \`${m.prefix}fakedev3 <nama>\`\n` +
-        `> 2. Reply foto dengan \`${m.prefix}fakedev3 <nama>\``,
+        `> Ingresa un nombre para el perfil\n\n` +
+        `*ᴍᴏᴅᴏ ᴅᴇ ᴜsᴏ:*\n` +
+        `> 1. Envía foto + descripción \`${m.prefix}fakedev3 <nombre>\`\n` +
+        `> 2. Responde a una foto con \`${m.prefix}fakedev3 <nombre>\``,
     );
   }
+
   let buffer = null;
   if (
     m.quoted &&
@@ -51,23 +55,27 @@ async function handler(m, { sock }) {
     }
   } else {
     try {
-      let te = await sock.profilePictureUrl(m.sender, "image");
+      let pfpUrl = await sock.profilePictureUrl(m.sender, "image");
       buffer = Buffer.from(
-        (await axios.get(te, { responseType: "arraybuffer" })).data,
+        (await axios.get(pfpUrl, { responseType: "arraybuffer" })).data,
       );
     } catch (error) {
       buffer = fs.readFileSync("./assets/images/pp-kosong.jpg");
     }
   }
+
   if (!buffer) {
-    return m.reply(`❌ Kirim/reply gambar untuk dijadikan avatar!`);
+    return m.reply(`❌ ¡Envía o responde a una imagen para usarla como avatar!`);
   }
+
   m.react("🕕");
+
   try {
     const gmbr = await uploadTo0x0(buffer, {
       filename: "image.jpg",
       contentType: "image/jpeg",
     });
+
     await sock.sendMedia(
       m.chat,
       `https://api.ourin.my.id/api/fake-developer-1?text=${encodeURIComponent(name)}&image=${gmbr.directUrl}`,
@@ -80,7 +88,8 @@ async function handler(m, { sock }) {
     m.react("✅");
   } catch (error) {
     m.react("❌");
-    m.reply(`Coba lagi`);
+    m.reply(`Ocurrió un error, por favor intenta de nuevo.`);
   }
 }
+
 export { pluginConfig as config, handler };
