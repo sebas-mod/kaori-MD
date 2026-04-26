@@ -10,7 +10,7 @@ const pluginConfig = {
     name: ['ttmp3'],
     alias: ['ttmusic', 'tiktokmusic'],
     category: 'download',
-    description: 'Download video TikTok tanpa watermark',
+    description: 'Descargar audio de TikTok',
     usage: '.ttmp3 <url>',
     example: '.ttmp3 https://vt.tiktok.com/xxx',
     isOwner: false,
@@ -36,31 +36,31 @@ async function handler(m, { sock }) {
   if (!url) {
     return m.reply(
 `╭┈┈⬡「 🎵 *ᴛɪᴋᴛᴏᴋ ᴅᴏᴡɴʟᴏᴀᴅ* 」
-┃ ㊗ ᴜsᴀɢᴇ: \`${m.prefix}ttmp3 <url>\`
+┃ ㊗ ᴜsᴏ: \`${m.prefix}ttmp3 <url>\`
 ╰┈┈⬡
 
-> Contoh: ${m.prefix}ttmp3 https://vt.tiktok.com/xxx`
+> Ejemplo: ${m.prefix}ttmp3 https://vt.tiktok.com/xxx`
     )
   }
 
   if (!url.match(/tiktok\.com|vt\.tiktok/i)) {
-    return m.reply('❌ URL tidak valid. Gunakan link TikTok.')
+    return m.reply('❌ URL no válida. Por favor, usa un enlace de TikTok.')
   }
 
   m.react('🕕')
 
   try {
     const result = await ttdown(url)
-    
+
     const saluranName =
       config.saluran?.name ||
       config.bot?.name ||
       'Ourin-AI'
 
-    const carivideotanpawm = result.downloads.find(d => d.type == 'mp3')
-    if (!carivideotanpawm) return m.reply('❌ Video HD tidak ditemukan.')
+    const cariaudio = result.downloads.find(d => d.type == 'mp3')
+    if (!cariaudio) return m.reply('❌ No se encontró el archivo de audio.')
 
-    await sock.sendMedia(m.chat, carivideotanpawm.url, null, m, {
+    await sock.sendMedia(m.chat, cariaudio.url, null, m, {
         type: 'audio',
         mimetype: 'audio/mpeg',
         fileName: `TikTok_Audio_${Date.now()}.mp3`,
@@ -68,8 +68,8 @@ async function handler(m, { sock }) {
             forwardingScore: 99,
             isForwarded: true,
             externalAdReply: {
-                title: result.title,
-                body: `👤 By \`${result.author.username || '-'}\``,
+                title: result.title || 'TikTok Audio',
+                body: `👤 Por: \`${result.author.username || '-'}\``,
                 thumbnailUrl: result.author?.avatar || result.author?.cover,
                 sourceUrl: url,
                 mediaUrl: url,
@@ -81,7 +81,7 @@ async function handler(m, { sock }) {
 
     m.react('✅')
 
-    // cleanup
+    // Limpieza de archivos temporales
     setTimeout(() => {
       if (fs.existsSync(result.file)) {
         fs.unlinkSync(result.file)
@@ -92,7 +92,7 @@ async function handler(m, { sock }) {
     console.error('[TikTokDL] Error:', err)
     m.react('❌')
     m.reply(
-      `❌ *ɢᴀɢᴀʟ ᴍᴇɴɢᴜɴᴅᴜʜ*\n\n> ${err.message}`
+      `❌ *ᴇʀʀᴏʀ ᴀʟ ᴅᴇsᴄᴀʀɢᴀʀ*\n\n> ${err.message}`
     )
   }
 }
