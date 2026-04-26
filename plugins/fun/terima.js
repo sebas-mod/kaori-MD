@@ -3,13 +3,14 @@ import * as timeHelper from '../../src/lib/ourin-time.js'
 import config from '../../config.js'
 import path from 'path'
 import fs from 'fs'
+
 const pluginConfig = {
-  name: "terima",
-  alias: ["accept", "yes"],
+  name: "aceptar",
+  alias: ["accept", "yes", "si", "terima"],
   category: "fun",
-  description: "Menerima tembakan dari seseorang",
-  usage: ".terima @tag",
-  example: ".terima @628xxx",
+  description: "Acepta la propuesta de alguien para ser pareja",
+  usage: ".aceptar @tag",
+  example: ".aceptar @user",
   isOwner: false,
   isPremium: false,
   isGroup: true,
@@ -31,17 +32,17 @@ try {
 } catch (e) {}
 
 const celebrationQuotes = [
-  "Semoga langgeng sampai ke pelaminan! 💍",
-  "Dari teman jadi cinta, indahnya! 💕",
-  "Love is in the air! 💖",
-  "Couple goals detected! 💑",
-  "Jangan lupa undang pas nikah ya! 💒",
-  "Selamat menempuh hidup berduaan! 🥰",
-  "Chemistry-nya kuat banget! 🔥",
-  "Match made in heaven! ✨",
+  "¡Ojalá duren hasta el altar! 💍",
+  "¡De amigos a amantes, qué hermoso! 💕",
+  "¡El amor está en el aire! 💖",
+  "¡Pareja del año detectada! 💑",
+  "¡No se olviden de invitar al casamiento! 💒",
+  "¡Felicidades por su nueva vida de a dos! 🥰",
+  "¡Tienen muchísima química! 🔥",
+  "¡Una pareja hecha en el cielo! ✨",
 ];
 
-function getContextInfo(title = "💕 *ᴛᴇʀɪᴍᴀ*", body = "Love accepted!") {
+function getContextInfo(title = "💕 *ᴀᴄᴇᴘᴛᴀʀ*", body = "¡Amor aceptado!") {
   const saluranId = config.saluran?.id || "120363208449943317@newsletter";
   const saluranName = config.saluran?.name || config.bot?.name || "Ourin-AI";
 
@@ -93,18 +94,18 @@ async function handler(m, { sock }) {
 
   if (!shooterJid) {
     return m.reply(
-      `⚠️ *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ*\n\n` +
-        `> Reply pesan tembakan + \`${m.prefix}terima\`\n` +
-        `> Atau \`${m.prefix}terima @tag\``,
+      `⚠️ *ᴍᴏᴅᴏ ᴅᴇ ᴜsᴏ*\n\n` +
+        `> Respondé al mensaje de la propuesta con \`${m.prefix}aceptar\`\n` +
+        `> O usá \`${m.prefix}aceptar @tag\``,
     );
   }
 
   if (shooterJid === m.sender) {
-    return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak bisa menerima diri sendiri!`);
+    return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> ¡No podés aceptarte a vos mismo!`);
   }
 
   if (shooterJid === m.botNumber) {
-    return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Bot tidak bisa pacaran!`);
+    return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> ¡El bot no puede tener pareja!`);
   }
 
   let shooterData = db.getUser(shooterJid) || {};
@@ -115,15 +116,17 @@ async function handler(m, { sock }) {
 
   if (shooterData.fun.pasangan !== m.sender && shooterData.fun.tembakTarget !== m.sender) {
     return m.reply(
-      `❌ *ᴛɪᴅᴀᴋ ᴍᴇɴᴇᴍʙᴀᴋ*\n\n` +
-        `> @${shooterJid.split("@")[0]} tidak sedang menembakmu`,
+      `❌ *sɪɴ ᴘʀᴏᴘᴜᴇsᴛᴀ*\n\n` +
+        `> @${shooterJid.split("@")[0]} no se te declaró recientemente.`,
       { mentions: [shooterJid] },
     );
   }
 
+  // Actualizar datos de pareja
   shooterData.fun.pasangan = m.sender;
   shooterData.fun.jadiPacar = Date.now();
   delete shooterData.fun.tembakTarget;
+  
   myData.fun.pasangan = shooterJid;
   myData.fun.jadiPacar = Date.now();
 
@@ -133,22 +136,20 @@ async function handler(m, { sock }) {
   db.setUser(shooterJid, shooterData);
   db.setUser(m.sender, myData);
 
+  // Limpiar sesión
   const sessionKey = `${m.chat}_${m.sender}`;
   if (global.tembakSessions?.[sessionKey]) {
     delete global.tembakSessions[sessionKey];
   }
 
-  const quote =
-    celebrationQuotes[Math.floor(Math.random() * celebrationQuotes.length)];
-  const dateStr = timeHelper.formatFull("dddd, DD MMMM YYYY");
-
+  const quote = celebrationQuotes[Math.floor(Math.random() * celebrationQuotes.length)];
+  
   await m.react("💕");
-  const ctx = getContextInfo("💕 *ᴊᴀᴅɪᴀɴ*", "Selamat!");
-  ctx.mentionedJid = [m.sender, shooterJid];
-
-  await m.reply(`💕 *WIDIHHHH, CIE CIE DITERIMA* @${shooterJid.split('@')[0]}\n\n` +
-                `@${m.sender.split('@')[0]} dan @${shooterJid.split('@')[0]} resmi pacaran\n\n` +
-                `Semoga langgeng dan bahagia 💍`, { mentions: [m.sender, shooterJid] })
+  
+  await m.reply(`💕 *¡WIDIII, DIJO QUE SÍ!* @${shooterJid.split('@')[0]}\n\n` +
+                `@${m.sender.split('@')[0]} y @${shooterJid.split('@')[0]} son oficialmente pareja.\n\n` +
+                `_"${quote}"_\n\n` +
+                `¡Que vivan los novios y sean muy felices! 💍`, { mentions: [m.sender, shooterJid] })
 }
 
 export { pluginConfig as config, handler }
