@@ -2,13 +2,14 @@ import axios from 'axios'
 import config from '../../config.js'
 import { uploadTo0x0 } from '../../src/lib/ourin-tmpfiles.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'fakeff2',
-    alias: ['fakefreefire2'],
+    alias: ['fakefreefire2', 'lobbyff2'],
     category: 'canvas',
-    description: 'Membuat gambar ff',
-    usage: '.fakeff2 <text>',
-    example: '.fakeff2 Hai cantik',
+    description: 'Crea una imagen de lobby de Free Fire (Versión 2)',
+    usage: '.fakeff2 <texto>',
+    example: '.fakeff2 ProPlayer',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -19,9 +20,9 @@ const pluginConfig = {
 }
 
 async function handler(m, { sock }) {
-    const nama = m.text
+    const nama = m.text?.trim()
     if(!nama) {
-        return m.reply(`*FAKE FF 2*\n\n> Contoh: ${m.prefix}fakeff nama1`)
+        return m.reply(`*FAKE FF 2*\n\n> Por favor, ingresa un nombre.\n\n> Ejemplo: ${m.prefix}fakeff2 MiNombre`)
     }
     m.react('🕕')
     
