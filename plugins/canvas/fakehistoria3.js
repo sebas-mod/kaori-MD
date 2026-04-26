@@ -1,16 +1,15 @@
 import fs from 'fs'
 import * as _canvas from '@napi-rs/canvas'
-
-
 import axios from "axios";
 import te from "../../src/lib/ourin-error.js";
+
 const pluginConfig = {
   name: "fakestory3",
-  alias: ["fstory3", "igstory3", "quotestory"],
+  alias: ["fstory3", "igstory3", "quotestory", "historiafalsa3"],
   category: "canvas",
-  description: "Fake Instagram story dengan text overlay",
-  usage: ".fakestory3 <nama>|<text1>|<text2>",
-  example: ".fakestory3 Misaki|Tersenyumlah|untuk menutupi kesedihan",
+  description: "Crea una historia de Instagram falsa con superposición de texto",
+  usage: ".fakestory3 <nombre>|<texto1>|<texto2>",
+  example: ".fakestory3 Misaki|Sonríe siempre|aunque sea difícil",
   isOwner: false,
   isPremium: false,
   isGroup: false,
@@ -19,21 +18,21 @@ const pluginConfig = {
   energi: 1,
   isEnabled: true,
 };
+
 const canvasConfig = {
   width: 720,
   cardBg: "#121212",
   textColor: "#ffffff",
   cornerRadius: 35,
 };
+
 const icons = {
-  heart:
-    "M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z",
-  comment:
-    "M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z",
+  heart: "M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z",
+  comment: "M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z",
   share: "M2.01 21L23 12 2.01 3 2 10l15 2-15 2z",
-  options:
-    "M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z",
+  options: "M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z",
 };
+
 function roundedRectPath(ctx, x, y, width, height, radius) {
   ctx.beginPath();
   ctx.moveTo(x + radius, y);
@@ -47,6 +46,7 @@ function roundedRectPath(ctx, x, y, width, height, radius) {
   ctx.quadraticCurveTo(x, y, x + radius, y);
   ctx.closePath();
 }
+
 function drawAvatar(ctx, img, x, y, size) {
   ctx.save();
   ctx.beginPath();
@@ -56,6 +56,7 @@ function drawAvatar(ctx, img, x, y, size) {
   ctx.drawImage(img, x, y, size, size);
   ctx.restore();
 }
+
 function drawCoverImage(ctx, img, x, y, w, h) {
   const imgRatio = img.width / img.height;
   const canvasRatio = w / h;
@@ -78,6 +79,7 @@ function drawCoverImage(ctx, img, x, y, w, h) {
   ctx.drawImage(img, drawX, drawY, drawW, drawH);
   ctx.restore();
 }
+
 function drawBlurredBackground(ctx, canvas, imgTop, imgBottom) {
   const w = canvas.width;
   const h = canvas.height;
@@ -88,6 +90,7 @@ function drawBlurredBackground(ctx, canvas, imgTop, imgBottom) {
   drawCoverImage(ctx, imgBottom, -bleed, h / 2, w + bleed * 2, h / 2 + bleed);
   ctx.restore();
 }
+
 function wrapText(ctx, text, maxWidth) {
   const words = text.split(" ");
   const lines = [];
@@ -105,41 +108,42 @@ function wrapText(ctx, text, maxWidth) {
   if (currentLine) lines.push(currentLine);
   return lines;
 }
-async function createFakeStory(
-  username,
-  avatarBuffer,
-  imageTopBuffer,
-  imageBottomBuffer,
-  text1,
-  text2,
-) {
+
+async function createFakeStory(username, avatarBuffer, imageTopBuffer, imageBottomBuffer, text1, text2) {
   const { createCanvas, loadImage, Path2D } = _canvas;
   const height = 1150;
   const canvas = createCanvas(canvasConfig.width, height);
   const ctx = canvas.getContext("2d");
+  
   const avatar = await loadImage(avatarBuffer);
   const imgTop = await loadImage(imageTopBuffer);
   const imgBottom = await loadImage(imageBottomBuffer);
+  
   drawBlurredBackground(ctx, canvas, imgTop, imgBottom);
+  
   const cardMarginX = 25;
   const cardMarginY = 60;
   const cardW = canvasConfig.width - cardMarginX * 2;
   const cardH = height - cardMarginY * 2;
   const cardX = cardMarginX;
   const cardY = cardMarginY;
+  
   ctx.save();
   roundedRectPath(ctx, cardX, cardY, cardW, cardH, canvasConfig.cornerRadius);
   ctx.fillStyle = canvasConfig.cardBg;
   ctx.fill();
   ctx.clip();
+  
   const headerHeight = 90;
   const avatarSize = 45;
   drawAvatar(ctx, avatar, cardX + 20, cardY + 22, avatarSize);
+  
   ctx.font = "bold 18px Arial";
   ctx.fillStyle = canvasConfig.textColor;
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
   ctx.fillText(username, cardX + 80, cardY + 45);
+  
   ctx.save();
   ctx.translate(cardX + cardW - 40, cardY + 45);
   ctx.rotate((90 * Math.PI) / 180);
@@ -147,17 +151,13 @@ async function createFakeStory(
   ctx.fillStyle = "white";
   ctx.fill(pOpts);
   ctx.restore();
+  
   const footerHeight = 70;
   const contentAvailableHeight = cardH - headerHeight - footerHeight;
   const singleImageHeight = contentAvailableHeight / 2;
-  drawCoverImage(
-    ctx,
-    imgTop,
-    cardX,
-    cardY + headerHeight,
-    cardW,
-    singleImageHeight,
-  );
+  
+  drawCoverImage(ctx, imgTop, cardX, cardY + headerHeight, cardW, singleImageHeight);
+  
   if (text1) {
     ctx.font = "20px Arial";
     ctx.fillStyle = "white";
@@ -165,21 +165,15 @@ async function createFakeStory(
     ctx.shadowColor = "rgba(0,0,0,0.8)";
     ctx.shadowBlur = 8;
     const lines1 = wrapText(ctx, text1, cardW - 60);
-    const textY1 =
-      cardY + headerHeight + singleImageHeight - 30 - lines1.length * 24;
+    const textY1 = cardY + headerHeight + singleImageHeight - 30 - lines1.length * 24;
     lines1.forEach((line, i) => {
       ctx.fillText(line, cardX + cardW / 2, textY1 + i * 24);
     });
     ctx.shadowBlur = 0;
   }
-  drawCoverImage(
-    ctx,
-    imgBottom,
-    cardX,
-    cardY + headerHeight + singleImageHeight,
-    cardW,
-    singleImageHeight,
-  );
+  
+  drawCoverImage(ctx, imgBottom, cardX, cardY + headerHeight + singleImageHeight, cardW, singleImageHeight);
+  
   if (text2) {
     ctx.font = "20px Arial";
     ctx.fillStyle = "white";
@@ -187,14 +181,15 @@ async function createFakeStory(
     ctx.shadowColor = "rgba(0,0,0,0.8)";
     ctx.shadowBlur = 8;
     const lines2 = wrapText(ctx, text2, cardW - 60);
-    const textY2 =
-      cardY + headerHeight + singleImageHeight * 2 - 30 - lines2.length * 24;
+    const textY2 = cardY + headerHeight + singleImageHeight * 2 - 30 - lines2.length * 24;
     lines2.forEach((line, i) => {
       ctx.fillText(line, cardX + cardW / 2, textY2 + i * 24);
     });
     ctx.shadowBlur = 0;
   }
+  
   const iconY = cardY + cardH - footerHeight / 2;
+  
   function drawSvgOutline(pathData, x, y, scale) {
     ctx.save();
     ctx.translate(x, y);
@@ -206,13 +201,17 @@ async function createFakeStory(
     ctx.stroke(p);
     ctx.restore();
   }
+  
   drawSvgOutline(icons.heart, cardX + 40, iconY, 1.3);
   drawSvgOutline(icons.comment, cardX + 100, iconY, 1.2);
   drawSvgOutline(icons.share, cardX + 160, iconY, 1.2);
+  
   ctx.restore();
   return await canvas.encode("png");
 }
+
 const DEFAULT_PP_PATH = "./assets/images/pp-kosong.jpg";
+
 async function getProfilePicture(sock, jid) {
   try {
     const pp = await sock.profilePictureUrl(jid, "image");
@@ -221,6 +220,7 @@ async function getProfilePicture(sock, jid) {
     return null;
   }
 }
+
 async function downloadImage(url) {
   const res = await axios.get(url, {
     responseType: "arraybuffer",
@@ -228,6 +228,7 @@ async function downloadImage(url) {
   });
   return Buffer.from(res.data);
 }
+
 async function getAvatarBuffer(sock, jid) {
   try {
     const ppUrl = await getProfilePicture(sock, jid);
@@ -238,41 +239,49 @@ async function getAvatarBuffer(sock, jid) {
   if (fs.existsSync(DEFAULT_PP_PATH)) {
     return fs.readFileSync(DEFAULT_PP_PATH);
   }
-  throw new Error("Tidak dapat mengambil foto profil");
+  throw new Error("No se pudo obtener la foto de perfil");
 }
+
 async function handler(m, { sock }) {
   const input = m.args.join(" ");
   if (!input || !input.includes("|")) {
     return m.reply(
       `📷 *ꜰᴀᴋᴇ sᴛᴏʀʏ 3*\n\n` +
-        `> Reply gambar dengan format:\n` +
-        `> \`${m.prefix}fakestory3 nama|text1|text2\`\n\n` +
-        `> Contoh:\n` +
-        `> \`${m.prefix}fakestory3 Misaki|Tersenyumlah|untuk menutupi kesedihan\``,
+        `> Responde a una imagen con el formato:\n` +
+        `> \`${m.prefix}fakestory3 nombre|texto1|texto2\`\n\n` +
+        `> Ejemplo:\n` +
+        `> \`${m.prefix}fakestory3 Misaki|Sonríe siempre|para ocultar la tristeza\``,
     );
   }
+  
   const parts = input.split("|").map((s) => s.trim());
-  const username = parts[0] || m.pushName || "User";
+  const username = parts[0] || m.pushName || "Usuario";
   const text1 = parts[1] || "";
   const text2 = parts[2] || "";
+  
   m.react("🕕");
+  
   try {
     const avatarBuffer = await getAvatarBuffer(sock, m.sender);
     const isImage = m.isImage || (m.quoted && m.quoted.isImage);
+    
     if (!isImage) {
       m.react("❌");
-      return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Reply gambar untuk membuat fake story!`);
+      return m.reply(`❌ *ERROR*\n\n> ¡Responde a una imagen para crear la historia!`);
     }
+    
     let imageBuffer;
     if (m.isImage && m.download) {
       imageBuffer = await m.download();
     } else if (m.quoted && m.quoted.isImage && m.quoted.download) {
       imageBuffer = await m.quoted.download();
     }
+    
     if (!imageBuffer) {
       m.react("❌");
-      return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak bisa download gambar`);
+      return m.reply(`❌ *ERROR*\n\n> No se pudo descargar la imagen`);
     }
+    
     const resultBuffer = await createFakeStory(
       username,
       avatarBuffer,
@@ -281,6 +290,7 @@ async function handler(m, { sock }) {
       text1,
       text2,
     );
+    
     await sock.sendMessage(
       m.chat,
       {
@@ -295,4 +305,5 @@ async function handler(m, { sock }) {
     m.reply(te(m.prefix, m.command, m.pushName));
   }
 }
+
 export { pluginConfig as config, handler };
