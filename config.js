@@ -9,8 +9,8 @@ const config = {
   },
 
   owner: {
-  name: ["sebas", "keni"], // ✅ correcto
-  number: ["5491138403093", "5491164431320"],
+  name: "sebas", // ✅ correcto
+  number: ["5491138403093",
 },
 
   session: {
