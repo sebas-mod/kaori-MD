@@ -1,10 +1,10 @@
 import { games } from '../../src/lib/ourin-games.js'
 
 games.register('tebaktebakan', {
-    alias: ['tbt', 'tebak2an', 'receh'],
+    alias: ['tbt', 'chiste', 'tebak2an', 'receh'],
     emoji: '😄',
-    title: 'TEBAK-TEBAKAN',
-    description: 'Tebak-tebakan receh'
+    title: 'ADIVINANZAS GRACIOSAS',
+    description: 'Adivinanzas simples y chistes para pasar el rato'
 })
 
 const { config: pluginConfig, handler, answerHandler } = games.createPlugin('tebaktebakan')
