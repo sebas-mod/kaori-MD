@@ -4,11 +4,12 @@ import path from 'path'
 import archiver from 'archiver'
 import config from '../../config.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'backupsc',
-    alias: ['backup', 'backupscript', 'backupsource'],
+    alias: ['respaldo', 'backupscript', 'backupsource'],
     category: 'owner',
-    description: 'Backup script bot dalam bentuk zip',
+    description: 'Realiza un respaldo del código fuente (script) del bot en formato ZIP',
     usage: '.backupsc',
     example: '.backupsc',
     isOwner: true,
@@ -61,13 +62,16 @@ function shouldExclude(filePath, basePath) {
 
 async function handler(m, { sock }) {
     await m.react('🕕')
-    await m.reply(`📦 *ʙᴀᴄᴋᴜᴘ sᴄʀɪᴘᴛ*\n\n> Memproses backup...\n> Mohon tunggu sebentar...`)
+    await m.reply(`📦 *RESPALDO DEL SCRIPT*\n\n> Procesando el respaldo...\n> Por favor, espera un momento...`)
+    
     try {
         const projectRoot = process.cwd()
-        const timestamp = moment().tz('Asia/Jakarta').format('YYYY-MM-DD_HH-mm-ss')
+        // Ajustado a una zona horaria común para hispanohablantes o se puede usar la local
+        const timestamp = moment().tz('America/Argentina/Buenos_Aires').format('YYYY-MM-DD_HH-mm-ss')
         const botName = config.bot?.name?.replace(/[^a-zA-Z0-9]/g, '') || 'OurinBot'
-        const zipFileName = `${botName}_backup_${timestamp}.zip`
+        const zipFileName = `${botName}_respaldo_${timestamp}.zip`
         const tmpDir = path.join(projectRoot, 'tmp')
+        
         if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
         const zipFilePath = path.join(tmpDir, zipFileName)
 
@@ -112,11 +116,11 @@ async function handler(m, { sock }) {
             fileName: zipFileName,
             mimetype: 'application/zip',
             caption:
-                `✅ *ʙᴀᴄᴋᴜᴘ sᴇʟᴇsᴀɪ*\n\n` +
-                `╭┈┈⬡「 📋 *ᴅᴇᴛᴀɪʟ* 」\n` +
-                `┃ 📝 ɴᴀᴍᴀ: \`${zipFileName}\`\n` +
-                `┃ 📊 sɪᴢᴇ: \`${fileSizeMB} MB\`\n` +
-                `┃ 📅 ᴛᴀɴɢɢᴀʟ: \`${moment().tz('Asia/Jakarta').format('DD/MM/YYYY')}\`\n` +
+                `✅ *RESPALDO COMPLETADO*\n\n` +
+                `╭┈┈⬡「 📋 *DETALLES* 」\n` +
+                `┃ 📝 Nombre: \`${zipFileName}\`\n` +
+                `┃ 📊 Tamaño: \`${fileSizeMB} MB\`\n` +
+                `┃ 📅 Fecha: \`${moment().tz('America/Argentina/Buenos_Aires').format('DD/MM/YYYY')}\`\n` +
                 `╰┈┈⬡`,
             contextInfo: {
                 forwardingScore: 9999,
