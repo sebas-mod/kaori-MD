@@ -1,9 +1,10 @@
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'cekonline',
-    alias: ['checkonline', 'online', 'siapayangonline', 'whosonline'],
+    alias: ['checkonline', 'online', 'quienestaonline', 'whosonline'],
     category: 'group',
-    description: 'Cek member yang online di grup',
+    description: 'Verifica qué miembros están online en el grupo',
     usage: '.cekonline',
     example: '.cekonline',
     isOwner: false,
@@ -24,10 +25,10 @@ async function handler(m, { sock }) {
         
         if (participants.length === 0) {
             m.react('❌')
-            return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak bisa mendapatkan data member grup`)
+            return m.reply(`❌ *ꜰᴀʟʟᴏ*\n\n> No se pudo obtener la información de los miembros.`)
         }
         
-        await m.reply(`🔍 *ᴍᴇɴᴄᴀʀɪ ᴍᴇᴍʙᴇʀ ᴏɴʟɪɴᴇ...*\n\n> Menunggu response dari ${participants.length} member\n> Estimasi: 5-10 detik`)
+        await m.reply(`🔍 *ʙᴜsᴄᴀɴᴅᴏ ᴍɪᴇᴍʙʀᴏs ᴇɴ ʟíɴᴇᴀ...*\n\n> Esperando respuesta de ${participants.length} miembros\n> Tiempo estimado: 5-10 segundos`)
         
         const presences = {}
         
@@ -61,23 +62,23 @@ async function handler(m, { sock }) {
         const onlineMembers = Object.keys(presences)
         const mentions = onlineMembers
         
-        let text = `📊 *ᴄᴇᴋ ᴏɴʟɪɴᴇ*\n\n`
-        text += `╭┈┈⬡「 📋 *ɪɴꜰᴏ ɢʀᴜᴘ* 」\n`
-        text += `┃ 👥 ɴᴀᴍᴀ: *${groupMetadata.subject}*\n`
-        text += `┃ 👤 ᴛᴏᴛᴀʟ: \`${participants.length}\` member\n`
-        text += `┃ 🟢 ᴏɴʟɪɴᴇ: \`${onlineMembers.length}\` member\n`
+        let text = `📊 *ᴄᴇᴋ ᴏɴʟɪɴᴇ | ᴋᴀᴏʀɪ ᴍᴅ*\n\n`
+        text += `╭┈┈⬡「 📋 *ɪɴꜰᴏ ᴅᴇʟ ɢʀᴜᴘᴏ* 」\n`
+        text += `┃ 👥 ɴᴏᴍʙʀᴇ: *${groupMetadata.subject}*\n`
+        text += `┃ 👤 ᴛᴏᴛᴀʟ: \`${participants.length}\` miembros\n`
+        text += `┃ 🟢 ᴏɴʟíɴᴇ: \`${onlineMembers.length}\` miembros\n`
         text += `╰┈┈⬡\n\n`
         
         if (onlineMembers.length === 0) {
-            text += `> _Tidak ada member yang terdeteksi online_\n`
-            text += `> _Pastikan member telah membuka WA_`
+            text += `> _No se detectaron miembros en línea._\n`
+            text += `> _Nota: Los miembros deben tener WhatsApp abierto._`
         } else {
-            text += `╭┈┈⬡「 🟢 *ᴍᴇᴍʙᴇʀ ᴏɴʟɪɴᴇ* 」\n`
+            text += `╭┈┈⬡「 🟢 *ᴍɪᴇᴍʙʀᴏs ᴇɴ ʟíɴᴇᴀ* 」\n`
             
             let count = 0
             for (const jid of onlineMembers) {
                 if (count >= 50) {
-                    text += `┃ ... dan ${onlineMembers.length - 50} member lainnya\n`
+                    text += `┃ ... y otros ${onlineMembers.length - 50} miembros más.\n`
                     break
                 }
                 const number = jid.split('@')[0]
@@ -94,7 +95,7 @@ async function handler(m, { sock }) {
             }
             
             text += `╰┈┈⬡\n\n`
-            text += `> 🟢 Online | ⌨️ Mengetik | 🎤 Rekam Audio`
+            text += `> 🟢 En línea | ⌨️ Escribiendo | 🎤 Grabando audio`
         }
         
         m.react('✅')
