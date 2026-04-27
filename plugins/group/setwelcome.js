@@ -1,11 +1,12 @@
 import { getDatabase } from "../../src/lib/ourin-database.js";
+
 const pluginConfig = {
   name: "setwelcome",
-  alias: ["customwelcome"],
+  alias: ["customwelcome", "configurarbienvenida"],
   category: "group",
-  description: "Set custom welcome message",
-  usage: ".setwelcome <pesan>",
-  example: ".setwelcome Halo {user}, selamat datang di {group}!",
+  description: "Configura un mensaje de bienvenida personalizado",
+  usage: ".setwelcome <mensaje>",
+  example: ".setwelcome ¡Hola {user}, bienvenido a {group}!",
   isOwner: false,
   isPremium: false,
   isGroup: true,
@@ -23,22 +24,22 @@ async function handler(m, { sock }) {
   if (!text) {
     return m.reply(
       `📝 *sᴇᴛ ᴡᴇʟᴄᴏᴍᴇ*\n\n` +
-        `╭┈┈⬡「 📋 *ᴘʟᴀᴄᴇʜᴏʟᴅᴇʀ* 」\n` +
-        `┃ ◦ \`{user}\` - Nama member\n` +
-        `┃ ◦ \`{number}\` - Nomor member\n` +
-        `┃ ◦ \`{group}\` - Nama grup\n` +
-        `┃ ◦ \`{desc}\` - Deskripsi grup\n` +
-        `┃ ◦ \`{count}\` - Jumlah member\n` +
-        `┃ ◦ \`{owner}\` - Nama owner grup\n` +
-        `┃ ◦ \`{date}\` - Tanggal (DD/MM/YYYY)\n` +
-        `┃ ◦ \`{time}\` - Waktu (HH:mm WIB)\n` +
-        `┃ ◦ \`{day}\` - Hari (Senin, Selasa, dll)\n` +
-        `┃ ◦ \`{bot}\` - Nama bot\n` +
-        `┃ ◦ \`{prefix}\` - Prefix bot\n` +
+        `╭┈┈⬡「 📋 *ᴘʟᴀᴄᴇʜᴏʟᴅᴇʀs* 」\n` +
+        `┃ ◦ \`{user}\` - Nombre del miembro\n` +
+        `┃ ◦ \`{number}\` - Número del miembro\n` +
+        `┃ ◦ \`{group}\` - Nombre del grupo\n` +
+        `┃ ◦ \`{desc}\` - Descripción del grupo\n` +
+        `┃ ◦ \`{count}\` - Cantidad de miembros\n` +
+        `┃ ◦ \`{owner}\` - Creador del grupo\n` +
+        `┃ ◦ \`{date}\` - Fecha (DD/MM/YYYY)\n` +
+        `┃ ◦ \`{time}\` - Hora (HH:mm)\n` +
+        `┃ ◦ \`{day}\` - Día (Lunes, Martes, etc)\n` +
+        `┃ ◦ \`{bot}\` - Nombre del bot\n` +
+        `┃ ◦ \`{prefix}\` - Prefix del bot\n` +
         `╰┈┈⬡\n\n` +
-        `\`Contoh:\`\n` +
-        `\`${m.prefix}setwelcome Halo {user}! 👋\`\n` +
-        `\`Selamat datang di {group} pada {day}, {date}\``,
+        `*Ejemplo:*\n` +
+        `> \`${m.prefix}setwelcome ¡Hola {user}! 👋\`\n` +
+        `> \`Bienvenido a {group} este {day}, {date}\``,
     );
   }
 
@@ -48,7 +49,7 @@ async function handler(m, { sock }) {
   m.react("✅");
 
   await m.reply(
-    `✅ Welcome berhasil di set menjadi *${text}*\nMau reset? ketik ${m.prefix}resetwelcome`,
+    `✅ La bienvenida se ha configurado como:\n\n> *${text}*\n\n¿Quieres restablecerla? Usa: *${m.prefix}resetwelcome*\n\n*KAORI MD — Ajustes*`,
   );
 }
 
