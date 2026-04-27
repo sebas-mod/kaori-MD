@@ -5,11 +5,11 @@ import te from '../../src/lib/ourin-error.js'
 
 const pluginConfig = {
     name: 'delplugin',
-    alias: ['delpl', 'hapusplugin', 'removeplugin'],
+    alias: ['delpl', 'borrarplugin', 'removeplugin', 'eliminarplugin'],
     category: 'owner',
-    description: 'Hapus plugin berdasarkan nama',
-    usage: '.delplugin <nama>',
-    example: '.delplugin bliblidl',
+    description: 'Elimina un archivo de plugin basado en su nombre',
+    usage: '.delplugin <nombre>',
+    example: '.delplugin anime_search',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -44,10 +44,10 @@ async function handler(m, { sock }) {
 
     if (!name) {
         return m.reply(
-            `🗑️ *DEL PLUGIN*\n\n` +
-            `Hapus plugin berdasarkan nama\n\n` +
-            `*Contoh:*\n` +
-            `\`${m.prefix}delplugin bliblidl\``
+            `🗑️ *ELIMINAR PLUGIN*\n\n` +
+            `Elimina un plugin del sistema permanentemente.\n\n` +
+            `*Ejemplo:*\n` +
+            `\`${m.prefix}delplugin nombre_del_plugin\``
         )
     }
 
@@ -59,23 +59,29 @@ async function handler(m, { sock }) {
 
         if (!found) {
             await m.react('❌')
-            return m.reply(`❌ *GAGAL*\n\nPlugin \`${name}\` tidak ditemukan`)
+            return m.reply(`❌ *ERROR*\n\nEl plugin \`${name}\` no fue encontrado en ninguna carpeta.`)
         }
 
         let unloadResult = { success: false }
-        try { unloadResult = unloadPlugin(name) || { success: true } } catch {}
+        try { 
+            // Intentamos descargar el plugin de la memoria primero
+            unloadResult = unloadPlugin(name) || { success: true } 
+        } catch (e) {
+            console.error('[DelPlugin] Error al descargar:', e)
+        }
 
+        // Borramos el archivo físico
         fs.unlinkSync(found.path)
 
         await m.react('✅')
         return m.reply(
-            `✅ *PLUGIN DIHAPUS*\n\n` +
-            `╭─〔 *DETAIL* 〕───⬣\n` +
-            `│ File: \`${found.file}\`\n` +
-            `│ Folder: \`${found.folder}\`\n` +
-            `│ Unload: ${unloadResult.success ? '✅ Sukses' : '⚠️ Pending'}\n` +
+            `✅ *PLUGIN ELIMINADO*\n\n` +
+            `╭─〔 *DETALLES* 〕───⬣\n` +
+            `│ Archivo: \`${found.file}\`\n` +
+            `│ Carpeta: \`${found.folder}\`\n` +
+            `│ Estado: ${unloadResult.success ? '✅ Descargado' : '⚠️ Pendiente'}\n` +
             `╰───────⬣\n\n` +
-            `Plugin sudah dihapus dan tidak aktif!`
+            `¡El plugin ha sido borrado del disco y ya no está activo!`
         )
 
     } catch (error) {
