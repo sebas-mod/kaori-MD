@@ -4,7 +4,7 @@ const pluginConfig = {
     name: 'kick',
     alias: ['remove', 'tendang'],
     category: 'group',
-    description: 'Kick member dari grup',
+    description: 'Expulsar a un miembro del grupo',
     usage: '.kick @user',
     example: '.kick @user',
     isOwner: false,
@@ -29,9 +29,9 @@ async function handler(m, { sock }) {
 
     if (!targetJid) {
         await m.reply(
-            `❌ *ᴛᴀʀɢᴇᴛ ᴛɪᴅᴀᴋ ᴅɪᴛᴇᴍᴜᴋᴀɴ*\n\n` +
-            `> Reply pesan user atau mention!\n` +
-            `> Contoh: \`${m.prefix}kick @user\``
+            `❌ *OBJETIVO NO ENCONTRADO*\n\n` +
+            `> ¡Responde al mensaje de un usuario o menciónalo!\n` +
+            `> Ejemplo: \`${m.prefix}kick @user\``
         )
         return
     }
@@ -40,12 +40,12 @@ async function handler(m, { sock }) {
     const targetNumber = targetJid.replace(/@.*$/, '')
 
     if (targetJid === botNumber || targetNumber === botNumber.replace(/@.*$/, '')) {
-        await m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak bisa kick bot sendiri!`)
+        await m.reply(`❌ *ERROR*\n\n> ¡No puedo expulsarme a mí mismo!`)
         return
     }
 
     if (targetJid === m.sender) {
-        await m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak bisa kick diri sendiri!`)
+        await m.reply(`❌ *ERROR*\n\n> ¡No puedes expulsarte a ti mismo!`)
         return
     }
 
@@ -54,18 +54,18 @@ async function handler(m, { sock }) {
         const targetParticipant = findParticipantByNumber(groupMeta.participants, targetJid)
         
         if (!targetParticipant) {
-            await m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> User tidak ditemukan dalam grup!`)
+            await m.reply(`❌ *ERROR*\n\n> ¡El usuario no se encuentra en el grupo!`)
             return
         }
         
         if (targetParticipant.admin) {
-            await m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak bisa kick admin grup!`)
+            await m.reply(`❌ *ERROR*\n\n> ¡No se puede expulsar a un administrador del grupo!`)
             return
         }
         
         await sock.groupParticipantsUpdate(m.chat, [targetParticipant.id], 'remove')
 
-        await m.reply(`✅ @${targetNumber} telah dikeluarkan dari grup ini.`, { mentions: [targetJid] })
+        await m.reply(`✅ @${targetNumber} ha sido expulsado de este grupo.`, { mentions: [targetJid] })
 
     } catch (error) {
         m.reply(te(m.prefix, m.command, m.pushName))
