@@ -3,11 +3,12 @@ import * as cheerio from 'cheerio'
 import moment from 'moment-timezone'
 import config from '../../config.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'infotourney',
-    alias: ['tourney', 'turnamen', 'mltourney'],
+    alias: ['tourney', 'torneo', 'mltorneo'],
     category: 'info',
-    description: 'Info turnamen Mobile Legends terbaru',
+    description: 'Muestra información sobre los últimos torneos de Mobile Legends',
     usage: '.infotourney',
     example: '.infotourney',
     isOwner: false,
@@ -34,7 +35,8 @@ async function getInfoTourney() {
         let datePublished = item.find('time[itemprop="datePublished"]').attr('datetime')
 
         if (datePublished) {
-            datePublished = moment(datePublished).tz('Asia/Jakarta').format('DD/MM/YYYY HH:mm')
+            // Ajustado a la zona horaria local de Argentina
+            datePublished = moment(datePublished).tz('America/Argentina/Buenos_Aires').format('DD/MM/YYYY HH:mm')
         }
 
         const descriptionHtml = item.find('p[style="text-align: center;"]').html() || ""
@@ -64,30 +66,42 @@ async function handler(m, { sock }) {
         
         if (!tournaments || tournaments.length === 0) {
             await m.react('❌')
-            return m.reply('❌ Tidak ada turnamen yang ditemukan')
+            return m.reply('❌ No se encontraron torneos disponibles en este momento.')
         }
         
         const saluranId = config.saluran?.id || '120363208449943317@newsletter'
-        const saluranName = config.saluran?.name || config.bot?.name || 'Ourin-AI'
+        const saluranName = config.saluran?.name || config.bot?.name || 'KAORI MD'
         
-        let text = `🏆 *ɪɴꜰᴏ ᴛᴜʀɴᴀᴍᴇɴ ᴍᴏʙɪʟᴇ ʟᴇɢᴇɴᴅs*\n\n`
-        text += `> 5 Turnamen Terbaru\n\n`
+        let text = `🏆 *ɪɴꜰᴏ ᴅᴇ ᴛᴏʀɴᴇᴏs ᴍᴏʙɪʟᴇ ʟᴇɢᴇɴᴅs*\n\n`
+        text += `> Los 5 torneos más recientes:\n\n`
         
         for (let i = 0; i < tournaments.length; i++) {
             const t = tournaments[i]
             text += `${i + 1}. *${t.title}*\n`
-            text += `📅 ${t.datePublished || 'N/A'}\n`
+            text += `📅 Publicado: ${t.datePublished || 'N/A'}\n`
             if (t.description) text += `📝 ${t.description}\n`
             if (t.info) text += `⚠️ ${t.info}\n`
-            text += `🔗 ${t.url}\n\n`
+            text += `🔗 Enlace: ${t.url}\n\n`
         }
+
+        text += `*KAORI MD — E-Sports*`
         
         const firstImage = tournaments[0]?.imageUrl
         
         if (firstImage) {
-            await sock.sendMedia(m.chat, firstImage, text, m, {
-                type: 'image'
-            })
+            // Se asume que sock.sendMedia es una función compatible en tu versión de KAORI MD
+            await sock.sendMessage(m.chat, {
+                image: { url: firstImage },
+                caption: text,
+                contextInfo: {
+                    forwardingScore: 999,
+                    isForwarded: true,
+                    forwardedNewsletterMessageInfo: {
+                        newsletterJid: saluranId,
+                        newsletterName: saluranName,
+                    }
+                }
+            }, { quoted: m })
         } else {
             await m.reply(text)
         }
