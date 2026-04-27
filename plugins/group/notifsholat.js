@@ -1,11 +1,12 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
-    name: 'notifsholat',
-    alias: ['notifsolat'],
+    name: 'notiforacion',
+    alias: ['notifsholat', 'notifsolat', 'recordatorio'],
     category: 'group',
-    description: 'Toggle notifikasi sholat untuk grup ini',
-    usage: '.notifsholat on/off',
-    example: '.notifsholat on',
+    description: 'Activa o desactiva las notificaciones de tiempos de oración en este grupo',
+    usage: '.notiforacion on/off',
+    example: '.notiforacion on',
     isOwner: false,
     isPremium: false,
     isGroup: true,
@@ -17,45 +18,48 @@ const pluginConfig = {
 
 function handler(m, { sock, db }) {
     if (!m.isAdmin && !m.isOwner) {
-        return m.reply(`❌ Hanya admin grup yang bisa menggunakan fitur ini`);
+        return m.reply(`❌ Solo los administradores del grupo pueden usar esta función.`);
     }
 
     const args = m.args[0]?.toLowerCase();
     const group = db.getGroup(m.chat) || {};
     const globalDb = getDatabase();
-    const kotaSetting = globalDb.setting('autoSholatKota') || { nama: 'KOTA JAKARTA' };
+    
+    // Configuración de ubicación (Se mantiene la lógica de la base de datos)
+    const kotaSetting = globalDb.setting('autoSholatKota') || { nama: 'CIUDAD DE JAKARTA' };
 
-    if (!['on', 'off'].includes(args)) {
+    if (!['on', 'off', 'activar', 'desactivar'].includes(args)) {
         const isGlobalActive = globalDb.setting('autoSholat') || false;
-        const statusGlobal = isGlobalActive ? '✅ AKTIF' : '❌ NONAKTIF';
-        const statusGrup = group.notifSholat !== false ? '✅ AKTIF' : '❌ NONAKTIF';
+        const statusGlobal = isGlobalActive ? '✅ ACTIVO' : '❌ INACTIVO';
+        const statusGrup = group.notifSholat !== false ? '✅ ACTIVO' : '❌ INACTIVO';
         
         return m.reply(
-            `🕌 *PENGINGAT WAKTU SHOLAT*\n\n` +
-            `Status Global: *${statusGlobal}* (Dari Owner)\n` +
-            `Status Grup: *${statusGrup}*\n` +
-            `Lokasi: *${kotaSetting.nama}*\n\n` +
-            `*PENGATURAN GRUP:*\n` +
-            `• *${m.prefix}notifsholat on* — Aktifkan notif di grup ini\n` +
-            `• *${m.prefix}notifsholat off* — Nonaktifkan notif di grup ini\n\n` +
-            `*CARA KERJA:*\n` +
-            `1. Mengirimkan mp3 adzan & gambar jadwal saat masuk waktu sholat\n` +
-            `2. Mengikuti jadwal real-time dari myquran.com\n` +
-            `3. Jika Status Global NONAKTIF, grup tidak akan dikirim adzan meskipun Status Grup AKTIF.\n` +
-            `4. Jika grup merasa terganggu, admin dapat mematikan khusus untuk grup ini.`
+            `🕌 *ʀᴇᴄᴏʀᴅᴀᴛᴏʀɪᴏ ᴅᴇ ᴏʀᴀᴄɪᴏ́ɴ*\n\n` +
+            `Estado Global: *${statusGlobal}* (Control del Owner)\n` +
+            `Estado del Grupo: *${statusGrup}*\n` +
+            `Ubicación: *${kotaSetting.nama}*\n\n` +
+            `*AJUSTES DEL GRUPO:*\n` +
+            `• *${m.prefix}notiforacion on* — Activar avisos en este grupo\n` +
+            `• *${m.prefix}notiforacion off* — Desactivar avisos en este grupo\n\n` +
+            `*CÓMO FUNCIONA:*\n` +
+            `1. Envía el audio del Adzan e imagen del horario al entrar en tiempo de oración.\n` +
+            `2. Sigue el horario en tiempo real basado en el servicio configurado.\n` +
+            `3. Si el Estado Global está INACTIVO, el grupo no recibirá avisos aunque su estado sea ACTIVO.\n` +
+            `4. Los administradores pueden apagarlo si consideran que interrumpe el chat.\n\n` +
+            `*KAORI MD — Espiritualidad*`
         );
     }
 
-    if (args === 'on') {
+    if (args === 'on' || args === 'activar') {
         group.notifSholat = true;
         db.setGroup(m.chat, group);
-        return m.reply(`✅ *ɴᴏᴛɪꜰ sʜᴏʟᴀᴛ ᴅɪᴀᴋᴛɪꜰᴋᴀɴ*\n\n> Grup ini akan menerima pengingat waktu sholat\n> Lokasi: ${kotaSetting.nama}`);
+        return m.reply(`✅ *ɴᴏᴛɪꜰɪᴄᴀᴄɪᴏ́ɴ ᴀᴄᴛɪᴠᴀᴅᴀ*\n\n> Este grupo ahora recibirá recordatorios de oración.\n> Ubicación actual: ${kotaSetting.nama}`);
     }
 
-    if (args === 'off') {
+    if (args === 'off' || args === 'desactivar') {
         group.notifSholat = false;
         db.setGroup(m.chat, group);
-        return m.reply(`❌ *ɴᴏᴛɪꜰ sʜᴏʟᴀᴛ ᴅɪɴᴏɴᴀᴋᴛɪꜰᴋᴀɴ*`);
+        return m.reply(`❌ *ɴᴏᴛɪꜰɪᴄᴀᴄɪᴏ́ɴ ᴅᴇsᴀᴄᴛɪᴠᴀᴅᴀ*\n\n> Se han desactivado los avisos de oración para este grupo.`);
     }
 }
 
