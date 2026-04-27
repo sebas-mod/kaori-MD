@@ -31,7 +31,7 @@ function handler(m, { sock }) {
                      `El grupo *${groupName}* ha sido silenciado por @${m.sender.split('@')[0]}.\n\n` +
                      `> Ahora solo los administradores pueden enviar mensajes.\n` +
                      `> Usa \`${m.prefix}unmute\` para habilitar el chat de nuevo.\n\n` +
-                     `*KAORI MD — Moderación*`
+                     `*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Moderación*`
 
     m.reply(response, { mentions: [m.sender] })
 }
