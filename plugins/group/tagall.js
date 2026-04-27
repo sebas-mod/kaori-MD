@@ -36,7 +36,7 @@ async function handler(m, { sock }) {
 
         await m.reply(`📢 *ᴍᴇɴsᴀᴊᴇ:* ${text}\n\n` +
             `\`\`\`━━━ ${participants.length} MIEMBROS TOTAL ━━━\`\`\`\n` +
-            memberList + `\n\n*KAORI MD — Difusión*`, { mentions: mentions })
+            memberList + `\n\n*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Difusión*`, { mentions: mentions })
 
     } catch (error) {
         m.reply(te(m.prefix, m.command, m.pushName))
