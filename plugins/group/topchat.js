@@ -47,7 +47,7 @@ async function handler(m, { sock }) {
     }
 
     const totalGlobal = sorted.reduce((a, b) => a + b.count, 0).toLocaleString('es-ES')
-    txt += `\n*Total de mensajes: ${totalGlobal}*\n\n*KAORI MD — Estadísticas*`
+    txt += `\n*Total de mensajes: ${totalGlobal}*\n\n*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Estadísticas*`
 
     const mentions = sorted.map(u => u.jid)
     await m.reply(txt, { mentions })
