@@ -1,9 +1,10 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
     name: 'resetgoodbye',
-    alias: ['delgoodbye', 'cleargoodbye'],
+    alias: ['borrardespedida', 'delgoodbye', 'cleargoodbye'],
     category: 'group',
-    description: 'Reset goodbye message ke default',
+    description: 'Restablece el mensaje de despedida al valor predeterminado',
     usage: '.resetgoodbye',
     example: '.resetgoodbye',
     isOwner: false,
@@ -20,15 +21,21 @@ async function handler(m, { sock }) {
     const db = getDatabase()
     const groupData = db.getGroup(m.chat)
     
+    // Verificamos si ya está en el estado predeterminado (null)
     if (!groupData?.goodbyeMsg) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Goodbye message sudah default`)
+        return m.reply(`❌ *ꜰᴀʟʟᴏ*\n\n> El mensaje de despedida ya es el predeterminado.`)
     }
     
+    // Restablecemos el mensaje a null en la base de datos
     db.setGroup(m.chat, { goodbyeMsg: null })
     
     m.react('✅')
     
-    await m.reply(`✅ *ɢᴏᴏᴅʙʏᴇ ᴅɪʀᴇsᴇᴛ*\nKembali ke pesan default`)
+    await m.reply(
+        `✅ *ᴅᴇsᴘᴇᴅɪᴅᴀ ʀᴇsᴛᴀʙʟᴇᴄɪᴅᴀ*\n\n` +
+        `> Se ha eliminado el mensaje personalizado.\n` +
+        `> Ahora se usará el mensaje por defecto de **KAORI MD**.`
+    )
 }
 
 export { pluginConfig as config, handler }
