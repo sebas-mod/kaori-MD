@@ -1,9 +1,10 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
     name: 'resetwelcome',
-    alias: ['delwelcome', 'clearwelcome'],
+    alias: ['borrarbienvenida', 'delwelcome', 'clearwelcome'],
     category: 'group',
-    description: 'Reset welcome message ke default',
+    description: 'Restablece el mensaje de bienvenida al valor predeterminado',
     usage: '.resetwelcome',
     example: '.resetwelcome',
     isOwner: false,
@@ -21,14 +22,18 @@ async function handler(m, { sock }) {
     const groupData = db.getGroup(m.chat)
     
     if (!groupData?.welcomeMsg) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Welcome message sudah default`)
+        return m.reply(`❌ *ꜰᴀʟʟᴏ*\n\n> El mensaje de bienvenida ya es el predeterminado.`)
     }
     
     db.setGroup(m.chat, { welcomeMsg: null })
     
     m.react('✅')
     
-    await m.reply(`✅ *ᴡᴇʟᴄᴏᴍᴇ ᴅɪʀᴇsᴇᴛ*\n\n> Kembali ke pesan default`)
+    await m.reply(
+        `✅ *ʙɪᴇɴᴠᴇɴɪᴅᴀ ʀᴇsᴛᴀʙʟᴇᴄɪᴅᴀ*\n\n` +
+        `> Se ha eliminado el mensaje personalizado.\n` +
+        `> Ahora se usará el mensaje por defecto de **KAORI MD**.`
+    )
 }
 
 export { pluginConfig as config, handler }
