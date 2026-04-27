@@ -32,7 +32,7 @@ async function handler(m, { sock }) {
     await m.reply(
         `✅ *ʙɪᴇɴᴠᴇɴɪᴅᴀ ʀᴇsᴛᴀʙʟᴇᴄɪᴅᴀ*\n\n` +
         `> Se ha eliminado el mensaje personalizado.\n` +
-        `> Ahora se usará el mensaje por defecto de **KAORI MD**.`
+        `> Ahora se usará el mensaje por defecto de **𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃**.`
     )
 }
 
