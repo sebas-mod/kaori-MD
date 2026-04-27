@@ -1,10 +1,11 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
     name: 'slowmode',
-    alias: ['slow', 'setslowmode'],
+    alias: ['slow', 'modolento', 'setslowmode'],
     category: 'group',
-    description: 'Slowmode grup — batasi kecepatan pesan member',
-    usage: '.slowmode <on/off/onlycommand> [detik]',
+    description: 'Modo lento del grupo — limita la velocidad de mensajes de los miembros',
+    usage: '.slowmode <on/off/onlycommand> [segundos]',
     example: '.slowmode on 30',
     isOwner: false,
     isPremium: false,
@@ -19,16 +20,16 @@ const pluginConfig = {
 const lastMessageTime = new Map()
 
 const PRESETS = {
-    santai: 10,
+    relajado: 10,
     normal: 30,
-    ketat: 60,
-    superketat: 120,
+    estricto: 60,
+    superestricto: 120,
     max: 300,
 }
 
 const MODES = {
-    all: 'Semua pesan + command dihapus',
-    onlycommand: 'Command di-silent, chat biasa tetap jalan',
+    all: 'Se eliminan todos los mensajes + comandos',
+    onlycommand: 'Comandos silenciados, el chat normal sigue libre',
 }
 
 async function handler(m, { sock }) {
@@ -37,7 +38,7 @@ async function handler(m, { sock }) {
     const subCmd = args[0]?.toLowerCase()
     let groupData = db.getGroup(m.chat) || {}
 
-    if (!subCmd || subCmd === 'status') {
+    if (!subCmd || subCmd === 'status' || subCmd === 'estado') {
         const sm = groupData.slowmode || {}
         const enabled = sm.enabled
         const delay = sm.delay || 30
@@ -47,34 +48,34 @@ async function handler(m, { sock }) {
             .join('\n')
 
         return m.reply(
-            `🐢 *SLOWMODE*\n\n` +
-            `Status: ${enabled ? `✅ ON (${delay}s)` : '❌ OFF'}\n` +
-            `Mode: *${mode}*\n\n` +
-            `*Penggunaan:*\n` +
-            `*.slowmode on 30* — semua pesan + command\n` +
-            `*.slowmode onlycommand 30* — command only\n` +
-            `*.slowmode off* — nonaktifkan\n\n` +
-            `*Preset:*\n${presetList}\n\n` +
-            `*Mode:*\n` +
-            `  *all* — hapus semua pesan saat delay\n` +
-            `  *onlycommand* — silent command, chat bebas\n\n` +
-            `_Admin & owner tidak terpengaruh_`
+            `🐢 *sʟᴏᴡᴍᴏᴅᴇ — KAORI MD*\n\n` +
+            `Estado: ${enabled ? `✅ ACTIVADO (${delay}s)` : '❌ DESACTIVADO'}\n` +
+            `Modo: *${mode}*\n\n` +
+            `*Uso:* \n` +
+            `> *.slowmode on 30* — todos los mensajes\n` +
+            `> *.slowmode onlycommand 30* — solo comandos\n` +
+            `> *.slowmode off* — desactivar\n\n` +
+            `*Presets disponibles:*\n${presetList}\n\n` +
+            `*Modos:*\n` +
+            `  *all* — borra todo durante el delay\n` +
+            `  *onlycommand* — solo silencia comandos\n\n` +
+            `_Nota: Admins y Owner no son afectados._`
         )
     }
 
-    if (subCmd === 'off') {
+    if (subCmd === 'off' || subCmd === 'desactivar') {
         db.setGroup(m.chat, { ...groupData, slowmode: { enabled: false } })
-        return m.reply(`✅ Slowmode *dinonaktifkan*`)
+        return m.reply(`✅ Slowmode *desactivado* con éxito.`)
     }
 
     let mode = 'all'
     let delay
     let delayArg
 
-    if (subCmd === 'onlycommand' || subCmd === 'oc') {
+    if (subCmd === 'onlycommand' || subCmd === 'oc' || subCmd === 'solocomandos') {
         mode = 'onlycommand'
         delayArg = args[1]
-    } else if (subCmd === 'on' || subCmd === 'set') {
+    } else if (subCmd === 'on' || subCmd === 'set' || subCmd === 'activar') {
         delayArg = args[1]
     } else if (PRESETS[subCmd]) {
         delay = PRESETS[subCmd]
@@ -83,7 +84,7 @@ async function handler(m, { sock }) {
     } else {
         delay = parseInt(subCmd)
         if (isNaN(delay)) {
-            return m.reply(`❌ Gunakan *.slowmode on 30* atau *.slowmode onlycommand 30*`)
+            return m.reply(`❌ Usa *.slowmode on 30* o *.slowmode onlycommand 30*`)
         }
     }
 
@@ -96,7 +97,7 @@ async function handler(m, { sock }) {
     }
 
     if (delay < 5 || delay > 600) {
-        return m.reply(`❌ Delay harus antara 5–600 detik`)
+        return m.reply(`❌ El delay debe estar entre 5 y 600 segundos.`)
     }
 
     db.setGroup(m.chat, {
@@ -109,11 +110,11 @@ async function handler(m, { sock }) {
     const modeDesc = MODES[mode]
 
     await m.reply(
-        `✅ Slowmode *aktif*\n\n` +
-        `Delay: *${delay} detik*${label}\n` +
-        `Mode: *${mode}*\n` +
-        `${modeDesc}\n\n` +
-        `_Admin & owner tidak terpengaruh_`
+        `✅ *sʟᴏᴡᴍᴏᴅᴇ ᴀᴄᴛɪᴠᴀᴅᴏ*\n\n` +
+        `Espera: *${delay} segundos*${label}\n` +
+        `Modo: *${mode}*\n` +
+        `Efecto: ${modeDesc}\n\n` +
+        `_Admins y Owner no son afectados._`
     )
 }
 
