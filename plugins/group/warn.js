@@ -42,7 +42,7 @@ async function handler(m, { sock }) {
             `2. El bot registrará la infracción y el motivo.\n` +
             `3. Si el usuario alcanza las *${maxWarns}* advertencias, será EXPULSADO (Kick) automáticamente.\n` +
             `4. Puedes ver el historial detallado con *${m.prefix}listwarn @user*.\n\n` +
-            `*KAORI MD — Gestión de Grupo*`
+            `*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Gestión de Grupo*`
         )
     }
 
