@@ -31,7 +31,7 @@ const pluginConfig = {
 
 function getContextInfo(title = '📢 ᴊᴘᴍ', body = 'Difusión Masiva') {
     const saluranId = config.saluran?.id || '120363208449943317@newsletter'
-    const saluranName = config.saluran?.name || config.bot?.name || 'KAORI MD'
+    const saluranName = config.saluran?.name || config.bot?.name || '𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃'
     
     const contextInfo = {
         forwardingScore: 9999,
