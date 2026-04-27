@@ -165,7 +165,7 @@ async function handler(m, { sock, db }) {
 > _El grupo se ${finalAction === 'open' ? 'abrirá' : 'cerrará'} automáticamente_
 > _todos los días a las *${formattedTime}* hs._
 
-*Powered by KAORI MD*`;
+*Powered by 𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃*`;
     
     await m.reply(successMsg);
 }
