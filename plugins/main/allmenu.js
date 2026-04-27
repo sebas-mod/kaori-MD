@@ -1,4 +1,4 @@
-import * as botmodePlugin from '../group/botmode.js'
+import * as botmodePlugin from '../group/botmode.js' 
 import { generateWAMessageFromContent, proto } from 'ourin'
 import _sharp from 'sharp'
 import config from "../../config.js";
@@ -76,7 +76,7 @@ function toSmallCaps(text) {
 function getContextInfo(botConfig, m, thumbBuffer) {
   const saluranId = botConfig.saluran?.id || "";
   const saluranName =
-    botConfig.saluran?.name || botConfig.bot?.name || "ᴋᴀᴏʀɪ ᴍᴅ";
+    botConfig.saluran?.name || botConfig.bot?.name || "𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃";
   return {
     mentionedJid: [m.sender],
     forwardingScore: 9999,
@@ -121,8 +121,9 @@ async function handler(m, { sock, config: botConfig, db, uptime }) {
   const greeting = getTimeGreeting();
 
   let txt = `Hola *@${m.pushName || "Usuario"}* 🪸
-Soy ${botConfig.bot?.name || "ᴋᴀᴏʀɪ ᴍᴅ"}, un bot de WhatsApp listo para ayudarte.  
-Puedes usarme para buscar información, obtener datos o ayudarte con tareas simples directamente desde WhatsApp — práctico y sin complicaciones.
+Soy ${botConfig.bot?.name || "𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃"}... y desde que apareciste, todo se siente un poco más especial ✨  
+Estoy aquí para ti, para ayudarte en lo que necesites, acompañarte y hacer tu experiencia más fácil… y un poquito más linda 💖  
+Puedes pedirme lo que quieras, estaré encantada de responderte 💫
 `;
 
   const categoryOrder = [
@@ -184,7 +185,7 @@ Puedes usarme para buscar información, obtener datos o ayudarte con tareas simp
     txt += `╰───────⬣\n\n`;
   }
 
-  txt += `_© ${botConfig.bot?.name || "ᴋᴀᴏʀɪ ᴍᴅ"} | ${new Date().getFullYear()}_\n`;
+  txt += `_© ${botConfig.bot?.name || "𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃"} | ${new Date().getFullYear()}_\n`;
   txt += `_ᴅᴇsᴀʀʀᴏʟʟᴀᴅᴏʀ: sebas MD_`;
 
   const imagePath = path.join(process.cwd(), "assets", "images", "ourin.jpg");
@@ -200,13 +201,6 @@ Puedes usarme para buscar información, obtener datos o ayudarte con tareas simp
     mentionedJid: [m.sender],
     forwardingScore: 9999,
     isForwarded: true,
-  /*  externalAdReply: {
-      title: botConfig.bot?.name || "ᴋᴀᴏʀɪ ᴍᴅ",
-      body: `Owner: sebas MD`,
-      mediaType: 1,
-      thumbnail: imageBuffer,
-      renderLargerThumbnail: true,
-    },*/
   };
 
   try {
