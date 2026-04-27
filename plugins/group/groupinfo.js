@@ -2,11 +2,12 @@ import axios from 'axios'
 import { getParticipantJid, resolveAnyLidToJid } from '../../src/lib/ourin-lid.js'
 import * as timeHelper from '../../src/lib/ourin-time.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'groupinfo',
-    alias: ['infogroup', 'gcinfo', 'infogc', 'gc'],
+    alias: ['infogrupo', 'gcinfo', 'infogc', 'gc'],
     category: 'group',
-    description: 'Menampilkan informasi lengkap grup',
+    description: 'Muestra la información detallada del grupo',
     usage: '.groupinfo',
     example: '.groupinfo',
     isOwner: false,
@@ -45,61 +46,58 @@ async function handler(m, { sock, db }) {
         const group = db.getGroup(m.chat) || {}
 
         const createdDate = groupMeta.creation
-            ? timeHelper.fromTimestamp(groupMeta.creation * 1000, 'D MMMM YYYY')
-            : 'Tidak diketahui'
+            ? timeHelper.fromTimestamp(groupMeta.creation * 1000, 'D [de] MMMM [de] YYYY')
+            : 'Desconocido'
 
         const ownerNumber = ownerJid ? ownerJid.split('@')[0] : null
         const ownerDisplay = ownerNumber && !ownerNumber.includes(':')
             ? `@${ownerNumber}`
-            : 'Tidak diketahui'
+            : 'Desconocido'
 
         let ppUrl = null
         try {
-            ppUrl = await sock.profilePictureUrl(m.chat)
+            ppUrl = await sock.profilePictureUrl(m.chat, 'image')
         } catch {}
 
         const isOpen = groupMeta.announce === false || !groupMeta.announce
 
-        let text = `👥 *INFO GRUP*\n\n`
-        text += `Nama: *${groupMeta.subject}*\n`
-        text += `ID: ${m.chat}\n`
-        text += `Owner: ${ownerDisplay}\n`
-        text += `Dibuat: ${createdDate}\n`
-        text += `Status: ${isOpen ? '🔓 Terbuka' : '🔒 Tertutup'}\n\n`
+        let text = `👥 *ɪɴꜰᴏʀᴍᴀᴄɪᴏ́ɴ ᴅᴇʟ ɢʀᴜᴘᴏ*\n\n`
+        text += `📌 *Nombre:* ${groupMeta.subject}\n`
+        text += `🆔 *ID:* ${m.chat}\n`
+        text += `👑 *Dueño:* ${ownerDisplay}\n`
+        text += `📅 *Creado:* ${createdDate}\n`
+        text += `🔓 *Estado:* ${isOpen ? 'Abierto' : 'Cerrado (Solo Admins)'}\n\n`
 
-        text += `📊 *MEMBER*\n`
-        text += `Total: ${participants.length}\n`
-        text += `Admin: ${admins.length}\n`
-        text += `Member: ${participants.length - admins.length}\n\n`
+        text += `📊 *ᴇsᴛᴀᴅɪ́sᴛɪᴄᴀs*\n`
+        text += `Total de miembros: *${participants.length}*\n`
+        text += `Administradores: *${admins.length}*\n`
+        text += `Usuarios: *${participants.length - admins.length}*\n\n`
 
-        text += `🔧 *FITUR AKTIF*\n`
-        text += `Welcome: ${featureStatus(group.welcome)}\n`
+        text += `🔧 *ꜰᴜɴᴄɪᴏɴᴇs ᴀᴄᴛɪᴠᴀs*\n`
+        text += `Welcome: ${featureStatus(group.welcome)} | `
         text += `Goodbye: ${featureStatus(group.goodbye)}\n`
-        text += `Autoreply: ${featureStatus(group.autoreply)}\n`
+        text += `Autoreply: ${featureStatus(group.autoreply)} | `
         text += `AutoAI: ${featureStatus(group.autoai)}\n`
-        text += `AutoDL: ${featureStatus(group.autodl)}\n`
-        text += `AutoSticker: ${featureStatus(group.autosticker)}\n`
-        text += `AutoMedia: ${featureStatus(group.automedia)}\n\n`
+        text += `AutoDL: ${featureStatus(group.autodl)} | `
+        text += `Sticker: ${featureStatus(group.autosticker)}\n\n`
 
-        text += `🛡️ *PROTEKSI*\n`
-        text += `AntiLink: ${featureStatus(group.antilink)}\n`
+        text += `🛡️ *ᴘʀᴏᴛᴇᴄᴄɪᴏ́ɴ*\n`
+        text += `AntiLink: ${featureStatus(group.antilink)} | `
         text += `AntiBot: ${featureStatus(group.antibot)}\n`
+        text += `AntiToxic: ${featureStatus(group.antitoxic)} | `
         text += `AntiSpam: ${featureStatus(group.antispam)}\n`
-        text += `AntiToxic: ${featureStatus(group.antitoxic)}\n`
-        text += `AntiRemove: ${featureStatus(group.antiremove)}\n`
-        text += `AntiHidetag: ${featureStatus(group.antihidetag)}\n`
-        text += `AntiSticker: ${featureStatus(group.antisticker)}\n`
-        text += `AntiMedia: ${featureStatus(group.antimedia)}\n`
-        text += `AntiDocument: ${featureStatus(group.antidocument)}`
+        text += `AntiViewOnce: ${featureStatus(group.antiviewonce)} | `
+        text += `AntiDelete: ${featureStatus(group.antidelete)}\n`
 
         if (groupMeta.desc) {
-            text += `\n\n📝 *DESKRIPSI*\n${groupMeta.desc}`
+            text += `\n📝 *ᴅᴇsᴄʀɪᴘᴄɪᴏ́ɴ*\n${groupMeta.desc}`
         }
+
+        text += `\n\n_Powered by KAORI MD_`
 
         const mentions = ownerJid && !ownerJid.includes(':') ? [ownerJid] : []
 
         if (ppUrl) {
-
             try {
                 const ppBuffer = Buffer.from((await axios.get(ppUrl, { responseType: 'arraybuffer', timeout: 10000 })).data)
                 await sock.sendMessage(m.chat, {
@@ -114,6 +112,7 @@ async function handler(m, { sock, db }) {
             await m.reply(text, { mentions })
         }
     } catch (error) {
+        console.error(error)
         m.reply(te(m.prefix, m.command, m.pushName))
     }
 }
