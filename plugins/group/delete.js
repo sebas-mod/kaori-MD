@@ -1,9 +1,9 @@
 const pluginConfig = {
     name: 'delete',
-    alias: ['del', 'hapus', 'd'],
+    alias: ['del', 'borrar', 'eliminar', 'd'],
     category: 'group',
-    description: 'Hapus pesan dengan reply',
-    usage: '.delete (reply pesan)',
+    description: 'Elimina un mensaje respondiendo a él (reply)',
+    usage: '.delete (respondiendo a un mensaje)',
     example: '.delete',
     isOwner: false,
     isPremium: false,
@@ -18,20 +18,23 @@ const pluginConfig = {
 
 async function handler(m, { sock }) {
     if (!m.quoted) {
-        return m.reply('⚠️ *Reply pesan yang ingin dihapus!*')
+        return m.reply('⚠️ *¡Responde al mensaje que deseas eliminar!*')
     }
     
     const quotedSender = m.quoted.sender || m.quoted.key?.participant
     const botJid = sock.user?.id?.split(':')[0] + '@s.whatsapp.net'
+    
+    // Verificaciones de propiedad
     const isOwnMessage = m.quoted.key?.fromMe || quotedSender === m.sender
     const isBotMessage = quotedSender === botJid || m.quoted.key?.fromMe
     
+    // Si no es un mensaje propio ni del bot, se requiere ser admin
     if (!isOwnMessage && !isBotMessage) {
         if (!m.isBotAdmin) {
-            return m.reply('⚠️ *Bot harus jadi admin untuk hapus pesan orang lain!*')
+            return m.reply('⚠️ *¡El bot debe ser admin para eliminar mensajes de otros!*')
         }
         if (!m.isAdmin && !m.isOwner) {
-            return m.reply('⚠️ *Hanya admin yang bisa hapus pesan orang lain!*')
+            return m.reply('⚠️ *¡Solo los administradores pueden eliminar mensajes de otros!*')
         }
     }
     
@@ -48,7 +51,7 @@ async function handler(m, { sock }) {
         
     } catch (err) {
         if (err.message?.includes('not found') || err.message?.includes('forbidden')) {
-            await m.reply('❌ *Gagal menghapus!*\n> Pesan mungkin sudah dihapus atau terlalu lama.')
+            await m.reply('❌ *¡Error al eliminar!*\n> El mensaje puede ser muy antiguo o ya fue borrado.')
         } else {
             await m.react('❌')
         }
