@@ -44,7 +44,7 @@ async function handler(m, { sock }) {
                 remoteJid: 'status@broadcast'
             },
             message: {
-                conversation: '𝐊𝐀𝐎𝐑𝐈 𝐌𝐃 🌸'
+                conversation: '𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 🌸'
             }
         }
 
