@@ -1,13 +1,14 @@
 import config from '../../config.js'
 import { getParticipantJids } from '../../src/lib/ourin-lid.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: 'hidetag2',
-    alias: ['h2', 'ht2'],
+    name: 'notify',
+    alias: ['n', 'h2', 'ht2', 'notificar2'],
     category: 'group',
-    description: 'Hidetag dengan fakeQuoted styling',
-    usage: '.h2 <text> atau reply pesan',
-    example: '.h2 Pengumuman penting!',
+    description: 'Notifica a todos los miembros con un estilo de cita falso',
+    usage: '.n <texto> o respondiendo a un mensaje',
+    example: '.n ¡Atención a todos!',
     isOwner: false,
     isPremium: false,
     isGroup: true,
@@ -24,15 +25,18 @@ async function handler(m, { sock }) {
 
     if (!text && !m.quoted) {
         return m.reply(
-            `📢 *HIDETAG 2*\n\n` +
-            `• \`${m.prefix}h2 <text>\`\n` +
-            `• Reply pesan + \`${m.prefix}h2\``
+            `📢 *ɴᴏᴛɪꜰʏ*\n\n` +
+            `• \`${m.prefix}n <texto>\`\n` +
+            `• Responde a un mensaje + \`${m.prefix}n\``
         )
     }
+
     try {
         m.react('📢')
         const groupMeta = m.groupMetadata
         const users = getParticipantJids(groupMeta.participants || [])
+
+        // Configuración de la cita falsa con el nombre del bot
         const fakeQuoted = {
             key: {
                 fromMe: false,
@@ -40,13 +44,15 @@ async function handler(m, { sock }) {
                 remoteJid: 'status@broadcast'
             },
             message: {
-                conversation: config.bot?.name || 'Ourin MD'
+                conversation: '𝐊𝐀𝐎𝐑𝐈 𝐌𝐃 🌸'
             }
         }
+
         if (m.quoted) {
             const q = m.quoted
             const qMsg = q.message || {}
             const type = Object.keys(qMsg)[0]
+
             if (type === 'imageMessage') {
                 const media = await q.download()
                 return sock.sendMessage(
@@ -59,6 +65,7 @@ async function handler(m, { sock }) {
                     { quoted: fakeQuoted }
                 )
             }
+
             if (type === 'videoMessage') {
                 const media = await q.download()
                 return sock.sendMessage(
@@ -71,6 +78,7 @@ async function handler(m, { sock }) {
                     { quoted: fakeQuoted }
                 )
             }
+
             if (type === 'stickerMessage') {
                 const media = await q.download()
                 return sock.sendMessage(
@@ -79,6 +87,7 @@ async function handler(m, { sock }) {
                     { quoted: fakeQuoted }
                 )
             }
+
             if (type === 'audioMessage') {
                 const media = await q.download()
                 return sock.sendMessage(
@@ -92,19 +101,21 @@ async function handler(m, { sock }) {
                     { quoted: fakeQuoted }
                 )
             }
+
             if (type === 'documentMessage') {
                 const media = await q.download()
                 return sock.sendMessage(
                     m.chat,
                     {
                         document: media,
-                        fileName: qMsg.documentMessage?.fileName || 'file',
+                        fileName: qMsg.documentMessage?.fileName || 'archivo',
                         mimetype: qMsg.documentMessage?.mimetype,
                         mentions: users
                     },
                     { quoted: fakeQuoted }
                 )
             }
+
             const quotedText =
                 q.text ||
                 qMsg.conversation ||
@@ -118,11 +129,11 @@ async function handler(m, { sock }) {
             )
         }
 
-        // ===== TEXT MODE =====
+        // ===== MODO TEXTO =====
         await sock.sendMessage(
             m.chat,
             {
-                text,
+                text: text,
                 mentions: users
             },
             { quoted: fakeQuoted }
@@ -131,6 +142,7 @@ async function handler(m, { sock }) {
         m.react('✅')
 
     } catch (err) {
+        console.error(err)
         m.react('☢')
         m.reply(te(m.prefix, m.command, m.pushName))
     }
