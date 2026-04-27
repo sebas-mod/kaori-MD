@@ -1,10 +1,10 @@
 const pluginConfig = {
-    name: 'poll',
-    alias: ['voting', 'vote', 'survei'],
+    name: 'encuesta',
+    alias: ['poll', 'vote', 'voting', 'votacion'],
     category: 'group',
-    description: 'Buat polling/voting di grup',
-    usage: '.poll <pertanyaan> | <opsi1>, <opsi2>, ...',
-    example: '.poll Makan apa? | Nasi Goreng, Mie Ayam, Bakso',
+    description: 'Crea una encuesta o votación en el grupo',
+    usage: '.encuesta <pregunta> | <opción1>, <opción2>, ...',
+    example: '.encuesta ¿Qué almorzamos? | Pizza, Hamburguesa, Sushi',
     isOwner: false,
     isPremium: false,
     isGroup: true,
@@ -19,15 +19,15 @@ async function handler(m, { sock }) {
     
     if (!text || text.trim() === '') {
         await m.reply(
-            `⚠️ *ᴠᴀʟɪᴅᴀsɪ ɢᴀɢᴀʟ*\n\n` +
-            `> Format tidak valid!\n\n` +
-            `*Format:*\n` +
-            `> \`.poll pertanyaan | opsi1, opsi2\`\n\n` +
-            `*Contoh:*\n` +
-            `> \`.poll Makan siang apa? | Nasi Goreng, Mie Ayam\`\n\n` +
-            `*Opsi tambahan:*\n` +
-            `> \`.poll multi | pertanyaan | opsi1, opsi2, opsi3, dst\`\n` +
-            `> (untuk pilihan ganda)`
+            `⚠️ *ᴠᴀʟɪᴅᴀᴄɪᴏ́ɴ ꜰᴀʟʟɪᴅᴀ*\n\n` +
+            `> ¡Formato no válido!\n\n` +
+            `*Formato:*\n` +
+            `> \`${m.prefix}encuesta pregunta | opción1, opción2\`\n\n` +
+            `*Ejemplo:*\n` +
+            `> \`${m.prefix}encuesta ¿Qué jugamos? | Free Fire, Minecraft\`\n\n` +
+            `*Opción múltiple:*\n` +
+            `> \`${m.prefix}encuesta multi | pregunta | opción1, opción2, ...\`\n` +
+            `> (Permite elegir más de una opción)`
         );
         return;
     }
@@ -42,8 +42,9 @@ async function handler(m, { sock }) {
     
     if (parts.length < 2) {
         await m.reply(
-            `⚠️ *ᴠᴀʟɪᴅᴀsɪ ɢᴀɢᴀʟ*\n\n` +
-            `> Format: \`pertanyaan | opsi1, opsi2, ...\``
+            `⚠️ *ᴠᴀʟɪᴅᴀᴄɪᴏ́ɴ ꜰᴀʟʟɪᴅᴀ*\n\n` +
+            `> Debes usar el separador "|" entre la pregunta y las opciones.\n` +
+            `> Uso: \`pregunta | opción1, opción2, ...\``
         );
         return;
     }
@@ -53,31 +54,31 @@ async function handler(m, { sock }) {
     
     if (options.length < 2) {
         await m.reply(
-            `⚠️ *ᴠᴀʟɪᴅᴀsɪ ɢᴀɢᴀʟ*\n\n` +
-            `> Minimal 2 opsi pilihan!`
+            `⚠️ *ᴠᴀʟɪᴅᴀᴄɪᴏ́ɴ ꜰᴀʟʟɪᴅᴀ*\n\n` +
+            `> ¡Se requieren al menos 2 opciones!`
         );
         return;
     }
     
     if (options.length > 12) {
         await m.reply(
-            `⚠️ *ᴠᴀʟɪᴅᴀsɪ ɢᴀɢᴀʟ*\n\n` +
-            `> Maksimal 12 opsi pilihan!`
+            `⚠️ *ᴠᴀʟɪᴅᴀᴄɪᴏ́ɴ ꜰᴀʟʟɪᴅᴀ*\n\n` +
+            `> ¡Máximo 12 opciones permitidas!`
         );
         return;
     }
     
     if (question.length > 255) {
         await m.reply(
-            `⚠️ *ᴠᴀʟɪᴅᴀsɪ ɢᴀɢᴀʟ*\n\n` +
-            `> Pertanyaan terlalu panjang!\n` +
-            `> Maksimal 255 karakter.`
+            `⚠️ *ᴠᴀʟɪᴅᴀᴄɪᴏ́ɴ ꜰᴀʟʟɪᴅᴀ*\n\n` +
+            `> ¡La pregunta es demasiado larga!\n` +
+            `> Máximo 255 caracteres.`
         );
         return;
     }
     
     try {
-        const pollMsg = `✅ Success membuat poll`;
+        const pollMsg = `✅ *ᴇɴᴄᴜᴇsᴛᴀ ᴄʀᴇᴀᴅᴀ*\n\n> Generada con éxito por @${m.sender.split('@')[0]}`;
         
         await m.reply(pollMsg, { mentions: [m.sender] });
         
@@ -92,8 +93,8 @@ async function handler(m, { sock }) {
     } catch (error) {
         await m.reply(
             `❌ *ᴇʀʀᴏʀ*\n\n` +
-            `> Gagal membuat poll.\n` +
-            `> _${error.message}_`
+            `> No se pudo crear la encuesta.\n` +
+            `> _Detalle: ${error.message}_`
         );
     }
 }
