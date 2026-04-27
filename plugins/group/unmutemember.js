@@ -3,7 +3,7 @@ import { isLid, lidToJid } from '../../src/lib/ourin-lid.js'
 
 const pluginConfig = {
     name: 'unmutemember',
-    alias: ['unmutemiembro', 'desmutearmiembro', 'listmute', 'listamute', 'vermutas'],
+    alias: ['unmutemiembro', 'desmutearmienbro', 'listmute', 'listamute', 'vermutas'],
     category: 'group',
     description: 'Quita el silencio a un miembro específico o muestra la lista de silenciados',
     usage: '.unmutemember <@tag/reply/número>',
