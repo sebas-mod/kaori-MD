@@ -35,7 +35,7 @@ async function handler(m, { sock }) {
         
         const senderNum = m.sender.split('@')[0];
         
-        const successMsg = `✅ @${senderNum} ha abierto este grupo.\n\n_Ahora todos los miembros pueden participar._\n\n*KAORI MD — Gestión*`;
+        const successMsg = `✅ @${senderNum} ha abierto este grupo.\n\n_Ahora todos los miembros pueden participar._\n\n*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Gestión*`;
         
         await m.reply(successMsg, { mentions: [m.sender] });
         
