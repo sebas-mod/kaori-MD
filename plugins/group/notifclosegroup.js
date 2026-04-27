@@ -30,7 +30,7 @@ function handler(m, { sock, db }) {
             `*Uso:*\n` +
             `\`${m.prefix}notifcierre on\` - Para activar\n` +
             `\`${m.prefix}notifcierre off\` - Para desactivar\n\n` +
-            `*KAORI MD — Ajustes*`
+            `*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Ajustes*`
         )
     }
     
