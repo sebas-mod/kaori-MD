@@ -1,13 +1,14 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { getParticipantJid } from '../../src/lib/ourin-lid.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'warn',
-    alias: ['warning', 'peringatan'],
+    alias: ['warning', 'advertir', 'advertencia', 'admon'],
     category: 'group',
-    description: 'Memberi peringatan kepada member',
-    usage: '.warn @user <alasan>',
-    example: '.warn @user spam',
+    description: 'Añade una advertencia a un miembro del grupo',
+    usage: '.warn @user <motivo>',
+    example: '.warn @user spam de mensajes',
     isOwner: false,
     isPremium: false,
     isGroup: true,
@@ -28,30 +29,31 @@ async function handler(m, { sock }) {
     const args = m.args
     if (!args[0] && !m.quoted && (!m.mentionedJid || m.mentionedJid.length === 0)) {
         return m.reply(
-            `⚠️ *SISTEM WARNING GRUP*\n\n` +
-            `Sistem manajemen pelanggaran untuk member grup.\n` +
-            `Batas Warning: *${maxWarns} kali* (Otomatis Kick)\n\n` +
-            `*PENGGUNAAN:*\n` +
-            `• *${m.prefix}warn @user <alasan>* — Memberi warning\n` +
-            `• *${m.prefix}warn max <angka>* — Mengubah batas maksimal warning\n` +
-            `• *${m.prefix}listwarn* — Melihat daftar member bermasalah\n` +
-            `• *${m.prefix}resetwarn @user* — Menghapus semua warning member\n\n` +
-            `*PENJELASAN ALUR PENGGUNAAN:*\n` +
-            `1. Saat member melakukan pelanggaran pertama, beri mereka SP1: *${m.prefix}warn @user Spam pesan*\n` +
-            `2. Bot akan mencatat "Spam pesan" sebagai warning ke-1 mereka.\n` +
-            `3. Jika melanggar lagi, beri peringatan kedua dengan alasan baru: *${m.prefix}warn @user Berkata kasar*\n` +
-            `4. Jika total peringatan member mencapai batas maksimal (saat ini *${maxWarns}*), bot akan otomatis MENGELUARKAN (Kick) member tersebut.\n` +
-            `5. Riwayat pelanggaran bisa dilihat lengkap dengan mengetik *${m.prefix}listwarn @user*.`
+            `⚠️ *sɪsᴛᴇᴍᴀ ᴅᴇ ᴀᴅᴠᴇʀᴛᴇɴᴄɪᴀs*\n\n` +
+            `Gestión de infracciones para los miembros del grupo.\n` +
+            `Límite actual: *${maxWarns} advertencias* (Expulsión automática)\n\n` +
+            `*COMANDOS:* \n` +
+            `• *${m.prefix}warn @user <motivo>* — Dar advertencia\n` +
+            `• *${m.prefix}warn max <número>* — Cambiar límite máximo\n` +
+            `• *${m.prefix}listwarn* — Ver lista de advertidos\n` +
+            `• *${m.prefix}resetwarn @user* — Borrar advertencias de un miembro\n\n` +
+            `*INSTRUCCIONES:* \n` +
+            `1. Si un miembro rompe las reglas, usa: *${m.prefix}warn @user Spam*\n` +
+            `2. El bot registrará la infracción y el motivo.\n` +
+            `3. Si el usuario alcanza las *${maxWarns}* advertencias, será EXPULSADO (Kick) automáticamente.\n` +
+            `4. Puedes ver el historial detallado con *${m.prefix}listwarn @user*.\n\n` +
+            `*KAORI MD — Gestión de Grupo*`
         )
     }
+
     if (args[0]?.toLowerCase() === 'max') {
         const newMax = parseInt(args[1])
         if (isNaN(newMax) || newMax < 1 || newMax > 20) {
-            return m.reply(`❌ *GAGAL*\n\nBatas referensi warning harus berupa angka 1-20.\nContoh: *${m.prefix}warn max 5*`)
+            return m.reply(`❌ *ꜰᴀʟʟᴏ*\n\nEl límite de advertencias debe ser un número entre 1 y 20.\nEjemplo: *${m.prefix}warn max 5*`)
         }
         groupData.maxWarnings = newMax
         db.setGroup(m.chat, groupData)
-        return m.reply(`✅ *BATAS WARNING DIUBAH*\n\nMaksimal warning grup ini telah diupdate menjadi *${newMax} kali*.`)
+        return m.reply(`✅ *ʟɪ́ᴍɪᴛᴇ ᴀᴄᴛᴜᴀʟɪᴢᴀᴅᴏ*\n\nEl máximo de advertencias para este grupo ahora es de *${newMax}*.`)
     }
 
     let targetUser = null
@@ -63,29 +65,30 @@ async function handler(m, { sock }) {
     
     if (!targetUser) {
         await m.reply(
-            `⚠️ *CARA PAKAI*\n\n` +
-            `> Reply pesan user + \`${m.prefix}warn alasan\`\n` +
-            `> Atau: \`${m.prefix}warn @user alasan\``
+            `⚠️ *ᴍᴏᴅᴏ ᴅᴇ ᴜsᴏ*\n\n` +
+            `> Responde a un mensaje + \`${m.prefix}warn motivo\`\n` +
+            `> O usa: \`${m.prefix}warn @user motivo\``
         )
         return
     }
+
     try {
         const groupMeta = m.groupMetadata
         const participant = groupMeta.participants.find(p => getParticipantJid(p) === targetUser)
         if (participant?.admin) {
-            await m.reply(`❌ Tidak bisa memberikan warning kepada admin grup.`)
+            await m.reply(`❌ No puedo dar advertencias a los administradores del grupo.`)
             return
         }
     } catch (e) {}
     
     const botJid = sock.user?.id?.split(':')[0] + '@s.whatsapp.net'
     if (targetUser === botJid) {
-        await m.reply(`❌ Gak usah warn aku, aku cuma bot.`)
+        await m.reply(`❌ No puedo advertirme a mí misma. Soy el bot.`)
         return
     }
     
     const reasonArg = m.quoted ? m.text?.trim() : m.text?.replace(/@\d+/g, '').replace(/^\s*warn\s*/i, '').trim()
-    const reason = reasonArg || 'Tidak ada alasan'
+    const reason = reasonArg || 'Sin motivo especificado'
     
     let userWarnings = warnings[targetUser] || []
     userWarnings.push({
@@ -104,11 +107,12 @@ async function handler(m, { sock }) {
         try {
             await sock.groupParticipantsUpdate(m.chat, [targetUser], 'remove')
             await m.reply(
-                `🚨 *MAX WARNING TERCAPAI*\n\n` +
-                `@${targetName} telah dikeluarkan dari grup karena mencapai batas pelanggaran!\n\n` +
-                `*Rincian:*\n` +
-                `> Warning: *${warnCount}/${maxWarns}*\n` +
-                `> Alasan Terakhir: *${reason}*`,
+                `🚨 *ʟɪ́ᴍɪᴛᴇ ᴀʟᴄᴀɴᴢᴀᴅᴏ*\n\n` +
+                `@${targetName} ha sido expulsado del grupo por acumular demasiadas advertencias.\n\n` +
+                `*Detalles:*\n` +
+                `> Infracciones: *${warnCount}/${maxWarns}*\n` +
+                `> Último motivo: *${reason}*\n\n` +
+                `*KAORI MD — Seguridad*`,
                 { mentions: [targetUser] }
             )
             delete warnings[targetUser]
@@ -118,12 +122,12 @@ async function handler(m, { sock }) {
         }
     } else {
         await m.reply(
-            `⚠️ *PERINGATAN DIBERIKAN*\n\n` +
-            `@${targetName} telah menerima Surat Peringatan (SP${warnCount})!\n\n` +
-            `*Rincian:*\n` +
-            `> Warning ke: *${warnCount}/${maxWarns}*\n` +
-            `> Alasan: *${reason}*\n\n` +
-            `_${maxWarns - warnCount} warning lagi = KICK OTOMATIS_`,
+            `⚠️ *ᴀᴅᴠᴇʀᴛᴇɴᴄɪᴀ ᴇᴍɪᴛɪᴅᴀ*\n\n` +
+            `¡@${targetName} ha recibido una advertencia oficial!\n\n` +
+            `*Resumen:*\n` +
+            `> Advertencia: *${warnCount}/${maxWarns}*\n` +
+            `> Motivo: *${reason}*\n\n` +
+            `_Quedan ${maxWarns - warnCount} avisos más antes de la EXPULSIÓN AUTOMÁTICA._`,
             { mentions: [targetUser] }
         )
     }
