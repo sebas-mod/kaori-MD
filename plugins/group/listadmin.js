@@ -49,7 +49,7 @@ async function handler(m, { sock }) {
         }
         
         adminList += `\n> *Total Admins:* ${admins.length}\n`
-        adminList += `*KAORI MD — Gestión de Grupo*`
+        adminList += `*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Gestión de Grupo*`
 
         const mentions = admins.map(a => a.id)
 
