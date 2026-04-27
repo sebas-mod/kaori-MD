@@ -1,8 +1,8 @@
 const pluginConfig = {
     name: 'antiremove',
-    alias: ['antidelete', 'antihapus', 'ar'],
+    alias: ['antidelete', 'antieliminar', 'ar'],
     category: 'group',
-    description: 'Mengaktifkan/menonaktifkan anti hapus pesan di grup',
+    description: 'Activa o desactiva la función anti-eliminación de mensajes en el grupo',
     usage: '.antiremove <on/off>',
     example: '.antiremove on',
     isOwner: false,
@@ -23,9 +23,9 @@ async function handler(m, { sock, db }) {
     if (!action) {
         const status = group.antiremove || 'off'
         await m.reply(
-            `🗑️ *AntiRemove*\n\n` +
-            `> Status: *${status === 'on' ? '✅ Aktif' : '❌ Nonaktif'}*\n\n` +
-            `> \`.antiremove on/off\``
+            `🗑️ *ᴀɴᴛɪ-ᴇʟɪᴍɪɴᴀʀ | ᴋᴀᴏʀɪ ᴍᴅ*\n\n` +
+            `> Estado: *${status === 'on' ? '✅ Activo' : '❌ Desactivado'}*\n\n` +
+            `> Usa: \`.antiremove on/off\``
         )
         return
     }
@@ -33,18 +33,18 @@ async function handler(m, { sock, db }) {
     if (action === 'on') {
         db.setGroup(m.chat, { ...group, antiremove: 'on' })
         m.react('✅')
-        await m.reply(`✅ *AntiRemove diaktifkan*\n> Pesan yang dihapus akan di-forward ulang.`)
+        await m.reply(`✅ *AntiRemove activado*\n> Los mensajes que sean eliminados serán reenviados por ᴋᴀᴏʀɪ ᴍᴅ.`)
         return
     }
 
     if (action === 'off') {
         db.setGroup(m.chat, { ...group, antiremove: 'off' })
         m.react('❌')
-        await m.reply(`❌ *AntiRemove dinonaktifkan*`)
+        await m.reply(`❌ *AntiRemove desactivado*`)
         return
     }
 
-    await m.reply(`❌ Gunakan \`.antiremove on\` atau \`.antiremove off\``)
+    await m.reply(`❌ Opción no válida. Usa \`.antiremove on\` o \`.antiremove off\``)
 }
 
 export { pluginConfig as config, handler }
