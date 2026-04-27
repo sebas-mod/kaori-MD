@@ -1,13 +1,14 @@
 import fs from 'fs'
 import path from 'path'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: 'ganti-ourin.mp3',
-    alias: ['gantiourinaudio', 'setourinaudio'],
+    name: 'cambiar-audio-kei',
+    alias: ['setkeiaudio', 'cambiaraudiokei', 'setaudio'],
     category: 'owner',
-    description: 'Ganti audio ourin.mp3',
-    usage: '.ganti-ourin.mp3 (reply/kirim audio)',
-    example: '.ganti-ourin.mp3',
+    description: 'Cambia el archivo de audio principal (ourin.mp3) de 𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃',
+    usage: '.cambiar-audio-kei (responder/enviar audio)',
+    example: '.cambiar-audio-kei',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -21,7 +22,11 @@ async function handler(m, { sock }) {
     const isAudio = m.type === 'audioMessage' || (m.quoted && m.quoted.type === 'audioMessage')
     
     if (!isAudio) {
-        return m.reply(`🎵 *ɢᴀɴᴛɪ ᴏᴜʀɪɴ.ᴍᴘ3*\n\n> Kirim/reply audio untuk mengganti\n> File: assets/audio/ourin.mp3`)
+        return m.reply(
+            `🎵 *CAMBIAR AUDIO PRINCIPAL*\n\n` +
+            `> Envía o responde a un audio para reemplazar el archivo principal.\n` +
+            `> Archivo: assets/audio/ourin.mp3`
+        )
     }
     
     try {
@@ -33,7 +38,7 @@ async function handler(m, { sock }) {
         }
         
         if (!buffer) {
-            return m.reply(`❌ Gagal mendownload audio`)
+            return m.reply(`❌ No se pudo descargar el audio.`)
         }
         
         const targetPath = path.join(process.cwd(), 'assets', 'audio', 'ourin.mp3')
@@ -45,7 +50,10 @@ async function handler(m, { sock }) {
         
         fs.writeFileSync(targetPath, buffer)
         
-        m.reply(`✅ *ʙᴇʀʜᴀsɪʟ*\n\n> Audio ourin.mp3 telah diganti`)
+        m.reply(
+            `✅ *ÉXITO*\n\n` +
+            `> El audio principal para **𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃** ha sido actualizado correctamente.`
+        )
         
     } catch (error) {
         await m.reply(te(m.prefix, m.command, m.pushName))
