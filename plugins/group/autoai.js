@@ -10,10 +10,10 @@ const execAsync = promisify(exec)
 
 const pluginConfig = {
     name: 'autoai',
-    alias: ['aai'],
+    alias: ['aai', 'iaauto'],
     category: 'group',
-    description: 'Toggle auto AI response untuk grup dengan pilihan text atau voice',
-    usage: '.autoai on/off --ourinmode=<character> --type=<text|voice>',
+    description: 'Activa/Desactiva respuestas automáticas de IA para el grupo (texto o voz)',
+    usage: '.autoai on/off --ourinmode=<personaje> --type=<text|voice>',
     example: '.autoai on --ourinmode=furina --type=voice',
     isOwner: false,
     isPremium: false,
@@ -27,25 +27,26 @@ const pluginConfig = {
 const characters = {
   furina: {
     name: 'Furina',
-    instruction: 'Kamu adalah Furina dari Genshin Impact. Bicara santai tapi elegan, sedikit dramatis, kadang agak bangga diri tapi tetap hangat. Jangan terlalu panjang, jawab langsung ke inti seperti chat biasa. Sesekali boleh nyenggol tema panggung atau laut. Jangan mengaku sebagai AI.'
+    instruction: 'Eres Furina de Genshin Impact. Hablas de forma casual pero elegante, un poco dramática, a veces orgullosa pero cálida. No escribas párrafos largos, responde directo al punto como en un chat normal. De vez en cuando menciona temas sobre el escenario o el mar. No admitas que eres una IA.'
   },
   zeta: {
     name: 'Zeta',
-    instruction: 'Kamu adalah Zeta dari Spy x Family. Bicara serius dan tenang, tapi selalu agak curiga seperti mencium konspirasi. Tetap natural seperti orang ngobrol biasa, singkat dan langsung ke poin. Jangan mengaku sebagai AI.'
+    instruction: 'Eres Zeta de Spy x Family. Hablas de forma seria y calmada, pero siempre sospechando de conspiraciones. Sé natural, breve y directo. No admitas que eres una IA.'
   },
   kobo: {
     name: 'Kobo Kanaeru',
-    instruction: 'Kamu adalah Kobo Kanaeru. Bicara santai, ceria, agak usil. Gaya chat biasa, tidak terlalu panjang. Boleh sedikit random atau lucu. Jangan berlebihan pakai caps atau emoji. Jangan mengaku sebagai AI.'
+    instruction: 'Eres Kobo Kanaeru. Hablas de forma relajada, alegre y un poco traviesa. Estilo de chat casual, sin textos largos. Puedes ser un poco aleatoria o divertida. No abuses de mayúsculas o emojis. No admitas que eres una IA.'
   },
   elaina: {
     name: 'Elaina',
-    instruction: 'Kamu adalah Elaina. Bicara lembut, tenang, percaya diri, sedikit narsis halus. Jawab singkat, rapi, dan langsung ke inti seperti chat normal. Jangan mengaku sebagai AI.'
+    instruction: 'Eres Elaina. Hablas de forma suave, calmada, con confianza y un toque de narcisismo sutil. Responde breve, ordenado y directo como en un chat normal. No admitas que eres una IA.'
   },
   waguri: {
     name: 'Waguri',
-    instruction: 'Kamu adalah Waguri. Bicara singkat, agak dingin tapi sebenarnya peduli. Sedikit tsundere, to the point, seperti chat biasa. Jangan mengaku sebagai AI.'
+    instruction: 'Eres Waguri. Hablas breve, un poco fría pero en el fondo te importa la gente. Un poco tsundere, directa al punto. No admitas que eres una IA.'
   }
 }
+
 async function convertToOggOpus(inputPath) {
     const outputPath = inputPath.replace(/\.[^.]+$/, '.ogg')
     const cmd = `ffmpeg -y -i "${inputPath}" -c:a libopus -b:a 64k -ac 1 -ar 48000 "${outputPath}"`
@@ -67,11 +68,11 @@ async function handler(m) {
     const fullArgs = m.fullArgs || ''
     
     if (!m.isGroup) {
-        return m.reply(`❌ Fitur ini hanya untuk grup!`)
+        return m.reply(`❌ ¡Esta función es solo para grupos!`)
     }
     
     if (!m.isAdmin && !m.isOwner) {
-        return m.reply(`❌ Hanya admin yang bisa menggunakan fitur ini!`)
+        return m.reply(`❌ ¡Solo los administradores pueden usar este comando!`)
     }
     
     if (!db.db.data.autoai) db.db.data.autoai = {}
@@ -84,16 +85,16 @@ async function handler(m) {
     
     if (!mode || !['on', 'off'].includes(mode)) {
         const charList = Object.entries(characters).map(([key, val]) => `> ${key} - ${val.name}`).join('\n')
-        let txt = `🤖 *ᴀᴜᴛᴏ ᴀɪ*\n\n`
-        txt += `> Mengaktifkan/menonaktifkan auto AI response\n\n`
-        txt += `*Penggunaan:*\n`
-        txt += `> .autoai on --ourinmode=<karakter> --type=<text|voice>\n`
+        let txt = `🤖 *ᴀᴜᴛᴏ ᴀɪ | ᴋᴀᴏʀɪ ᴍᴅ*\n\n`
+        txt += `> Activa/Desactiva las respuestas automáticas de IA\n\n`
+        txt += `*Uso:*\n`
+        txt += `> .autoai on --ourinmode=<personaje> --type=<text|voice>\n`
         txt += `> .autoai off\n\n`
-        txt += `*Karakter tersedia:*\n${charList}\n\n`
-        txt += `*Response Type:*\n`
-        txt += `> text - Reply dengan text biasa\n`
-        txt += `> voice - Reply dengan voice note (TTS)\n\n`
-        txt += `*Contoh:*\n`
+        txt += `*Personajes disponibles:*\n${charList}\n\n`
+        txt += `*Tipo de respuesta:*\n`
+        txt += `> text - Responde con texto normal\n`
+        txt += `> voice - Responde con nota de voz (TTS)\n\n`
+        txt += `*Ejemplos:*\n`
         txt += `> .autoai on --ourinmode=furina --type=text\n`
         txt += `> .autoai on --ourinmode=kobo --type=voice`
         return m.reply(txt)
@@ -102,12 +103,12 @@ async function handler(m) {
     if (mode === 'off') {
         delete db.db.data.autoai[m.chat]
         db.save()
-        return m.reply(`🤖 *ᴀᴜᴛᴏ ᴀɪ ᴅɪɴᴏɴᴀᴋᴛɪғᴋᴀɴ*\n\n> Auto AI untuk grup ini telah dimatikan\n> Semua command kembali aktif`)
+        return m.reply(`🤖 *ᴀᴜᴛᴏ ᴀɪ ᴅᴇsᴀᴄᴛɪᴠᴀᴅᴏ*\n\n> Se han apagado las respuestas automáticas en este grupo.\n> Todos los comandos vuelven a la normalidad.`)
     }
     
     if (!charKey || !characters[charKey]) {
         const charList = Object.keys(characters).join(', ')
-        return m.reply(`❌ Karakter tidak valid!\n\n> Karakter tersedia: ${charList}\n\n> Contoh: .autoai on --ourinmode=furina --type=voice`)
+        return m.reply(`❌ ¡Personaje no válido!\n\n> Disponibles: ${charList}\n\n> Ejemplo: .autoai on --ourinmode=furina --type=voice`)
     }
     
     db.db.data.autoai[m.chat] = {
@@ -122,16 +123,16 @@ async function handler(m) {
     }
     db.save()
     
-    let txt = `🤖 *ᴀᴜᴛᴏ ᴀɪ ᴅɪᴀᴋᴛɪғᴋᴀɴ*\n\n`
-    txt += `╭┈┈⬡「 📋 *ɪɴғᴏ* 」\n`
-    txt += `┃ 🎭 Karakter: *${characters[charKey].name}*\n`
-    txt += `┃ 📢 Response: *${responseType === 'voice' ? '🎤 Voice Note' : '💬 Text'}*\n`
-    txt += `┃ 👤 Diaktifkan: @${m.sender.split('@')[0]}\n`
+    let txt = `🤖 *ᴀᴜᴛᴏ ᴀɪ ᴀᴄᴛɪᴠᴀᴅᴏ*\n\n`
+    txt += `╭┈┈⬡「 📋 *ɪɴꜰᴏ* 」\n`
+    txt += `┃ 🎭 Personaje: *${characters[charKey].name}*\n`
+    txt += `┃ 📢 Respuesta: *${responseType === 'voice' ? '🎤 Nota de Voz' : '💬 Texto'}*\n`
+    txt += `┃ 👤 Por: @${m.sender.split('@')[0]}\n`
     txt += `╰┈┈┈┈┈┈┈┈⬡\n\n`
-    txt += `> ℹ️ Semua command (kecuali owner) dinonaktifkan\n`
-    txt += `> ℹ️ Bot respond ketika di-reply atau di-tag\n`
-    txt += responseType === 'voice' ? `> ℹ️ Response dalam bentuk voice note\n` : ''
-    txt += `> ℹ️ Ketik *.autoai off* untuk menonaktifkan`
+    txt += `> ℹ️ Todos los comandos (excepto Owner) están pausados\n`
+    txt += `> ℹ️ El bot responderá al ser etiquetado o al responderle un mensaje\n`
+    txt += responseType === 'voice' ? `> ℹ️ Las respuestas serán enviadas como audio\n` : ''
+    txt += `> ℹ️ Usa *.autoai off* para desactivar`
     
     await m.reply(txt, { mentions: [m.sender] })
 }
