@@ -1,12 +1,13 @@
 import * as pakasir from '../../src/lib/ourin-pakasir.js'
 import config from '../../config.js'
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
     name: 'botmode',
-    alias: ['setmode', 'mode'],
+    alias: ['setmode', 'modo'],
     category: 'owner',
-    description: 'Mengatur mode bot (md/cpanel/store/pushkontak/all)',
-    usage: '.botmode <mode> [--autoorder]',
+    description: 'Configura el modo del bot (md/cpanel/store/pushkontak/all)',
+    usage: '.botmode <modo> [--autoorder]',
     example: '.botmode store --autoorder',
     isOwner: true,
     isPremium: false,
@@ -16,29 +17,37 @@ const pluginConfig = {
     energi: 0,
     isEnabled: true
 }
+
 const VALID_MODES = ['md', 'cpanel', 'store', 'pushkontak', 'all']
+
 const MODE_DESCRIPTIONS = {
-    md: 'Mode default, semua fitur kecuali panel/store/pushkontak',
-    cpanel: 'Mode panel, main + group + sticker + owner + tools + panel',
-    store: 'Mode store, main + group + sticker + owner + store',
-    pushkontak: 'Mode pushkontak, main + group + sticker + owner + pushkontak',
-    all: 'Mode full, SEMUA fitur dari semua mode bisa diakses'
+    md: 'Modo predeterminado: todas las funciones excepto panel/tienda/pushkontak',
+    cpanel: 'Modo Panel: funciones principales + grupos + stickers + owner + herramientas + panel',
+    store: 'Modo Tienda: funciones principales + grupos + stickers + owner + tienda',
+    pushkontak: 'Modo Push: funciones principales + grupos + stickers + owner + pushkontak',
+    all: 'Modo Full: permite el acceso a TODAS las funciones de todos los modos'
 }
+
 async function handler(m, { sock }) {
     const db = getDatabase()
     const args = m.args || []
     const mode = (args[0] || '').toLowerCase()
     const flags = args.slice(1).map(f => f.toLowerCase())
-    const isAutoorder = false
+    
+    // Nota: El flag se detecta si incluye '--autoorder'
+    const isAutoorder = flags.includes('--autoorder')
+    
     const globalMode = db.setting('botMode') || 'md'
     const groupData = m.isGroup ? (db.getGroup(m.chat) || {}) : {}
     const groupMode = groupData.botMode || null
+
     if (!mode) {
         const autoorderStatus = groupData.storeConfig?.autoorder ? '✅ ON' : '❌ OFF'
-        let txt = `╭┈┈⬡「 🤖 *ʙᴏᴛ ᴍᴏᴅᴇ* 」
-┃ ㊗ ɢʟᴏʙᴀʟ: *${globalMode.toUpperCase()}*
-${m.isGroup ? `┃ ㊗ ɢʀᴜᴘ: *${(groupMode || 'INHERIT').toUpperCase()}*\n` : ''}${m.isGroup && (groupMode === 'store' || (!groupMode && globalMode === 'store')) ? `┃ ㊗ ᴀᴜᴛᴏᴏʀᴅᴇʀ: *${autoorderStatus}*\n` : ''}╰┈┈⬡
-╭┈┈⬡「 📋 *ᴀᴠᴀɪʟᴀʙʟᴇ ᴍᴏᴅᴇs* 」
+        let txt = `╭┈┈⬡「 🤖 *MODO DEL BOT* 」
+┃ ㊗ Global: *${globalMode.toUpperCase()}*
+${m.isGroup ? `┃ ㊗ Grupo: *${(groupMode || 'HEREDADO').toUpperCase()}*\n` : ''}${m.isGroup && (groupMode === 'store' || (!groupMode && globalMode === 'store')) ? `┃ ㊗ Auto-pedido: *${autoorderStatus}*\n` : ''}╰┈┈⬡
+
+╭┈┈⬡「 📋 *MODOS DISPONIBLES* 」
 `
         const currentMode = m.isGroup ? (groupMode || globalMode) : globalMode
         for (const [key, desc] of Object.entries(MODE_DESCRIPTIONS)) {
@@ -47,21 +56,24 @@ ${m.isGroup ? `┃ ㊗ ɢʀᴜᴘ: *${(groupMode || 'INHERIT').toUpperCase()}*\n
             txt += `┃   ${desc}\n`
         }
         txt += `╰┈┈⬡
-*ꜰʟᴀɢ sᴛᴏʀᴇ:*
-> \`${m.prefix}botmode store\` - Manual order
-> \`${m.prefix}botmode store --autoorder\` - Auto payment
-> \`${m.prefix}botmode md\` → Mode default
-> \`${m.prefix}botmode all\` → Semua fitur`
+
+*FLAGS DE TIENDA:*
+> \`${m.prefix}botmode store\` - Pedido manual
+> \`${m.prefix}botmode store --autoorder\` - Pago automático
+> \`${m.prefix}botmode md\` → Modo predeterminado
+> \`${m.prefix}botmode all\` → Todas las funciones`
+        
         await m.reply(txt)
         return
     }
+
     if (!VALID_MODES.includes(mode)) {
         return m.reply(
-            `❌ *ᴍᴏᴅᴇ ᴛɪᴅᴀᴋ ᴠᴀʟɪᴅ*\n\n` +
-            `> Mode tersedia: \`${VALID_MODES.join(', ')}\``
+            `❌ *MODO NO VÁLIDO*\n\n` +
+            `> Modos disponibles: \`${VALID_MODES.join(', ')}\``
         )
     }
-    console.log('[Botmode] Debug:', { args: m.args, mode, flags, isAutoorder })
+
     if (m.isGroup) {
         const newGroupData = {
             ...groupData,
@@ -79,32 +91,35 @@ ${m.isGroup ? `┃ ㊗ ɢʀᴜᴘ: *${(groupMode || 'INHERIT').toUpperCase()}*\n
         db.setting('botMode', mode)
     }
     db.save()
+    
     await m.react('✅')
+    
     let extraInfo = ''
     if (mode === 'store' && m.isGroup) {
         if (isAutoorder) {
             try {
                 if (!pakasir.isEnabled()) {
-                    extraInfo = `\n\n⚠️ *Pakasir belum dikonfigurasi!*\n> Set di config.js: pakasir.slug & pakasir.apiKey`
+                    extraInfo = `\n\n⚠️ *¡Pakasir no está configurado!*\n> Configura en config.js: pakasir.slug y pakasir.apiKey`
                 } else {
-                    extraInfo = `\n\n✅ *Autoorder aktif!*\n> Pembayaran otomatis via Pakasir`
+                    extraInfo = `\n\n✅ *¡Auto-pedido activo!*\n> Pagos automáticos vía Pakasir`
                 }
             } catch {
-                extraInfo = `\n\n⚠️ *Pakasir module not found*`
+                extraInfo = `\n\n⚠️ *Módulo Pakasir no encontrado*`
             }
         } else {
-            extraInfo = `\n\n📋 *Manual mode*\n> Admin perlu confirm order manual`
+            extraInfo = `\n\n📋 *Modo Manual*\n> El administrador debe confirmar los pedidos manualmente`
         }
     }
+
     await m.reply(
-        `✅ *ᴍᴏᴅᴇ ᴅɪᴜʙᴀʜ*\n\n` +
-        `> Mode: *${mode.toUpperCase()}*\n` +
+        `✅ *MODO CAMBIADO*\n\n` +
+        `> Modo: *${mode.toUpperCase()}*\n` +
         `> ${MODE_DESCRIPTIONS[mode]}\n` +
-        (mode === 'store' && m.isGroup ? `> Autoorder: *${isAutoorder ? 'ON' : 'OFF'}*` : '') +
+        (mode === 'store' && m.isGroup ? `> Auto-pedido: *${isAutoorder ? 'ON' : 'OFF'}*` : '') +
         extraInfo +
         `\n\n` +
-        (m.isGroup ? `> _Mode grup ini juga diubah._` : `> _Mode global diubah._`)
+        (m.isGroup ? `> _Se cambió el modo para este grupo._` : `> _Se cambió el modo global._`)
     )
-    console.log(`[BotMode] Changed to ${mode.toUpperCase()} by ${m.pushName} (${m.sender})`)
 }
+
 export { pluginConfig as config, handler, VALID_MODES, MODE_DESCRIPTIONS }
