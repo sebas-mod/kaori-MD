@@ -1,10 +1,11 @@
 import config from '../../config.js'
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
     name: 'automedia',
     alias: ['automedi', 'am'],
     category: 'group',
-    description: 'Toggle auto media - otomatis jadikan sticker jadi gambar/video',
+    description: 'Convierte automáticamente stickers recibidos en imágenes/videos',
     usage: '.automedia on/off',
     example: '.automedia on',
     isOwner: false,
@@ -25,37 +26,37 @@ async function handler(m, { sock }) {
     const arg = args[0]?.toLowerCase()
     
     if (!arg) {
-        const status = current ? '✅ Aktif' : '❌ Nonaktif'
+        const status = current ? '✅ Activo' : '❌ Desactivado'
         return m.reply(
-            `🎬 *ᴀᴜᴛᴏᴍᴇᴅɪᴀ*\n\n` +
-            `> Status: ${status}\n\n` +
-            `> Gunakan:\n` +
-            `> \`${m.prefix}automedia on\` - aktifkan\n` +
-            `> \`${m.prefix}automedia off\` - nonaktifkan\n\n` +
-            `> _Otomatis jadikan sticker jadi gambar_\n` +
-            `> Video gak jadi bang`
+            `🎬 *ᴀᴜᴛᴏᴍᴇᴅɪᴀ | ᴋᴀᴏʀɪ ᴍᴅ*\n\n` +
+            `> Estado: ${status}\n\n` +
+            `> Uso:\n` +
+            `> \`${m.prefix}automedia on\` - Activar\n` +
+            `> \`${m.prefix}automedia off\` - Desactivar\n\n` +
+            `> _Convierte automáticamente stickers a imagen_\n` +
+            `> _Nota: No aplica para stickers animados_`
         )
     }
     
-    if (arg === 'on' || arg === '1' || arg === 'aktif') {
+    if (arg === 'on' || arg === '1' || arg === 'activar') {
         if (current) {
-            return m.reply(`🎬 *ᴀᴜᴛᴏᴍᴇᴅɪᴀ*\n\n> Sudah aktif!`)
+            return m.reply(`🎬 *ᴀᴜᴛᴏᴍᴇᴅɪᴀ*\n\n> ¡Ya está activo!`)
         }
-        db.setGroup(m.chat, { automedia: true })
+        db.setGroup(m.chat, { ...groupData, automedia: true })
         await db.save()
-        return m.reply(`🎬 *ᴀᴜᴛᴏᴍᴇᴅɪᴀ*\n\n> ✅ Berhasil diaktifkan!\n> Sticker akan otomatis jadi gambar/video`)
+        return m.reply(`🎬 *ᴀᴜᴛᴏᴍᴇᴅɪᴀ*\n\n> ✅ ¡Se ha activado correctamente!\n> Los stickers se convertirán automáticamente en imagen/video.`)
     }
     
-    if (arg === 'off' || arg === '0' || arg === 'nonaktif') {
+    if (arg === 'off' || arg === '0' || arg === 'desactivar') {
         if (!current) {
-            return m.reply(`🎬 *ᴀᴜᴛᴏᴍᴇᴅɪᴀ*\n\n> Sudah nonaktif!`)
+            return m.reply(`🎬 *ᴀᴜᴛᴏᴍᴇᴅɪᴀ*\n\n> ¡Ya está desactivado!`)
         }
-        db.setGroup(m.chat, { automedia: false })
+        db.setGroup(m.chat, { ...groupData, automedia: false })
         await db.save()
-        return m.reply(`🎬 *ᴀᴜᴛᴏᴍᴇᴅɪᴀ*\n\n> ❌ Berhasil dinonaktifkan!`)
+        return m.reply(`🎬 *ᴀᴜᴛᴏᴍᴇᴅɪᴀ*\n\n> ❌ Se ha desactivado correctamente.`)
     }
     
-    return m.reply(`❌ Gunakan: \`${m.prefix}automedia on/off\``)
+    return m.reply(`❌ Uso incorrecto. Usa: \`${m.prefix}automedia on/off\``)
 }
 
 async function autoMediaHandler(m, sock) {
@@ -76,6 +77,7 @@ async function autoMediaHandler(m, sock) {
         const hasSticker = msg.stickerMessage
         if (!hasSticker) return false
         
+        // No procesar stickers animados para evitar errores de buffer pesado
         if (hasSticker.isAnimated) return false
         
         const buffer = await m.download()
