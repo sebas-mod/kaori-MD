@@ -1,13 +1,14 @@
 import config from '../../config.js'
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'delpremall',
-    alias: ['delpremiumall', 'removepremall'],
+    alias: ['delpremiumall', 'quitarpremall', 'removerpremall'],
     category: 'owner',
-    description: 'Menghapus semua member grup dari premium',
-    usage: '.delprem all',
-    example: '.delprem all',
+    description: 'Elimina el estatus premium de todos los miembros del grupo actual',
+    usage: '.delpremall',
+    example: '.delpremall',
     isOwner: true,
     isPremium: false,
     isGroup: true,
@@ -23,7 +24,7 @@ async function handler(m, { sock }) {
         const participants = groupMeta.participants || []
         
         if (participants.length === 0) {
-            return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak ada member di grup ini`)
+            return m.reply(`❌ *ERROR*\n\n> No se encontraron miembros en este grupo`)
         }
         
         await m.react('🕕')
@@ -38,14 +39,17 @@ async function handler(m, { sock }) {
             const number = participant.jid?.replace(/[^0-9]/g, '') || ''
             if (!number) continue
             
-            const index = db.data?.premium.indexOf(number)
+            const index = db.data.premium.indexOf(number)
             
             if (index === -1) {
                 notPremCount++
                 continue
             }
             
-            db.data.premium?.splice(index, 1)
+            // Eliminar de la lista global de premium
+            db.data.premium.splice(index, 1)
+            
+            // Actualizar objeto de usuario en la DB
             const jid = number + '@s.whatsapp.net'
             const user = db.getUser(jid)
             if (user) {
@@ -61,14 +65,14 @@ async function handler(m, { sock }) {
         await m.react('🗑️')
         
         await m.reply(
-            `🗑️ *ᴅᴇʟ ᴘʀᴇᴍɪᴜᴍ ᴀʟʟ*\n\n` +
-            `╭┈┈⬡「 📋 *ʜᴀsɪʟ* 」\n` +
-            `┃ 👥 ᴛᴏᴛᴀʟ ᴍᴇᴍʙᴇʀ: \`${participants.length}\`\n` +
-            `┃ ✅ ᴅɪʜᴀᴘᴜs: \`${removedCount}\`\n` +
-            `┃ ⏭️ ʙᴜᴋᴀɴ ᴘʀᴇᴍɪᴜᴍ: \`${notPremCount}\`\n` +
-            `┃ 💎 sɪsᴀ ᴘʀᴇᴍɪᴜᴍ: \`${db.data.premium.length}\`\n` +
+            `🗑️ *QUITAR PREMIUM MASIVO*\n\n` +
+            `╭┈┈⬡「 📋 *RESULTADOS* 」\n` +
+            `┃ 👥 Total miembros: \`${participants.length}\`\n` +
+            `┃ ✅ Eliminados: \`${removedCount}\`\n` +
+            `┃ ⏭️ No eran premium: \`${notPremCount}\`\n` +
+            `┃ 💎 Premium restantes: \`${db.data.premium.length}\`\n` +
             `╰┈┈⬡\n\n` +
-            `> Grup: ${groupMeta.subject}`
+            `> Grupo: ${groupMeta.subject}`
         )
         
     } catch (error) {
