@@ -2,13 +2,14 @@ import config from '../../config.js'
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import fs from 'fs'
 import path from 'path'
+
 const pluginConfig = {
-    name: 'rulesgrup',
-    alias: ['grouprules', 'aturangrup', 'grules'],
+    name: 'reglasgrup',
+    alias: ['rulesgrup', 'grouprules', 'reglas', 'grules'],
     category: 'group',
-    description: 'Menampilkan rules/aturan grup',
-    usage: '.rulesgrup',
-    example: '.rulesgrup',
+    description: 'Muestra las reglas o normas del grupo',
+    usage: '.reglasgrup',
+    example: '.reglasgrup',
     isOwner: false,
     isPremium: false,
     isGroup: true,
@@ -18,18 +19,18 @@ const pluginConfig = {
     isEnabled: true
 }
 
-const DEFAULT_GROUP_RULES = `📜 *ᴀᴛᴜʀᴀɴ ɢʀᴜᴘ*
+const DEFAULT_GROUP_RULES = `📜 *ʀᴇɢʟᴀs ᴅᴇʟ ɢʀᴜᴘᴏ*
 
-┃ 1️⃣ Dilarang spam/flood chat
-┃ 2️⃣ Dilarang promosi tanpa izin
-┃ 3️⃣ Dilarang konten SARA/Porn
-┃ 4️⃣ Hormati sesama member
-┃ 5️⃣ Gunakan bahasa yang sopan
-┃ 6️⃣ Dilarang share link tanpa izin
-┃ 7️⃣ Patuhi instruksi admin
-┃ 8️⃣ No toxic & bullying
+┃ 1️⃣ Prohibido el spam/flood en el chat.
+┃ 2️⃣ Prohibido promocionar sin permiso.
+┃ 3️⃣ Prohibido contenido ofensivo o +18.
+┃ 4️⃣ Respetar a todos los miembros.
+┃ 5️⃣ Usar un lenguaje adecuado.
+┃ 6️⃣ No compartir enlaces sin autorización.
+┃ 7️⃣ Seguir las instrucciones de los admins.
+┃ 8️⃣ Prohibido el acoso (bullying).
 
-_Mau langgar? Siap-siap di Kick!_`
+_¿Vas a romper las reglas? ¡Prepárate para el Kick!_`
 
 async function handler(m, { sock, config: botConfig }) {
     const db = getDatabase()
@@ -40,8 +41,8 @@ async function handler(m, { sock, config: botConfig }) {
     const imagePath = path.join(process.cwd(), 'assets', 'images', 'ourin-rules.jpg')
     let imageBuffer = fs.existsSync(imagePath) ? fs.readFileSync(imagePath) : null
 
-    const saluranId = botConfig.saluran?.id || '120363208449943317@newsletter'
-    const saluranName = botConfig.saluran?.name || botConfig.bot?.name || 'Ourin-AI'
+    // Adaptación del nombre del canal para KAORI MD
+    const saluranName = botConfig.saluran?.name || botConfig.bot?.name || 'KAORI MD'
 
     if (imageBuffer) {
         await sock.sendMedia(m.chat, imageBuffer, rulesText, m, {
