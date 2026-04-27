@@ -45,7 +45,7 @@ async function handler(m, { sock }) {
     text += `Total: *${customWords.length + defaultWords.length}* palabras\n\n`
     text += `> Usa \`${m.prefix}addtoxic <palabra>\` para agregar\n`
     text += `> Usa \`${m.prefix}deltoxic <palabra>\` para eliminar\n\n`
-    text += `*KAORI MD — Moderación*`
+    text += `*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Moderación*`
     
     await m.reply(text)
 }
