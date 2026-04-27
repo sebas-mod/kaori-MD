@@ -1,10 +1,11 @@
 import { getQuotedStickerHash, deleteStickerCommand, listStickerCommands, findByCommand } from '../../src/lib/ourin-sticker-command.js'
+
 const pluginConfig = {
     name: 'delstickercmd',
-    alias: ['delcmdsticker', 'removesticker', 'unsticker'],
+    alias: ['delcmdsticker', 'removesticker', 'unsticker', 'eliminarcmd'],
     category: 'group',
-    description: 'Hapus sticker command',
-    usage: '.delstickercmd <command> atau reply sticker',
+    description: 'Elimina un comando asignado a un sticker',
+    usage: '.delstickercmd <comando> o respondiendo a un sticker',
     example: '.delstickercmd menu',
     isOwner: false,
     isPremium: false,
@@ -19,43 +20,46 @@ const pluginConfig = {
 async function handler(m, { sock }) {
     const args = m.args || []
     const commandName = args[0]
+
     if (!commandName && !m.quoted) {
         const existingCmds = listStickerCommands()
         if (existingCmds.length === 0) {
             return m.reply(
-                `🖼️ *sᴛɪᴄᴋᴇʀ ᴄᴏᴍᴍᴀɴᴅs*\n\n` +
-                `> Tidak ada sticker command yang terdaftar.\n` +
-                `> Tambahkan dengan \`.addcmdsticker\``
+                `🖼️ *sᴛɪᴄᴋᴇʀ ᴄᴏᴍᴍᴀɴᴅs | ᴋᴀᴏʀɪ ᴍᴅ*\n\n` +
+                `> No hay comandos de sticker registrados.\n` +
+                `> Puedes agregar uno con \`.addcmdsticker\``
             )
         }
         
         let txt = `🖼️ *sᴛɪᴄᴋᴇʀ ᴄᴏᴍᴍᴀɴᴅs*\n\n`
-        txt += `╭┈┈⬡「 📋 *ᴅᴀꜰᴛᴀʀ* 」\n`
+        txt += `╭┈┈⬡「 📋 *ʟɪsᴛᴀ ᴀᴄᴛᴜᴀʟ* 」\n`
         
         for (const cmd of existingCmds) {
             txt += `┃ 🖼️ → \`.${cmd.command}\`\n`
         }
         txt += `╰┈┈┈┈┈┈┈┈⬡\n\n`
         
-        txt += `*Hapus dengan:*\n`
-        txt += `> \`.delstickercmd <command>\`\n`
-        txt += `> atau reply sticker + \`.delstickercmd\``
+        txt += `*ᴇʟɪᴍɪɴᴀ ᴄᴏɴ:*\n`
+        txt += `> \`.delstickercmd <comando>\`\n`
+        txt += `> o responde a un sticker con \`.delstickercmd\``
         
         return m.reply(txt)
     }
     
     let deleted = false
     let deletedCmd = ''
+
     if (m.quoted) {
         const stickerHash = getQuotedStickerHash(m)
         if (stickerHash) {
             const success = deleteStickerCommand(stickerHash)
             if (success) {
                 deleted = true
-                deletedCmd = 'sticker yang di-reply'
+                deletedCmd = 'el sticker seleccionado'
             }
         }
     }
+
     if (!deleted && commandName) {
         const cleanCmd = commandName.toLowerCase().replace(/^\./, '')
         const found = findByCommand(cleanCmd)
@@ -64,12 +68,12 @@ async function handler(m, { sock }) {
             const success = deleteStickerCommand(found.hash)
             if (success) {
                 deleted = true
-                deletedCmd = cleanCmd
+                deletedCmd = `.${cleanCmd}`
             }
         } else {
             return m.reply(
-                `❌ Sticker command \`${cleanCmd}\` tidak ditemukan!\n\n` +
-                `> Lihat daftar dengan \`.delstickercmd\``
+                `❌ ¡El comando de sticker \`${cleanCmd}\` no existe!\n\n` +
+                `> Revisa la lista completa con \`.delstickercmd\``
             )
         }
     }
@@ -77,14 +81,14 @@ async function handler(m, { sock }) {
     if (deleted) {
         await m.react('✅')
         await m.reply(
-            `✅ *sᴛɪᴄᴋᴇʀ ᴄᴏᴍᴍᴀɴᴅ ᴅɪʜᴀᴘᴜs*\n\n` +
-            `> 🗑️ \`${deletedCmd}\` telah dihapus.`
+            `✅ *ᴄᴏᴍᴀɴᴅᴏ ᴇʟɪᴍɪɴᴀᴅᴏ*\n\n` +
+            `> 🗑️ El acceso mediante \`${deletedCmd}\` ha sido borrado.`
         )
     } else {
         await m.reply(
-            `❌ Gagal menghapus!\n\n` +
-            `> Reply sticker yang ingin dihapus, atau\n` +
-            `> Ketik nama command: \`.delstickercmd menu\``
+            `❌ ¡No se pudo eliminar!\n\n` +
+            `> Responde al sticker que quieres quitar, o\n` +
+            `> Escribe el nombre del comando: \`.delstickercmd menu\``
         )
     }
 }
