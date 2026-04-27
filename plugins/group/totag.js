@@ -1,11 +1,12 @@
 import config from '../../config.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'totag',
-    alias: ['tagall2', 'mentionall'],
+    alias: ['tagall2', 'mentionall', 'citartodos', 'reenviartag'],
     category: 'group',
-    description: 'Tag semua member dengan reply pesan',
-    usage: '.totag (reply pesan)',
+    description: 'Menciona a todos los miembros reenviando un mensaje',
+    usage: '.totag (responde a un mensaje)',
     example: '.totag',
     isOwner: false,
     isPremium: false,
@@ -22,8 +23,8 @@ async function handler(m, { sock }) {
     if (!m.quoted) {
         return m.reply(
             `📢 *ᴛᴏᴛᴀɢ*\n\n` +
-            `> Reply pesan yang ingin di-forward ke semua member\n\n` +
-            `> Contoh: Reply pesan lalu ketik \`${m.prefix}totag\``
+            `> Responde al mensaje que deseas reenviar a todos los miembros.\n\n` +
+            `> Ejemplo: Responde a un mensaje y escribe \`${m.prefix}totag\``
         )
     }
     
@@ -33,7 +34,7 @@ async function handler(m, { sock }) {
         const participants = m.groupMembers || []
         
         if (!participants || participants.length === 0) {
-            return m.reply(`❌ Gagal mendapatkan data member grup`)
+            return m.reply(`❌ Error al obtener la lista de miembros del grupo.`)
         }
         
         const users = participants
