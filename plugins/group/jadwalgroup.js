@@ -1,11 +1,12 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
-    name: 'jadwalgroup',
-    alias: ['schedulegroup', 'jdwlgrup', 'autoopenclose'],
+    name: 'horariogrupo',
+    alias: ['schedulegroup', 'horariog', 'abrecierra'],
     category: 'group',
-    description: 'Jadwal buka/tutup grup otomatis',
-    usage: '.jadwalgroup <open/close> <HH:MM>',
-    example: '.jadwalgroup open 06:00',
+    description: 'Establece un horario de apertura/cierre automático para el grupo',
+    usage: '.horariogrupo <abrir/cerrar> <HH:MM>',
+    example: '.horariogrupo abrir 06:00',
     isOwner: false,
     isPremium: false,
     isGroup: true,
@@ -52,73 +53,78 @@ async function handler(m, { sock, db }) {
         const openTime = group.scheduleOpen || null;
         const closeTime = group.scheduleClose || null;
         
-        let scheduleInfo = `⏰ *ᴊᴀᴅᴡᴀʟ ɢʀᴜᴘ*
+        let scheduleInfo = `⏰ *ʜᴏʀᴀʀɪᴏ ᴅᴇʟ ɢʀᴜᴘᴏ*
 
-「 📋 *sᴛᴀᴛᴜs* 」
-🔓 ᴏᴘᴇɴ: *${openTime || 'Tidak aktif'}*
-🔒 ᴄʟᴏsᴇ: *${closeTime || 'Tidak aktif'}*
+「 📋 *ᴇsᴛᴀᴅᴏ ᴀᴄᴛᴜᴀʟ* 」
+🔓 ᴀᴘᴇʀᴛᴜʀᴀ: *${openTime || 'No activa'}*
+🔒 ᴄɪᴇʀʀᴇ: *${closeTime || 'No activa'}*
 
-*Cara Penggunaan:*
-\`.jadwalgroup open 06:00\`
-\`.jadwalgroup close 22:00\`
-\`.jadwalgroup hapus open\`
-\`.jadwalgroup hapus close\``;
+*Modo de uso:*
+\`.horariogrupo abrir 06:00\`
+\`.horariogrupo cerrar 22:00\`
+\`.horariogrupo borrar abrir\`
+\`.horariogrupo borrar cerrar\``;
         
         await m.reply(scheduleInfo);
         return;
     }
     
-    if (action === 'hapus' || action === 'delete' || action === 'remove') {
+    if (action === 'borrar' || action === 'delete' || action === 'remove' || action === 'hapus') {
         const type = args[1]?.toLowerCase();
         
-        if (type !== 'open' && type !== 'close') {
+        if (type !== 'abrir' && type !== 'cerrar' && type !== 'open' && type !== 'close') {
             await m.reply(
-                `⚠️ *ᴠᴀʟɪᴅᴀsɪ ɢᴀɢᴀʟ*\n\n` +
-                `> Gunakan: \`.jadwalgroup hapus open\`\n` +
-                `> atau: \`.jadwalgroup hapus close\``
+                `⚠️ *ᴠᴀʟɪᴅᴀᴄɪᴏ́ɴ ꜰᴀʟʟɪᴅᴀ*\n\n` +
+                `> Usa: \`.horariogrupo borrar abrir\`\n` +
+                `> o: \`.horariogrupo borrar cerrar\``
             );
             return;
         }
         
         const group = db.getGroup(m.chat) || {};
         
-        if (type === 'open') {
+        if (type === 'abrir' || type === 'open') {
             delete group.scheduleOpen;
             db.setGroup(m.chat, group);
             
             await m.reply(
-                `✅ *ʙᴇʀʜᴀsɪʟ*\n\n` +
-                `> Jadwal *buka grup* otomatis telah dihapus.`
+                `✅ *ᴇ́xɪᴛᴏ*\n\n` +
+                `> El horario de *apertura automática* ha sido eliminado.`
             );
         } else {
             delete group.scheduleClose;
             db.setGroup(m.chat, group);
             
             await m.reply(
-                `✅ *ʙᴇʀʜᴀsɪʟ*\n\n` +
-                `> Jadwal *tutup grup* otomatis telah dihapus.`
+                `✅ *ᴇ́xɪᴛᴏ*\n\n` +
+                `> El horario de *cierre automático* ha sido eliminado.`
             );
         }
         return;
     }
     
-    if (action !== 'open' && action !== 'close') {
+    // Traducción de acciones para compatibilidad
+    let finalAction = action;
+    if (action === 'abrir') finalAction = 'open';
+    if (action === 'cerrar') finalAction = 'close';
+
+    if (finalAction !== 'open' && finalAction !== 'close') {
         await m.reply(
-            `⚠️ *ᴠᴀʟɪᴅᴀsɪ ɢᴀɢᴀʟ*\n\n` +
-            `> Action harus \`open\` atau \`close\`!\n\n` +
-            `> *Contoh:*\n` +
-            `> \`.jadwalgroup open 06:00\`\n` +
-            `> \`.jadwalgroup close 22:00\``
+            `⚠️ *ᴠᴀʟɪᴅᴀᴄɪᴏ́ɴ ꜰᴀʟʟɪᴅᴀ*\n\n` +
+            `> ¡La acción debe ser \`abrir\` o \`cerrar\`!\n\n` +
+            `> *Ejemplo:*\n` +
+            `> \`.horariogrupo abrir 06:00\`\n` +
+            `> \`.horariogrupo cerrar 22:00\``
         );
         return;
     }
     
     if (!time) {
         await m.reply(
-            `⚠️ *ᴠᴀʟɪᴅᴀsɪ ɢᴀɢᴀʟ*\n\n` +
-            `> Waktu harus diisi!\n\n` +
-            `> *Format:* \`HH:MM\` (24 jam)\n` +
-            `> *Contoh:* \`.jadwalgroup ${action} 08:00\``
+            `⚠️ *ᴠᴀʟɪᴅᴀᴄɪᴏ́ɴ ꜰᴀʟʟɪᴅᴀ*\n\n` +
+            `> ¡Debes indicar una hora!\n\n` +
+            `> *Formato:* \`HH:MM\` (24 horas)\n` +
+            `> *Ejemplo:* \`.horariogrupo ${action} 08:00\``
         );
         return;
     }
@@ -126,10 +132,10 @@ async function handler(m, { sock, db }) {
     const parsed = parseTime(time);
     if (!parsed) {
         await m.reply(
-            `⚠️ *ᴠᴀʟɪᴅᴀsɪ ɢᴀɢᴀʟ*\n\n` +
-            `> Format waktu tidak valid!\n\n` +
-            `> *Format:* \`HH:MM\` (24 jam)\n` +
-            `> *Contoh:* \`06:00\`, \`22:30\`, \`08:15\``
+            `⚠️ *ᴠᴀʟɪᴅᴀᴄɪᴏ́ɴ ꜰᴀʟʟɪᴅᴀ*\n\n` +
+            `> ¡Formato de hora no válido!\n\n` +
+            `> *Formato:* \`HH:MM\` (24 horas)\n` +
+            `> *Ejemplo:* \`06:00\`, \`22:30\`, \`08:15\``
         );
         return;
     }
@@ -137,7 +143,7 @@ async function handler(m, { sock, db }) {
     const group = db.getGroup(m.chat) || {};
     const formattedTime = formatTime(parsed.hours, parsed.minutes);
     
-    if (action === 'open') {
+    if (finalAction === 'open') {
         group.scheduleOpen = formattedTime;
     } else {
         group.scheduleClose = formattedTime;
@@ -145,19 +151,21 @@ async function handler(m, { sock, db }) {
     
     db.setGroup(m.chat, group);
     
-    const actionText = action === 'open' ? 'BUKA' : 'TUTUP';
-    const emoji = action === 'open' ? '🔓' : '🔒';
+    const actionText = finalAction === 'open' ? 'APERTURA' : 'CIERRE';
+    const emoji = finalAction === 'open' ? '🔓' : '🔒';
     
-    const successMsg = `✅ *ᴊᴀᴅᴡᴀʟ ᴅɪsɪᴍᴘᴀɴ*
+    const successMsg = `✅ *ʜᴏʀᴀʀɪᴏ ɢᴜᴀʀᴅᴀᴅᴏ*
 
-╭┈┈⬡「 ⏰ *sᴇᴛᴛɪɴɢ* 」
-┃ ㊗ ${emoji} ᴀᴋsɪ: *${actionText}*
-┃ ㊗ ⏱️ ᴡᴀᴋᴛᴜ: *${formattedTime} WIB*
-┃ ㊗ 📡 sᴛᴀᴛᴜs: *🟢 Aktif*
+╭┈┈⬡「 ⏰ *ᴄᴏɴꜰɪɢᴜʀᴀᴄɪᴏ́ɴ* 」
+┃ ㊗ ${emoji} ᴀᴄᴄɪᴏ́ɴ: *${actionText}*
+┃ ㊗ ⏱️ ʜᴏʀᴀ: *${formattedTime}*
+┃ ㊗ 📡 ᴇsᴛᴀᴅᴏ: *🟢 Activo*
 ╰┈┈⬡
 
-> _Grup akan otomatis ${action === 'open' ? 'dibuka' : 'ditutup'}_
-> _setiap hari pada jam *${formattedTime}* WIB._`;
+> _El grupo se ${finalAction === 'open' ? 'abrirá' : 'cerrará'} automáticamente_
+> _todos los días a las *${formattedTime}* hs._
+
+*Powered by KAORI MD*`;
     
     await m.reply(successMsg);
 }
