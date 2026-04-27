@@ -100,7 +100,7 @@ Deseémosle lo mejor.`,
       .replace(/{date}/gi, now.format("DD/MM/YYYY"))
       .replace(/{time}/gi, now.format("HH:mm"))
       .replace(/{day}/gi, dayId)
-      .replace(/{bot}/gi, "KAORI MD")
+      .replace(/{bot}/gi, "𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃")
       .replace(/{prefix}/gi, prefix);
   }
 
@@ -166,7 +166,7 @@ async function sendGoodbyeMessage(sock, groupJid, participant, groupMeta) {
     );
 
     const saluranId = config.saluran?.id || "120363208449943317@newsletter";
-    const saluranName = "KAORI MD";
+    const saluranName = "𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃";
 
     if (goodbyeType === 2) {
       await sock.sendMessage(groupJid, {
