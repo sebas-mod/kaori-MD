@@ -1,10 +1,10 @@
 const pluginConfig = {
     name: 'setdeskgc',
-    alias: ['setdesc', 'setdescgc', 'setdeskripsi', 'setdesk'],
+    alias: ['setdesc', 'setdescgc', 'setdescripcion', 'setdescrip'],
     category: 'group',
-    description: 'Mengubah deskripsi grup',
-    usage: '.setdeskgc <deskripsi baru>',
-    example: '.setdeskgc Grup untuk diskusi',
+    description: 'Cambia la descripción del grupo',
+    usage: '.setdeskgc <nueva descripción>',
+    example: '.setdeskgc Grupo para programadores',
     isOwner: false,
     isPremium: false,
     isGroup: true,
@@ -20,9 +20,9 @@ async function handler(m, { sock }) {
     const newDesc = m.text?.trim() || ''
     if (!m.text && m.args?.length === 0) {
         await m.reply(
-            `⚠️ *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ*\n\n` +
-            `> \`${m.prefix}setdeskgc Deskripsi baru\`\n` +
-            `> \`${m.prefix}setdeskgc clear\` - Hapus deskripsi`
+            `⚠️ *ᴍᴏᴅᴏ ᴅᴇ ᴜsᴏ*\n\n` +
+            `> \`${m.prefix}setdeskgc Nueva descripción\`\n` +
+            `> \`${m.prefix}setdeskgc clear\` - Borrar descripción`
         )
         return
     }
@@ -30,8 +30,8 @@ async function handler(m, { sock }) {
     
     if (descToSet.length > 2048) {
         await m.reply(
-            `⚠️ *ᴠᴀʟɪᴅᴀsɪ*\n\n` +
-            `> Deskripsi maksimal 2048 karakter.`
+            `⚠️ *ᴠᴀʟɪᴅᴀᴄɪᴏ́ɴ*\n\n` +
+            `> La descripción no puede superar los 2048 caracteres.`
         )
         return
     }
@@ -41,18 +41,18 @@ async function handler(m, { sock }) {
         
         if (descToSet) {
             await m.reply(
-                `✅ Deskripsi grup berhasil diperbarui!`
+                `✅ ¡La descripción del grupo ha sido actualizada con éxito!`
             )
         } else {
             await m.reply(
-                `✅ Deskripsi grup berhasil dihapus!`
+                `✅ ¡La descripción del grupo ha sido eliminada!`
             )
         }
     } catch (error) {
         await m.reply(
-            `❌ *ɢᴀɢᴀʟ*\n\n` +
-            `> Tidak dapat mengubah deskripsi grup.\n` +
-            `> _${error.message}_`
+            `❌ *ꜰᴀʟʟᴏ*\n\n` +
+            `> No se pudo cambiar la descripción del grupo.\n` +
+            `> _Detalle: ${error.message}_`
         )
     }
 }
