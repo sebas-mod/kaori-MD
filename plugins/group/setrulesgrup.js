@@ -36,7 +36,7 @@ function handler(m) {
         `✅ *ʀᴇɢʟᴀs ᴀᴄᴛᴜᴀʟɪᴢᴀᴅᴀs*\n\n` +
         `> ¡Las reglas del grupo han sido modificadas con éxito!\n` +
         `> Escribe \`${m.prefix}rulesgrup\` para ver el resultado.\n\n` +
-        `*KAORI MD — Gestión*`
+        `*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Gestión*`
     )
 }
 
