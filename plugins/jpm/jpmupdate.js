@@ -4,6 +4,7 @@ import { fetchGroupsSafe } from '../../src/lib/ourin-jpm-helper.js'
 import config from '../../config.js'
 import fs from 'fs'
 import te from '../../src/lib/ourin-error.js'
+
 let cachedThumb = null;
 try {
   if (fs.existsSync("./assets/images/ourin.jpg")) {
@@ -13,11 +14,11 @@ try {
 
 const pluginConfig = {
   name: "jpmupdate",
-  alias: ["updatejpm", "broadcastupdate", "shareupdate"],
-  category: "jpm",
-  description: "Kirim update/changelog ke semua grup",
-  usage: ".jpmupdate <versi> | <changelog>",
-  example: ".jpmupdate v2.0 | Fitur baru:\\n- Quiz Battle\\n- Confession",
+  alias: ["updatejpm", "difundirupdate", "compartirupdate"],
+  category: "admin",
+  description: "Enviar actualización/changelog a todos los grupos",
+  usage: ".jpmupdate <versión> | <changelog>",
+  example: ".jpmupdate v2.0 | Nuevas funciones:\\n- Batalla de Quiz\\n- Confesiones",
   isOwner: true,
   isPremium: false,
   isGroup: false,
@@ -32,7 +33,7 @@ async function handler(m, { sock }) {
 
   if (global.statusjpm) {
     return m.reply(
-      `❌ *ɢᴀɢᴀʟ*\n\n> JPM sedang berjalan. Ketik \`${m.prefix}stopjpm\` untuk menghentikan.`,
+      `❌ *ᴇʀʀᴏʀ*\n\n> Ya hay un proceso de JPM en curso. Escribe \`${m.prefix}stopjpm\` para detenerlo.`,
     );
   }
 
@@ -40,13 +41,13 @@ async function handler(m, { sock }) {
 
   if (!input) {
     return m.reply(
-      `📢 *JPM UPDATE (PENGUMUMAN)*\n\n` +
-        `Kirim informasi update / changelog ke seluruh grup!\n\n` +
-        `*FORMAT PENGGUNAAN:*\n` +
-        `• \`.jpmupdate <versi> | <isi changelog>\`\n\n` +
-        `*CONTOH:*\n` +
-        `> \`.jpmupdate v3.0 | ✨ Fitur Baru:\\n- JPM Hidetag\\n- Sistem AFK Baru\\n- Perbaikan bug system\`\n\n` +
-        `_(Note: Gunakan \\n untuk membuat baris baru/enter)_`
+      `📢 *JPM UPDATE (ANUNCIOS)*\n\n` +
+        `¡Envía información de actualizaciones o cambios a todos los grupos!\n\n` +
+        `*FORMATO DE USO:*\n` +
+        `• \`.jpmupdate <versión> | <contenido del cambio>\`\n\n` +
+        `*EJEMPLO:*\n` +
+        `> \`.jpmupdate v3.0 | ✨ Nuevas Funciones:\\n- JPM Hidetag\\n- Nuevo sistema AFK\\n- Corrección de errores\`\n\n` +
+        `_(Nota: Usa \\n para crear una nueva línea o salto de línea)_`
     );
   }
 
@@ -60,7 +61,7 @@ async function handler(m, { sock }) {
   }
 
   if (!changelog) {
-    return m.reply(`❌ Changelog tidak boleh kosong!`);
+    return m.reply(`❌ ¡El registro de cambios no puede estar vacío!`);
   }
 
   await m.react("🕕");
@@ -78,35 +79,35 @@ async function handler(m, { sock }) {
     if (groupIds.length === 0) {
       await m.react("❌");
       return m.reply(
-        `❌ *ɢᴀɢᴀʟ*\n\n> Tidak ada grup yang ditemukan${blacklistedCount > 0 ? ` (${blacklistedCount} grup di-blacklist)` : ""}`,
+        `❌ *ᴇʀʀᴏʀ*\n\n> No se encontraron grupos${blacklistedCount > 0 ? ` (${blacklistedCount} en lista negra)` : ""}`,
       );
     }
 
     const jedaJpm = db.setting("jedaJpm") || 5000;
-    const botName = config.bot?.name || "Ourin-AI";
+    const botName = config.bot?.name || "KAORI MD";
     const saluranId = config.saluran?.id || "120363208449943317@newsletter";
     const saluranName = config.saluran?.name || botName;
 
-    const dateStr = timeHelper.formatDate("DD MMMM YYYY");
+    const dateStr = timeHelper.formatDate("DD [de] MMMM [de] YYYY");
 
     const updateMessage =
-      `🚀 *UPDATE !! | ${version}*\n\n` +
-      `📅 *Tanggal:* ${dateStr}\n\n` +
-      `*CHANGELOG:*\n` +
+      `🚀 *¡NUEVA ACTUALIZACIÓN! | ${version}*\n\n` +
+      `📅 *Fecha:* ${dateStr}\n\n` +
+      `*CAMBIOS Y MEJORAS:*\n` +
       `${changelog}\n\n` +
-      `*CATATAN TERBARU:*\n` +
-      `> 💡 Ketik *${m.prefix}menu* untuk mengeksplorasi fitur-fitur ini.\n` +
-      `> 📢 _Terima kasih telah menggunakan ${botName}_`;
+      `*NOTAS:* \n` +
+      `> 💡 Escribe *${m.prefix}menu* para explorar estas novedades.\n` +
+      `> 📢 _Gracias por preferir a ${botName}_`;
 
     await m.reply(
       `📢 *ᴊᴘᴍ ᴜᴘᴅᴀᴛᴇ*\n\n` +
-        `╭┈┈⬡「 📋 *ᴅᴇᴛᴀɪʟ* 」\n` +
-        `┃ 🏷️ ᴠᴇʀsɪ: \`${version}\`\n` +
-        `┃ 👥 ᴛᴀʀɢᴇᴛ: \`${groupIds.length}\` grup\n` +
-        `┃ ⏱️ ᴊᴇᴅᴀ: \`${jedaJpm}ms\`\n` +
-        `┃ 📊 ᴇsᴛɪᴍᴀsɪ: \`${Math.ceil((groupIds.length * jedaJpm) / 60000)} menit\`\n` +
+        `╭┈┈⬡「 📋 *ᴅᴇᴛᴀʟʟᴇs* 」\n` +
+        `┃ 🏷️ ᴠᴇʀsɪóɴ: \`${version}\`\n` +
+        `┃ 👥 ᴅᴇsᴛɪɴᴏs: \`${groupIds.length}\` grupos\n` +
+        `┃ ⏱️ ᴘᴀᴜsᴀ: \`${jedaJpm}ms\`\n` +
+        `┃ 📊 ᴇsᴛɪᴍᴀᴅᴏ: \`${Math.ceil((groupIds.length * jedaJpm) / 60000)} minutos\`\n` +
         `╰┈┈⬡\n\n` +
-        `> Memulai broadcast update...`,
+        `> Iniciando difusión de actualización...`,
     );
 
     global.statusjpm = true;
@@ -119,10 +120,10 @@ async function handler(m, { sock }) {
         delete global.statusjpm;
 
         await m.reply(
-          `⏹️ *ᴊᴘᴍ ᴜᴘᴅᴀᴛᴇ ᴅɪʜᴇɴᴛɪᴋᴀɴ*\n\n` +
-            `> ✅ Berhasil: \`${successCount}\`\n` +
-            `> ❌ Gagal: \`${failedCount}\`\n` +
-            `> ⏸️ Sisa: \`${groupIds.length - successCount - failedCount}\``,
+          `⏹️ *ᴊᴘᴍ ᴜᴘᴅᴀᴛᴇ ᴅᴇᴛᴇɴɪᴅᴏ*\n\n` +
+            `> ✅ Exitosos: \`${successCount}\`\n` +
+            `> ❌ Fallidos: \`${failedCount}\`\n` +
+            `> ⏸️ Pendientes: \`${groupIds.length - successCount - failedCount}\``,
         );
         return;
       }
@@ -140,8 +141,8 @@ async function handler(m, { sock }) {
             },
             externalAdReply: cachedThumb
               ? {
-                  title: `📢 PENGUMUMAN UPDATE`,
-                  body: `Versi Sistem: ${version}`,
+                  title: `📢 ANUNCIO DE ACTUALIZACIÓN`,
+                  body: `Versión del Sistema: ${version}`,
                   thumbnail: cachedThumb,
                   sourceUrl: config.saluran?.link || "",
                   mediaType: 1,
@@ -163,10 +164,10 @@ async function handler(m, { sock }) {
 
     await m.react("✅");
     await m.reply(
-      `✅ *ᴊᴘᴍ ᴜᴘᴅᴀᴛᴇ sᴇʟᴇsᴀɪ!*\n\n` +
-        `╭┈┈⬡「 📊 *ʀᴇsᴜʟᴛ* 」\n` +
-        `┃ ✅ Sukses: ${successCount}\n` +
-        `┃ ❌ Gagal: ${failedCount}\n` +
+      `✅ *ᴊᴘᴍ ᴜᴘᴅᴀᴛᴇ ꜰɪɴᴀʟɪᴢᴀᴅᴏ!*\n\n` +
+        `╭┈┈⬡「 📊 *ʀᴇsᴜʟᴛᴀᴅᴏ* 」\n` +
+        `┃ ✅ Éxito: ${successCount}\n` +
+        `┃ ❌ Falla: ${failedCount}\n` +
         `┃ 📊 Total: ${groupIds.length}\n` +
         `╰┈┈┈┈┈┈┈┈⬡`,
     );
