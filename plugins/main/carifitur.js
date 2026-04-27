@@ -4,15 +4,17 @@ import path from "path";
 import config from "../../config.js";
 import te from "../../src/lib/ourin-error.js";
 import { fileURLToPath } from "url";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 const pluginConfig = {
-  name: "carifitur",
-  alias: ["searchcmd", "findcmd", "cari", "search", "cf"],
+  name: "buscar",
+  alias: ["searchcmd", "findcmd", "carifitur", "search", "cf", "buscafuncion"],
   category: "main",
-  description: "Mencari fitur berdasarkan keyword dengan detail lengkap",
-  usage: ".carifitur <keyword>",
-  example: ".carifitur sticker",
+  description: "Busca funciones por palabras clave con detalles completos",
+  usage: ".buscar <palabra clave>",
+  example: ".buscar sticker",
   isOwner: false,
   isPremium: false,
   isGroup: false,
@@ -21,12 +23,12 @@ const pluginConfig = {
   energi: 0,
   isEnabled: true,
 };
+
+// Algoritmo de similitud para mejorar los resultados de búsqueda
 function levenshteinDistance(str1, str2) {
   const m = str1.length;
   const n = str2.length;
-  const dp = Array(m + 1)
-    .fill(null)
-    .map(() => Array(n + 1).fill(0));
+  const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
   for (let i = 0; i <= m; i++) dp[i][0] = i;
   for (let j = 0; j <= n; j++) dp[0][j] = j;
   for (let i = 1; i <= m; i++) {
@@ -40,6 +42,7 @@ function levenshteinDistance(str1, str2) {
   }
   return dp[m][n];
 }
+
 function getSimilarity(str1, str2) {
   if (typeof str1 !== "string" || typeof str2 !== "string") return 0;
   const maxLen = Math.max(str1.length, str2.length);
@@ -47,9 +50,9 @@ function getSimilarity(str1, str2) {
   const distance = levenshteinDistance(str1.toLowerCase(), str2.toLowerCase());
   return (maxLen - distance) / maxLen;
 }
+
 function matchesKeyword(text, keyword) {
   if (!text || !keyword) return false;
-  if (typeof text !== "string" || typeof keyword !== "string") return false;
   const textLower = text.toLowerCase();
   const keywordLower = keyword.toLowerCase();
   if (textLower.includes(keywordLower)) return true;
@@ -62,6 +65,7 @@ function matchesKeyword(text, keyword) {
   if (similarity >= 0.6) return true;
   return false;
 }
+
 async function loadAllPlugins() {
   const plugins = [];
   const pluginsDir = path.join(__dirname, "..");
@@ -72,22 +76,16 @@ async function loadAllPlugins() {
     });
     for (const category of categories) {
       const categoryPath = path.join(pluginsDir, category);
-      const files = fs
-        .readdirSync(categoryPath)
-        .filter((f) => f.endsWith(".js"));
+      const files = fs.readdirSync(categoryPath).filter((f) => f.endsWith(".js"));
       for (const file of files) {
         try {
-          const plugin = await import(
-            `file://${path.join(categoryPath, file).replace(/\\/g, "/")}`
-          );
+          const plugin = await import(`file://${path.join(categoryPath, file).replace(/\\/g, "/")}`);
           if (plugin.config && plugin.config.name) {
             plugins.push({
-              name: Array.isArray(plugin.config.name)
-                ? plugin.config.name[0]
-                : plugin.config.name,
+              name: Array.isArray(plugin.config.name) ? plugin.config.name[0] : plugin.config.name,
               alias: plugin.config.alias || [],
               category: plugin.config.category || category,
-              description: plugin.config.description || "Tidak ada deskripsi",
+              description: plugin.config.description || "Sin descripción",
               usage: plugin.config.usage || "",
               example: plugin.config.example || "",
               isEnabled: plugin.config.isEnabled !== false,
@@ -102,17 +100,18 @@ async function loadAllPlugins() {
       }
     }
   } catch {}
+  
   try {
     const caseCommands = getCaseCommands();
     const caseAliases = {
-      cping: ["cspeed", "clatency"],
-      listallcase: ["lcase", "caselist", "allcase"],
-      listallplugin: ["lplugin", "pluginlist", "allplugin"],
+      cping: ["velocidad", "latencia"],
+      listallcase: ["lcase", "todosloscase"],
+      listallplugin: ["lplugin", "todoslosplugins"],
     };
     const caseDescriptions = {
-      cping: "Cek ping case system",
-      listallcase: "Lihat daftar semua case commands",
-      listallplugin: "Lihat daftar semua plugin commands",
+      cping: "Verificar latencia del sistema",
+      listallcase: "Ver lista de todos los comandos de tipo case",
+      listallplugin: "Ver lista de todos los plugins instalados",
     };
     for (const [category, commands] of Object.entries(caseCommands)) {
       for (const cmd of commands) {
@@ -120,7 +119,7 @@ async function loadAllPlugins() {
           name: cmd,
           alias: caseAliases[cmd] || [],
           category: category,
-          description: caseDescriptions[cmd] || "Case command",
+          description: caseDescriptions[cmd] || "Comando de sistema",
           usage: `.${cmd}`,
           example: `.${cmd}`,
           isEnabled: true,
@@ -135,79 +134,67 @@ async function loadAllPlugins() {
   } catch {}
   return plugins;
 }
+
 async function handler(m, { sock }) {
   const keyword = m.text;
   if (!keyword) {
     return m.reply(
-      `🔍 *ᴄᴀʀɪ ꜰɪᴛᴜʀ*\n\n` +
-        `╭┈┈⬡「 📋 *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ* 」\n` +
-        `┃ \`${m.prefix}carifitur <keyword>\`\n` +
+      `🔍 *ʙᴜsᴄᴀʀ ꜰᴜɴᴄɪóɴ*\n\n` +
+        `╭┈┈⬡「 📋 *ᴍᴏᴅᴏ ᴅᴇ ᴜsᴏ* 」\n` +
+        `┃ \`${m.prefix}buscar <palabra clave>\`\n` +
         `╰┈┈⬡\n\n` +
-        `> Contoh:\n` +
-        `\`${m.prefix}carifitur sticker\`\n` +
-        `\`${m.prefix}carifitur download\`\n` +
-        `\`${m.prefix}carifitur game\``,
+        `> Ejemplos:\n` +
+        `\`${m.prefix}buscar sticker\`\n` +
+        `\`${m.prefix}buscar descargar\`\n` +
+        `\`${m.prefix}buscar juegos\``,
     );
   }
+  
   m.react("🕕");
+  
   try {
-    const allPlugins = loadAllPlugins();
+    const allPlugins = await loadAllPlugins();
     const matches = [];
     for (const plugin of allPlugins) {
       if (!plugin.isEnabled) continue;
       let isMatch = false;
       let matchScore = 0;
-      let matchReason = "";
+      
       if (matchesKeyword(plugin.name, keyword)) {
         isMatch = true;
-        matchScore = Math.max(
-          matchScore,
-          getSimilarity(plugin.name, keyword) * 1.2,
-        );
-        matchReason = "nama";
+        matchScore = Math.max(matchScore, getSimilarity(plugin.name, keyword) * 1.2);
       }
       for (const alias of plugin.alias) {
         if (matchesKeyword(alias, keyword)) {
           isMatch = true;
-          matchScore = Math.max(
-            matchScore,
-            getSimilarity(alias, keyword) * 1.1,
-          );
-          matchReason = matchReason || "alias";
+          matchScore = Math.max(matchScore, getSimilarity(alias, keyword) * 1.1);
         }
       }
       if (matchesKeyword(plugin.description, keyword)) {
         isMatch = true;
-        matchScore = Math.max(
-          matchScore,
-          getSimilarity(plugin.description, keyword) * 0.8,
-        );
-        matchReason = matchReason || "deskripsi";
+        matchScore = Math.max(matchScore, getSimilarity(plugin.description, keyword) * 0.8);
       }
       if (matchesKeyword(plugin.category, keyword)) {
         isMatch = true;
-        matchScore = Math.max(
-          matchScore,
-          getSimilarity(plugin.category, keyword) * 0.7,
-        );
-        matchReason = matchReason || "kategori";
+        matchScore = Math.max(matchScore, getSimilarity(plugin.category, keyword) * 0.7);
       }
+      
       if (isMatch) {
-        matches.push({ ...plugin, score: matchScore, matchReason });
+        matches.push({ ...plugin, score: matchScore });
       }
     }
+    
     matches.sort((a, b) => b.score - a.score);
+    
     if (matches.length === 0) {
       m.react("❌");
-      return m.reply(
-        `🔍 *ʜᴀsɪʟ ᴘᴇɴᴄᴀʀɪᴀɴ*\n\n> Tidak ditemukan fitur dengan keyword \`${keyword}\``,
-      );
+      return m.reply(`🔍 *ʙúsǫᴜᴇᴅᴀ*\n\n> No se encontraron funciones con la palabra \`${keyword}\``);
     }
-    const saluranId = config.saluran?.id || "120363208449943317@newsletter";
-    const saluranName = config.saluran?.name || config.bot?.name || "Ourin-AI";
-    let text = `🔍 *ʜᴀsɪʟ ᴘᴇɴᴄᴀʀɪᴀɴ: "${keyword}"*\n`;
-    text += `> Ditemukan *${matches.length}* fitur\n`;
-    text += `> Pilih salah satu command di bawah:\n\n`;
+    
+    let text = `🔍 *ʀᴇsᴜʟᴛᴀᴅᴏs: "${keyword}"*\n`;
+    text += `> Se encontraron *${matches.length}* funciones\n`;
+    text += `> Selecciona un comando de la lista:\n\n`;
+    
     const topMatches = matches.slice(0, 15);
     for (let i = 0; i < Math.min(5, topMatches.length); i++) {
       const p = topMatches[i];
@@ -215,20 +202,20 @@ async function handler(m, { sock }) {
       if (p.isPremium) badges.push("💎");
       if (p.isOwner) badges.push("👑");
       text += `*${i + 1}. ${m.prefix}${p.name}* ${badges.join("")}\n`;
-      text += `📁 Kategori: \`${p.category}\`\n`;
-      text += `📝 ${p.description.slice(0, 50)}${p.description.length > 50 ? "..." : ""}\n`;
-      if (p.usage) text += `💡 Usage: \`${p.usage}\`\n`;
-      if (p.cooldown > 0) text += `⏱️ Cooldown: ${p.cooldown}s\n`;
-      text += `\n`;
+      text += `📁 Cat: \`${p.category}\`\n`;
+      text += `📝 ${p.description.slice(0, 50)}${p.description.length > 50 ? "..." : ""}\n\n`;
     }
+    
     if (topMatches.length > 5) {
-      text += `_+${topMatches.length - 5} hasil lainnya tersedia_`;
+      text += `_+${topMatches.length - 5} resultados adicionales disponibles_`;
     }
-    const buttons = topMatches.slice(0, 10).map((p, i) => ({
+    
+    const buttons = topMatches.slice(0, 10).map((p) => ({
       title: `${m.prefix}${p.name}`,
       description: `${p.category} • ${p.description.slice(0, 40)}`,
       id: `${m.prefix}${p.name}`,
     }));
+    
     m.react("✅");
     await sock.sendButton(
       m.chat,
@@ -240,10 +227,10 @@ async function handler(m, { sock }) {
           {
             name: "single_select",
             buttonParamsJson: JSON.stringify({
-              title: "📋 Pilih Command",
+              title: "📋 Lista de Comandos",
               sections: [
                 {
-                  title: `Hasil untuk "${keyword}"`,
+                  title: `Resultados para "${keyword}"`,
                   rows: buttons,
                 },
               ],
@@ -257,4 +244,5 @@ async function handler(m, { sock }) {
     m.reply(te(m.prefix, m.command, m.pushName));
   }
 }
+
 export { pluginConfig as config, handler };
