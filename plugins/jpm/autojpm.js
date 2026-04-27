@@ -5,13 +5,14 @@ import * as timeHelper from '../../src/lib/ourin-time.js'
 import config from '../../config.js'
 import fs from 'fs'
 import path from 'path'
+
 const pluginConfig = {
   name: "autojpm",
-  alias: ["autojasher", "autojaserm", "autojasabroadcast"],
-  category: "jpm",
-  description: "Jadwalkan JPM otomatis dengan interval dan media",
-  usage: ".autojpm on <interval> <pesan>",
-  example: ".autojpm on 1h Halo semuanya!",
+  alias: ["autobroadcast", "autoanuncio", "jpm-auto"],
+  category: "admin",
+  description: "Programa anuncios automáticos (JPM) con intervalos y multimedia",
+  usage: ".autojpm on <intervalo> <mensaje>",
+  example: ".autojpm on 1h ¡Hola a todos!",
   isOwner: true,
   isPremium: false,
   isGroup: false,
@@ -42,12 +43,12 @@ function parseInterval(raw) {
 }
 
 function formatInterval(ms) {
-  if (!ms || ms <= 0) return "0 detik";
+  if (!ms || ms <= 0) return "0 segundos";
   const units = [
-    { label: "hari", value: 24 * 60 * 60 * 1000 },
-    { label: "jam", value: 60 * 60 * 1000 },
-    { label: "menit", value: 60 * 1000 },
-    { label: "detik", value: 1000 },
+    { label: "días", value: 24 * 60 * 60 * 1000 },
+    { label: "horas", value: 60 * 60 * 1000 },
+    { label: "minutos", value: 60 * 1000 },
+    { label: "segundos", value: 1000 },
   ];
   let remaining = ms;
   const parts = [];
@@ -58,12 +59,13 @@ function formatInterval(ms) {
       remaining -= amount * unit.value;
     }
   }
-  return parts.length ? parts.join(" ") : "0 detik";
+  return parts.length ? parts.join(" ") : "0 segundos";
 }
 
 function formatTimestamp(timestamp) {
   if (!timestamp) return "-";
-  return `${timeHelper.fromTimestamp(timestamp)} WIB`;
+  // Ajustado al formato local
+  return `${timeHelper.fromTimestamp(timestamp)}`;
 }
 
 function previewText(text) {
@@ -80,12 +82,12 @@ function normalizeMessageText(text) {
 
 function getMediaInfo(message) {
   if (!message) return null;
-  if (message.isImage) return { type: "image", mimetype: message.mimetype };
+  if (message.isImage) return { type: "imagen", mimetype: message.mimetype };
   if (message.isVideo) return { type: "video", mimetype: message.mimetype };
   if (message.isAudio) return { type: "audio", mimetype: message.mimetype };
   if (message.isDocument)
     return {
-      type: "document",
+      type: "documento",
       mimetype: message.mimetype,
       fileName: message.fileName || message.message?.documentMessage?.fileName,
     };
@@ -108,20 +110,21 @@ async function handler(m, { sock }) {
   const db = getDatabase();
   const prefix = m.prefix
   const input = (m.text || "").trim();
+
   if (!input) {
     const helpText =
-      `📢 *AUTO JPM (SIARAN TERJADWAL)*\n\n` +
-      `Sistem otomatis untuk broadcast ke seluruh grup berdasar interval waktu.\n\n` +
-      `*PENGGUNAAN:*\n` +
-      `• *${prefix}autojpm on <interval> <pesan>* — Menyalakan jadwal siaran\n` +
-      `• *${prefix}autojpm off* — Mematikan jadwal auto jpm\n` +
-      `• *${prefix}autojpm status* — Cek status & jadwal autojpm saat ini\n\n` +
-      `*FORMAT INTERVAL:*\n` +
-      `• \`10m\` (10 Menit) | \`1h\` (1 Jam)\n` +
-      `• \`2h30m\` (2 Jam 30 Menit) | \`1d\` (1 Hari)\n\n` +
-      `*CONTOH:*\n` +
-      `> \`${prefix}autojpm on 1h Halo semuanya, jangan lupa bahagia hari ini!\`\n\n` +
-      `_(Bisa kirim teks biasa atau reply foto/video jika ingin menggunakan media)_`;
+      `📢 *AUTO JPM (ANUNCIO PROGRAMADO)*\n\n` +
+      `Sistema automático para enviar anuncios a todos los grupos basándose en un intervalo.\n\n` +
+      `*MODO DE USO:*\n` +
+      `• *${prefix}autojpm on <intervalo> <mensaje>* — Activa el programa\n` +
+      `• *${prefix}autojpm off* — Desactiva el anuncio automático\n` +
+      `• *${prefix}autojpm status* — Ver configuración actual\n\n` +
+      `*FORMATO DE INTERVALO:*\n` +
+      `• \`10m\` (10 Minutos) | \`1h\` (1 Hora)\n` +
+      `• \`2h30m\` (2 Horas 30 Minutos) | \`1d\` (1 Día)\n\n` +
+      `*EJEMPLO:*\n` +
+      `> \`${prefix}autojpm on 1h ¡Hola a todos, que tengan un gran día!\`\n\n` +
+      `_(Puedes responder a una imagen/video para incluir multimedia en el anuncio)_`;
     return m.reply(helpText);
   }
 
@@ -133,48 +136,46 @@ async function handler(m, { sock }) {
   if (["off", "stop", "disable"].includes(action)) {
     const current = getAutoJpmConfig();
     if (!current.enabled) {
-      return m.reply(`ℹ️ AutoJPM sudah nonaktif.`);
+      return m.reply(`ℹ️ El AutoJPM ya se encuentra desactivado.`);
     }
     setAutoJpmConfig({ ...current, enabled: false });
     stopAutoJpmScheduler();
-    return m.reply(`✅ AutoJPM dinonaktifkan.`);
+    return m.reply(`✅ AutoJPM desactivado correctamente.`);
   }
 
   if (["status", "info"].includes(action)) {
     const current = getAutoJpmConfig();
     if (!current?.message) {
-      return m.reply(`ℹ️ AutoJPM belum dikonfigurasi.`);
+      return m.reply(`ℹ️ AutoJPM aún no ha sido configurado.`);
     }
     const statusText =
-      `📢 *STATUS AUTO JPM*\n\n` +
-      `Status: *${current.enabled ? "✅ AKTIF" : "❌ NONAKTIF"}*\n` +
-      `Interval: *${formatInterval(current.intervalMs || 0)}*\n\n` +
-      `*JADWAL:* \n` +
-      `• Terakhir: ${formatTimestamp(current.lastRun)}\n` +
-      `• Berikutnya: ${formatTimestamp(current.nextRun)}\n\n` +
-      `*PESAN:* \n` +
-      `• Teks: \`${previewText(current.message?.text)}\`\n` +
-      `• Media: *${current.message?.media?.type ? current.message.media.type.toUpperCase() : "TIDAK ADA"}*`;
+      `📢 *CONFIGURACIÓN AUTO JPM*\n\n` +
+      `Estado: *${current.enabled ? "✅ ACTIVO" : "❌ INACTIVO"}*\n` +
+      `Intervalo: *${formatInterval(current.intervalMs || 0)}*\n\n` +
+      `*CRONOGRAMA:* \n` +
+      `• Último envío: ${formatTimestamp(current.lastRun)}\n` +
+      `• Próximo envío: ${formatTimestamp(current.nextRun)}\n\n` +
+      `*CONTENIDO:* \n` +
+      `• Texto: \`${previewText(current.message?.text)}\`\n` +
+      `• Multimedia: *${current.message?.media?.type ? current.message.media.type.toUpperCase() : "NINGUNO"}*`;
     return m.reply(statusText);
   }
 
   if (!["on", "start", "enable"].includes(action)) {
-    return m.reply(`❌ Format salah. Gunakan ${prefix}autojpm on/off/status.`);
+    return m.reply(`❌ Formato incorrecto. Usa ${prefix}autojpm on/off/status.`);
   }
 
   if (!intervalRaw) {
-    return m.reply(
-      `❌ Interval wajib diisi. Contoh: ${prefix}autojpm on 1h Pesan.`,
-    );
+    return m.reply(`❌ Debes especificar un intervalo. Ejemplo: ${prefix}autojpm on 1h Mensaje.`);
   }
 
   const intervalMs = parseInterval(intervalRaw);
   if (!intervalMs) {
-    return m.reply(`❌ Interval tidak valid. Contoh: 10m, 1h, 2h30m, 1d.`);
+    return m.reply(`❌ Intervalo inválido. Usa formatos como: 10m, 1h, 2h30m, 1d.`);
   }
 
   if (intervalMs < 15 * 60 * 1000) {
-    return m.reply(`❌ Interval minimal 15 menit untuk mencegah spam.`);
+    return m.reply(`❌ El intervalo mínimo es de 15 minutos para evitar ser detectado como spam.`);
   }
 
   const existing = getAutoJpmConfig();
@@ -190,7 +191,7 @@ async function handler(m, { sock }) {
   if (mediaInfo) {
     const buffer = await quoted.download();
     if (!buffer) {
-      return m.reply(`❌ Gagal mengambil media.`);
+      return m.reply(`❌ Error al descargar el archivo multimedia.`);
     }
     const mimetype = mediaInfo.mimetype || getMimeType(buffer);
     const extension = getExtension(mimetype);
@@ -207,13 +208,8 @@ async function handler(m, { sock }) {
     };
   }
 
-  if (
-    !messageText &&
-    !mediaData &&
-    !existing?.message?.text &&
-    !existing?.message?.media
-  ) {
-    return m.reply(`❌ Pesan atau media wajib diisi.`);
+  if (!messageText && !mediaData && !existing?.message?.text && !existing?.message?.media) {
+    return m.reply(`❌ Debes incluir un mensaje de texto o un archivo multimedia.`);
   }
 
   const updatedConfig = {
@@ -231,12 +227,12 @@ async function handler(m, { sock }) {
   startAutoJpmScheduler(sock);
 
   const detailText =
-    `✅ *AUTO JPM AKTIF*\n\n` +
-    `╭┈┈⬡「 📋 *DETAIL* 」\n` +
-    `┃ ⏱️ Interval: ${formatInterval(intervalMs)}\n` +
-    `┃ 🕒 Next: ${formatTimestamp(updatedConfig.nextRun)}\n` +
-    `┃ 📷 Media: ${updatedConfig.message.media?.type || "Tidak"}\n` +
-    `┃ 📝 Pesan: ${previewText(updatedConfig.message.text)}\n` +
+    `✅ *AUTO JPM ACTIVADO*\n\n` +
+    `╭┈┈⬡「 📋 *DETALLES* 」\n` +
+    `┃ ⏱️ Intervalo: ${formatInterval(intervalMs)}\n` +
+    `┃ 🕒 Próximo envío: ${formatTimestamp(updatedConfig.nextRun)}\n` +
+    `┃ 📷 Multimedia: ${updatedConfig.message.media?.type || "No"}\n` +
+    `┃ 📝 Mensaje: ${previewText(updatedConfig.message.text)}\n` +
     `╰┈┈┈┈┈┈┈┈⬡`;
 
   return m.reply(detailText);
