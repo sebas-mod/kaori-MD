@@ -1,10 +1,10 @@
 const pluginConfig = {
-    name: 'hapusabsen',
-    alias: ['deleteabsen', 'tutupabsen', 'closeabsen', 'resetabsen'],
+    name: 'borrarasistencia',
+    alias: ['eliminarasistencia', 'cerrarasistencia', 'resetasistencia', 'tutupabsen'],
     category: 'group',
-    description: 'Hapus/tutup sesi absen (admin only)',
-    usage: '.hapusabsen',
-    example: '.hapusabsen',
+    description: 'Borra o cierra la sesión de asistencia actual (Solo Admins)',
+    usage: '.borrarasistencia',
+    example: '.borrarasistencia',
     isOwner: false,
     isPremium: false,
     isGroup: true,
@@ -22,22 +22,23 @@ async function handler(m) {
     
     if (!global.absensi[chatId]) {
         return m.reply(
-            `❌ *ᴛɪᴅᴀᴋ ᴀᴅᴀ ᴀʙsᴇɴ*\n\n` +
-            `> Tidak ada sesi absen di grup ini!`
+            `❌ *sɪɴ ᴀsɪsᴛᴇɴᴄɪᴀ*\n\n` +
+            `> No hay ninguna sesión de asistencia activa en este grupo.`
         )
     }
     
     const absen = global.absensi[chatId]
     const totalPeserta = absen.peserta.length
     
+    // Eliminar la sesión de la memoria global
     delete global.absensi[chatId]
     
     await m.reply(
-        `✅ *ABSEN DITUTUP!*\n\n` +
-        `Penyebab?\n` +
-        `📝 ${absen.keterangan}\n` +
-        `👥 Total hadir: ${totalPeserta}\n\n` +
-        `Sesi absen telah dihapus.`
+        `✅ *¡ᴀsɪsᴛᴇɴᴄɪᴀ ᴄᴇʀʀᴀᴅᴀ!*\n\n` +
+        `📌 *Asunto:* ${absen.keterangan}\n` +
+        `👥 *Total presentes:* ${totalPeserta}\n\n` +
+        `> La sesión de asistencia ha sido eliminada correctamente.\n` +
+        `_Powered by KAORI MD_`
     )
 }
 
