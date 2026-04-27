@@ -1,9 +1,10 @@
 import config from '../../config.js'
+
 const pluginConfig = {
     name: 'benefitpartner',
-    alias: ['partnerbenefits', 'keuntunganpartner'],
+    alias: ['beneficiospartner', 'ventajaspartner', 'partner'],
     category: 'info',
-    description: 'Lihat keuntungan menjadi partner bot',
+    description: 'Mira las ventajas de ser partner oficial del bot',
     usage: '.benefitpartner',
     example: '.benefitpartner',
     isOwner: false,
@@ -19,38 +20,38 @@ async function handler(m) {
 
     const prefix = m.prefix || '.'
 
-    let txt = `🤝 *BENEFIT PARTNER*\n\n`
-    txt += `Keuntungan menjadi partner ${config.bot?.name || 'Bot'}:\n\n`
+    let txt = `🤝 *VENTAJAS DE SER PARTNER*\n\n`
+    txt += `Beneficios exclusivos por ser partner de ${config.bot?.name || 'KAORI MD'}:\n\n`
 
-    txt += `🔓 *Akses Fitur*\n`
-    txt += `├ Semua fitur premium terbuka\n`
-    txt += `├ Energi & koin unlimited\n`
-    txt += `├ Akses command owner tertentu\n`
-    txt += `└ Prioritas support\n\n`
+    txt += `🔓 *Acceso Total*\n`
+    txt += `├ Todas las funciones Premium desbloqueadas\n`
+    txt += `├ Energía y monedas ilimitadas\n`
+    txt += `├ Acceso a comandos de gestión específicos\n`
+    txt += `└ Soporte técnico prioritario\n\n`
 
     txt += `📦 *Panel Pterodactyl*\n`
-    txt += `├ Bisa create server sendiri\n`
-    txt += `├ Akses panel management\n`
-    txt += `└ Bisa jualan panel (reseller)\n\n`
+    txt += `├ Capacidad para crear tus propios servidores\n`
+    txt += `├ Acceso al panel de administración\n`
+    txt += `└ Posibilidad de revender servicios (Reseller)\n\n`
 
-    txt += `💎 *Bonus*\n`
-    txt += `├ +200.000 EXP saat aktivasi\n`
-    txt += `├ +20.000 Koin saat aktivasi\n`
-    txt += `├ Badge partner di profil\n`
-    txt += `└ Akses early feature\n\n`
+    txt += `💎 *Bonificaciones*\n`
+    txt += `├ +200.000 EXP al activar el rango\n`
+    txt += `├ +20.000 Monedas de regalo\n`
+    txt += `├ Badge (insignia) de Partner en tu perfil\n`
+    txt += `└ Acceso anticipado a nuevas funciones\n\n`
 
-    txt += `💰 *Cara Jadi Partner*\n`
-    txt += `├ Hubungi owner: ${config.owner?.name || 'Owner'}\n`
-    txt += `├ Durasi: 30/60/90 hari\n`
-    txt += `└ Command: \`${prefix}addpartner\` (owner only)\n\n`
+    txt += `💰 *Cómo ser Partner*\n`
+    txt += `├ Contacta con: ${config.owner?.name || 'Owner'}\n`
+    txt += `├ Duración: Planes de 30/60/90 días\n`
+    txt += `└ Comando: \`${prefix}addpartner\` (Solo Owner)\n\n`
 
-    txt += `📋 *Command Partner*\n`
-    txt += `├ \`${prefix}cekpartner\` — Cek status partner\n`
-    txt += `├ \`${prefix}cekprem\` — Cek status premium\n`
-    txt += `├ \`${prefix}cekowner\` — Cek role user\n`
-    txt += `└ \`${prefix}listpartner\` — Daftar partner\n\n`
+    txt += `📋 *Comandos de Partner*\n`
+    txt += `├ \`${prefix}cekpartner\` — Ver tu estado de partner\n`
+    txt += `├ \`${prefix}cekprem\` — Ver estado premium\n`
+    txt += `├ \`${prefix}role\` — Ver tu rango actual\n`
+    txt += `└ \`${prefix}listpartner\` — Lista de partners oficiales\n\n`
 
-    txt += `> _Hubungi owner untuk info lebih lanjut_`
+    txt += `> _Contacta con el administrador para más información._`
 
     await m.reply(txt)
 }
