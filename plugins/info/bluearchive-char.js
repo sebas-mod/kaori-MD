@@ -79,8 +79,8 @@ async function handler(m, { sock }) {
         const ba = new BluArchive()
         const char = await ba.char(name)
         
-        const saluranId = config.saluran?.id || '120363208449943317@newsletter'
-        const saluranName = config.saluran?.name || config.bot?.name || 'KAORI MD'
+        const saluranId = config.saluran?.id || ''
+        const saluranName = config.saluran?.name || config.bot?.name || '𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃'
         
         let caption = `🎮 *${char.name?.toUpperCase()}*\n\n`
         
@@ -114,7 +114,7 @@ async function handler(m, { sock }) {
             caption += `╰┈┈┈┈┈┈┈┈⬡\n\n`
         }
 
-        caption += `*KAORI MD — Base de datos*`
+        caption += `*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Base de datos*`
         
         if (char.img) {
             await sock.sendMessage(m.chat, {
