@@ -1,10 +1,11 @@
 import { getParticipantJid } from '../../src/lib/ourin-lid.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'promote',
-    alias: ['jadiadmin', 'admin'],
+    alias: ['daradmin', 'haceradmin', 'ascender'],
     category: 'group',
-    description: 'Jadikan member sebagai admin',
+    description: 'Convierte a un miembro en administrador del grupo',
     usage: '.promote @user',
     example: '.promote @user',
     isOwner: false,
@@ -29,9 +30,9 @@ async function handler(m, { sock }) {
 
     if (!target) {
         await m.reply(
-            `❌ *ᴛᴀʀɢᴇᴛ ᴛɪᴅᴀᴋ ᴅɪᴛᴇᴍᴜᴋᴀɴ*\n\n` +
-            `> Reply pesan user atau mention!\n` +
-            `> Contoh: \`${m.prefix}promote @user\``
+            `❌ *ᴛᴀʀɢᴇᴛ ɴᴏ ᴇɴᴄᴏɴᴛʀᴀᴅᴏ*\n\n` +
+            `> ¡Responde al mensaje de alguien o menciónalo!\n` +
+            `> Ejemplo: \`${m.prefix}promote @user\``
         )
         return
     }
@@ -41,19 +42,19 @@ async function handler(m, { sock }) {
         const participant = groupMeta.participants.find(p => getParticipantJid(p) === target)
 
         if (!participant) {
-            await m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> User tidak ditemukan di grup!`)
+            await m.reply(`❌ *ꜰᴀʟʟᴏ*\n\n> ¡El usuario no se encuentra en este grupo!`)
             return
         }
 
         if (participant.admin) {
-            await m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> User sudah menjadi admin!`)
+            await m.reply(`❌ *ꜰᴀʟʟᴏ*\n\n> ¡El usuario ya es un administrador!`)
             return
         }
 
         await sock.groupParticipantsUpdate(m.chat, [target], 'promote')
 
         await m.reply(
-            `✅ @${target.split('@')[0]} sekarang menjadi admin!`,
+            `✅ @${target.split('@')[0]} ¡ahora es administrador!\n\n*KAORI MD — Gestión*`,
             { mentions: [target] }
         )
 
