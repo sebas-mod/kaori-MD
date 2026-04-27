@@ -4,6 +4,7 @@ import { fetchGroupsSafe } from '../../src/lib/ourin-jpm-helper.js'
 import fs from 'fs'
 import { config } from '../../config.js'
 import te from '../../src/lib/ourin-error.js'
+
 let cachedThumb = null
 try {
     if (fs.existsSync('./assets/images/ourin.jpg')) {
@@ -13,11 +14,11 @@ try {
 
 const pluginConfig = {
     name: 'jpmht',
-    alias: ['jpmhidetag'],
-    category: 'jpm',
-    description: 'Kirim pesan ke semua grup dengan hidetag',
-    usage: '.jpmht <pesan>',
-    example: '.jpmht Halo semuanya!',
+    alias: ['jpmhidetag', 'difusionht'],
+    category: 'admin',
+    description: 'Enviar mensaje a todos los grupos con hidetag',
+    usage: '.jpmht <mensaje>',
+    example: '.jpmht ¡Hola a todos!',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -33,25 +34,25 @@ async function handler(m, { sock }) {
     if (m.isGroup) {
         const groupMode = getGroupMode(m.chat, db)
         if (groupMode !== 'md' && groupMode !== 'all') {
-            return m.reply(`❌ *ᴍᴏᴅᴇ ᴛɪᴅᴀᴋ sᴇsᴜᴀɪ*\n\n> JPM hanya tersedia di mode MD\n\n\`${m.prefix}botmode md\``)
+            return m.reply(`❌ *ᴍᴏᴅᴏ ɴᴏ ᴄᴏᴍᴘᴀᴛɪʙʟᴇ*\n\n> JPM solo está disponible en modo MD.\n\nActívalo con: \`${m.prefix}botmode md\``)
         }
     }
     
     const text = m.fullArgs?.trim() || m.text?.trim()
     if (!text) {
         return m.reply(
-            `📢 *JPM HIDETAG (JASA PESAN MASSAL)*\n\n` +
-            `Sistem broadcast otomatis ke seluruh grup yang terdaftar dengan tag semua member (hidetag).\n\n` +
-            `*PENGGUNAAN:*\n` +
-            `• *${m.prefix}jpmht <pesan>* — Mengirim JPM hidetag teks biasa\n` +
-            `• *${m.prefix}jpmht (reply foto/video)* — Mengirim JPM hidetag dengan media\n\n` +
-            `*CONTOH:*\n` +
-            `> \`${m.prefix}jpmht Halo semuanya! Jangan lupa cek channel kita ya.\``
+            `📢 *JPM HIDETAG (DIFUSIÓN MASIVA)*\n\n` +
+            `Envía un mensaje a todos los grupos registrados mencionando a todos los miembros.\n\n` +
+            `*MODO DE USO:*\n` +
+            `• *${m.prefix}jpmht <mensaje>* — Envía texto masivo con hidetag.\n` +
+            `• *${m.prefix}jpmht (responder a foto/video)* — Envía multimedia con hidetag.\n\n` +
+            `*EJEMPLO:*\n` +
+            `> \`${m.prefix}jpmht ¡Hola a todos! No olviden revisar nuestro canal.\``
         )
     }
     
     if (global.statusjpm) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> JPM sedang berjalan. Ketik \`${m.prefix}stopjpm\` untuk menghentikan.`)
+        return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> Ya hay un proceso de JPM en curso. Escribe \`${m.prefix}stopjpm\` para detenerlo.`)
     }
     
     m.react('📢')
@@ -82,20 +83,20 @@ async function handler(m, { sock }) {
         
         if (groupIds.length === 0) {
             m.react('❌')
-            return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak ada grup yang ditemukan${blacklistedCount > 0 ? ` (${blacklistedCount} grup di-blacklist)` : ''}`)
+            return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> No se encontraron grupos disponibles${blacklistedCount > 0 ? ` (${blacklistedCount} en lista negra)` : ''}`)
         }
         
         const jedaJpm = db.setting('jedaJpm') || 5000
         
         await m.reply(
             `📢 *ᴊᴘᴍ ʜɪᴅᴇᴛᴀɢ*\n\n` +
-            `╭┈┈⬡「 📋 *ᴅᴇᴛᴀɪʟ* 」\n` +
-            `┃ 📝 ᴘᴇsᴀɴ: \`${text.substring(0, 50)}${text.length > 50 ? '...' : ''}\`\n` +
-            `┃ 📷 ᴍᴇᴅɪᴀ: \`${mediaBuffer ? mediaType : 'Tidak'}\`\n` +
-            `┃ 👥 ᴛᴀʀɢᴇᴛ: \`${groupIds.length}\` grup\n` +
-            `┃ ⏱️ ᴊᴇᴅᴀ: \`${jedaJpm}ms\`\n` +
+            `╭┈┈⬡「 📋 *ᴅᴇᴛᴀʟʟᴇs* 」\n` +
+            `┃ 📝 ᴍᴇɴsᴀᴊᴇ: \`${text.substring(0, 50)}${text.length > 50 ? '...' : ''}\`\n` +
+            `┃ 📷 ᴍᴜʟᴛɪᴍᴇᴅɪᴀ: \`${mediaBuffer ? mediaType : 'No'}\`\n` +
+            `┃ 👥 ᴅᴇsᴛɪɴᴏs: \`${groupIds.length}\` grupos\n` +
+            `┃ ⏱️ ᴘᴀᴜsᴀ: \`${jedaJpm}ms\`\n` +
             `╰┈┈⬡\n\n` +
-            `> Memulai JPM hidetag...`
+            `> Iniciando difusión masiva con menciones...`
         )
         
         global.statusjpm = true
@@ -108,9 +109,9 @@ async function handler(m, { sock }) {
                 delete global.statusjpm
                 
                 await m.reply(
-                    `⏹️ *ᴊᴘᴍ ᴅɪʜᴇɴᴛɪᴋᴀɴ*\n\n` +
-                    `> ✅ Berhasil: \`${successCount}\`\n` +
-                    `> ❌ Gagal: \`${failedCount}\``
+                    `⏹️ *ᴊᴘᴍ ᴅᴇᴛᴇɴɪᴅᴏ*\n\n` +
+                    `> ✅ Exitosos: \`${successCount}\`\n` +
+                    `> ❌ Fallidos: \`${failedCount}\``
                 )
                 return
             }
@@ -124,18 +125,19 @@ async function handler(m, { sock }) {
                     isForwarded: true,
                     forwardedNewsletterMessageInfo: {
                         newsletterJid: config.saluran?.id,
-                        newsletterName: config.saluran?.name,
+                        newsletterName: config.saluran?.name || 'KAORI MD',
                         serverMessageId: 127
                     },
                     externalAdReply: cachedThumb ? {
                                 title: '📢 JPM HIDETAG',
-                                body: 'Pesan Massal dengan Hidetag',
+                                body: 'Difusión Masiva Activa',
                                 thumbnail: cachedThumb,
                                 sourceUrl: config.saluran?.link || '',
                                 mediaType: 1,
                                 renderLargerThumbnail: true
                             } : undefined
                 }
+
                 if (mediaBuffer) {
                     await sock.sendMessage(groupId, {
                         [mediaType]: mediaBuffer,
@@ -162,10 +164,10 @@ async function handler(m, { sock }) {
         
         m.react('✅')
         await m.reply(
-            `✅ *ᴊᴘᴍ ʜɪᴅᴇᴛᴀɢ sᴇʟᴇsᴀɪ*\n\n` +
-            `╭┈┈⬡「 📊 *ʜᴀsɪʟ* 」\n` +
-            `┃ ✅ ʙᴇʀʜᴀsɪʟ: \`${successCount}\`\n` +
-            `┃ ❌ ɢᴀɢᴀʟ: \`${failedCount}\`\n` +
+            `✅ *ᴊᴘᴍ ʜɪᴅᴇᴛᴀɢ ꜰɪɴᴀʟɪᴢᴀᴅᴏ*\n\n` +
+            `╭┈┈⬡「 📊 *ʀᴇsᴜʟᴛᴀᴅᴏs* 」\n` +
+            `┃ ✅ ᴇxɪᴛᴏsᴏs: \`${successCount}\`\n` +
+            `┃ ❌ ꜰᴀʟʟɪᴅᴏs: \`${failedCount}\`\n` +
             `┃ 📊 ᴛᴏᴛᴀʟ: \`${groupIds.length}\`\n` +
             `╰┈┈⬡`
         )
