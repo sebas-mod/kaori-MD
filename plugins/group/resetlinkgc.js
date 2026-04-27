@@ -30,7 +30,7 @@ async function handler(m, { sock }) {
             `✅ *ᴇɴʟᴀᴄᴇ ʀᴇsᴛᴀʙʟᴇᴄɪᴅᴏ*\n\n` +
             `> El enlace anterior ha sido invalidado con éxito.\n` +
             `> Usa \`${m.prefix}linkgc\` para generar y obtener el nuevo enlace.\n\n` +
-            `*KAORI MD — Seguridad*`
+            `*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Seguridad*`
         )
         
     } catch (err) {
