@@ -1,9 +1,10 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
     name: 'autoforward',
-    alias: ['autofw', 'autofwd'],
+    alias: ['autofw', 'autofwd', 'autoreenvio'],
     category: 'group',
-    description: 'Auto forward pesan yang masuk ke grup ke grup ini',
+    description: 'Reenvía automáticamente los mensajes recibidos a este grupo',
     usage: '.autoforward <on/off>',
     example: '.autoforward on',
     isOwner: false,
@@ -23,14 +24,14 @@ function handler(m, { sock }) {
     const group = db.getGroup(groupId) || {}
     
     if (!option) {
-        const status = group.autoforward ? '✅ ON' : '❌ OFF'
+        const status = group.autoforward ? '✅ ACTIVADO' : '❌ DESACTIVADO'
         return m.reply(
-            `🔄 *ᴀᴜᴛᴏ ꜰᴏʀᴡᴀʀᴅ*\n\n` +
+            `🔄 *ᴀᴜᴛᴏ ꜰᴏʀᴡᴀʀᴅ | ᴋᴀᴏʀɪ ᴍᴅ*\n\n` +
             `╭┈┈⬡「 📋 *ɪɴꜰᴏ* 」\n` +
-            `┃ ◦ Status: *${status}*\n` +
+            `┃ ◦ Estado: *${status}*\n` +
             `╰┈┈⬡\n\n` +
-            `> Gunakan: \`${m.prefix}autoforward on/off\`\n\n` +
-            `_Fitur ini akan meneruskan semua pesan ke grup ini_`
+            `> Usa: \`${m.prefix}autoforward on/off\`\n\n` +
+            `_Esta función reenviará los mensajes entrantes a este grupo._`
         )
     }
     
@@ -39,10 +40,10 @@ function handler(m, { sock }) {
         m.react('✅')
         return m.reply(
             `🔄 *ᴀᴜᴛᴏ ꜰᴏʀᴡᴀʀᴅ*\n\n` +
-            `╭┈┈⬡「 ✅ *ᴀᴋᴛɪꜰ* 」\n` +
-            `┃ ◦ Status: *ON*\n` +
+            `╭┈┈⬡「 ✅ *ᴀᴄᴛɪᴠᴀᴅᴏ* 」\n` +
+            `┃ ◦ Estado: *ON*\n` +
             `╰┈┈⬡\n\n` +
-            `> _Semua pesan akan di-forward_`
+            `> _Todos los mensajes serán reenviados automáticamente._`
         )
     }
     
@@ -51,13 +52,13 @@ function handler(m, { sock }) {
         m.react('❌')
         return m.reply(
             `🔄 *ᴀᴜᴛᴏ ꜰᴏʀᴡᴀʀᴅ*\n\n` +
-            `╭┈┈⬡「 ❌ *ɴᴏɴᴀᴋᴛɪꜰ* 」\n` +
-            `┃ ◦ Status: *OFF*\n` +
+            `╭┈┈⬡「 ❌ *ᴅᴇsᴀᴄᴛɪᴠᴀᴅᴏ* 」\n` +
+            `┃ ◦ Estado: *OFF*\n` +
             `╰┈┈⬡`
         )
     }
     
-    return m.reply(`❌ Gunakan: on atau off`)
+    return m.reply(`❌ Opción no válida. Usa: on o off`)
 }
 
 export { pluginConfig as config, handler }
