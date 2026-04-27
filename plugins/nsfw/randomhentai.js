@@ -5,7 +5,7 @@ const pluginConfig = {
     name: 'randomhentai',
     alias: ['rhentai', 'hentairandom'],
     category: 'nsfw',
-    description: 'Random Hentai Video/Image from Vreden API',
+    description: 'Video/Imagen Hentai aleatorio desde Vreden API',
     usage: '.randomhentai',
     example: '.randomhentai',
     isOwner: false,
@@ -23,14 +23,15 @@ async function handler(m, { sock }) {
         const { data } = await axios.get('https://api.vreden.my.id/api/v1/random/hentai')
         if (!data.status || !data.result || data.result.length === 0) {
             m.react('❌')
-            return m.reply('❌ Konten tidak ditemukan atau API sedang down.')
+            return m.reply('❌ Contenido no encontrado o la API está caída.')
         }
         const randomContent = data.result[Math.floor(Math.random() * data.result.length)]
-        const caption = `🔞 *RANDOM HENTAI*\n\n` +
-            `🏷️ *Title:* ${randomContent.title}\n` +
-            `📂 *Category:* ${randomContent.category}\n` +
-            `👁️ *Views:* ${randomContent.views_count}\n` +
-            `🔗 *Source:* ${randomContent.link}`
+        const caption = `🔞 *HENTAI ALEATORIO*\n\n` +
+            `🏷️ *Título:* ${randomContent.title}\n` +
+            `📂 *Categoría:* ${randomContent.category}\n` +
+            `👁️ *Vistas:* ${randomContent.views_count}\n` +
+            `🔗 *Enlace:* ${randomContent.link}`
+        
         if (randomContent.type === 'video/mp4' || randomContent.video_1.endsWith('.mp4')) {
             await sock.sendMessage(m.chat, {
                 video: { url: randomContent.video_1 },
