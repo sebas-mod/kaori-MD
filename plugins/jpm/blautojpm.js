@@ -3,10 +3,10 @@ import config from '../../config.js'
 
 const pluginConfig = {
     name: 'blautojpm',
-    alias: ['blacklistautojpm', 'autojpmbl', 'listblautojpm'],
-    category: 'jpm',
-    description: 'Blacklist grup khusus Auto JPM menggunakan nomor urut',
-    usage: '.blautojpm [nomor]',
+    alias: ['blacklistautojpm', 'autojpmbl', 'listablautojpm'],
+    category: 'admin',
+    description: 'Gestiona la lista negra de grupos para Auto JPM usando números de índice',
+    usage: '.blautojpm [número]',
     example: '.blautojpm 2 3 7',
     isOwner: true,
     isPremium: false,
@@ -22,14 +22,15 @@ async function handler(m, { sock }) {
     let blacklist = db.setting('autoJpmBlacklist') || []
     const allGroups = await sock.groupFetchAllParticipating()
     const groups = Object.values(allGroups).sort((a, b) => a.subject.localeCompare(b.subject))
+
     if (!m.text) {
         if (groups.length === 0) {
-            return m.reply(`❌ Bot belum tergabung di grup mana pun.`)
+            return m.reply(`❌ El bot aún no se ha unido a ningún grupo.`)
         }
 
-        let listText = `📋 *DAFTAR GRUP & AUTO-JPM BLACKLIST*\n\n`
-        listText += `Di bawah ini adalah *${groups.length} grup* yang diikuti bot ${config.bot?.name}\n`
-        listText += `Tanda *(🚫)* berarti grup sedang di-blacklist khusus untuk fitur Auto-JPM.\n\n`
+        let listText = `📋 *LISTA DE GRUPOS Y BLACKLIST DE AUTO-JPM*\n\n`
+        listText += `A continuación se muestran los *${groups.length} grupos* donde se encuentra ${config.bot?.name || 'KAORI MD'}.\n`
+        listText += `La marca *(🚫)* indica que el grupo está excluido de los envíos de Auto-JPM.\n\n`
 
         for (let i = 0; i < groups.length; i++) {
             const isBlacklisted = blacklist.includes(groups[i].id)
@@ -37,15 +38,17 @@ async function handler(m, { sock }) {
             listText += `*${i + 1}.* ${groups[i].subject}${icon}\n`
         }
 
-        listText += `\n*CARA BLACKLIST / UN-BLACKLIST :*\n`
-        listText += `Ketik command diikuti dengan nomor grup yang ingin diubah (bisa lebih dari satu, pisahkan dengan spasi).\n\n`
-        listText += `*Contoh:*\n`
+        listText += `\n*CÓMO AGREGAR / QUITAR DE LA LISTA:* \n`
+        listText += `Escribe el comando seguido de los números de los grupos (puedes poner varios separados por espacios).\n\n`
+        listText += `*Ejemplo:*\n`
         listText += `> \`${m.prefix}blautojpm 2 3 7\``
 
         return m.reply(listText)
     }
+
     const args = m.text.trim().split(/\s+/)
     const toggled = []
+
     for (const numStr of args) {
         const num = parseInt(numStr)
         if (!isNaN(num) && num > 0 && num <= groups.length) {
@@ -53,22 +56,22 @@ async function handler(m, { sock }) {
             const targetGroup = groups[index] 
             if (blacklist.includes(targetGroup.id)) {
                 blacklist = blacklist.filter(jid => jid !== targetGroup.id)
-                toggled.push(`*${num}.* ${targetGroup.subject} ✅ *(Di-Unblacklist)*`)
+                toggled.push(`*${num}.* ${targetGroup.subject} ✅ *(Removido de Blacklist)*`)
             } else {
                 blacklist.push(targetGroup.id)
-                toggled.push(`*${num}.* ${targetGroup.subject} 🚫 ~(Di-Blacklist)~`)
+                toggled.push(`*${num}.* ${targetGroup.subject} 🚫 ~(Agregado a Blacklist)~`)
             }
         }
     }
 
     if (toggled.length === 0) {
-        return m.reply(`❌ Tidak ada nomor grup yang valid.\n\nKetik *${m.prefix}blautojpm* untuk melihat daftar nomor.`)
+        return m.reply(`❌ No ingresaste números de grupo válidos.\n\nEscribe *${m.prefix}blautojpm* para ver la lista numerada.`)
     }
 
     db.setting('autoJpmBlacklist', blacklist)
     m.react('✅')
 
-    return m.reply(`📢 *STATUS AUTO-JPM BLACKLIST DIPERBARUI:*\n\n${toggled.join('\n')}`)
+    return m.reply(`📢 *ESTADO DE BLACKLIST ACTUALIZADO:*\n\n${toggled.join('\n')}`)
 }
 
 export { pluginConfig as config, handler }
