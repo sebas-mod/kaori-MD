@@ -1,10 +1,11 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
     name: 'delenergi',
-    alias: ['kurangenergi', 'removeenergi', 'hapusenergi', 'delenergy'],
+    alias: ['quitarenergia', 'removeenergi', 'quitarenergia', 'delenergy', 'restarenergia'],
     category: 'owner',
-    description: 'Kurangi energi user',
-    usage: '.delenergi <jumlah> @user',
+    description: 'Resta energía a un usuario específico',
+    usage: '.delenergi <cantidad> @user',
     example: '.delenergi 50 @user',
     isOwner: true,
     isPremium: false,
@@ -16,7 +17,7 @@ const pluginConfig = {
 }
 
 function formatNumber(num) {
-    if (num === -1) return '∞ Unlimited'
+    if (num === -1) return '∞ Ilimitado'
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
 }
 
@@ -30,34 +31,33 @@ async function handler(m, { sock }) {
     const db = getDatabase()
     const args = m.args
     
+    // Buscar el argumento numérico que no sea una mención
     const numArg = args.find(a => !isNaN(a) && !a.startsWith('@'))
     const amount = parseInt(numArg) || 0
     
     let targetJid = await extractTarget(m)
     
+    // Si no hay mención pero hay cantidad, se aplica al que envía el mensaje
     if (!targetJid && amount > 0) {
         targetJid = m.sender
     }
     
     if (!targetJid || amount <= 0) {
         return m.reply(
-            `⚡ *ᴅᴇʟ ᴇɴᴇʀɢɪ*\n\n` +
-            `> \`.delenergi <jumlah>\` - dari diri sendiri\n` +
-            `> \`.delenergi <jumlah> @user\` - dari user\n\n` +
-            `\`Contoh: ${m.prefix}delenergi 50\``
+            `⚡ *QUITAR ENERGÍA*\n\n` +
+            `> \`${m.prefix}delenergi <cantidad>\` - de ti mismo\n` +
+            `> \`${m.prefix}delenergi <cantidad> @user\` - de un usuario\n\n` +
+            `\`Ejemplo: ${m.prefix}delenergi 50\``
         )
-    }
-    
-    if (amount <= 0) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Jumlah harus lebih dari 0`)
     }
     
     const user = db.getUser(targetJid)
     
     if (!user) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> User tidak ditemukan di database`)
+        return m.reply(`❌ *ERROR*\n\n> El usuario no existe en la base de datos`)
     }
     
+    // Si el usuario tenía energía ilimitada (-1), le ponemos una base antes de restar
     if (user.energi === -1) {
         db.setUser(targetJid, { energi: 25 })
     }
@@ -67,11 +67,11 @@ async function handler(m, { sock }) {
     await m.react('✅')
     
     await m.reply(
-        `✅ *ᴇɴᴇʀɢɪ ᴅɪᴋᴜʀᴀɴɢɪ*\n\n` +
-        `╭┈┈⬡「 📋 *ᴅᴇᴛᴀɪʟ* 」\n` +
-        `┃ 👤 ᴜsᴇʀ: @${targetJid.split('@')[0]}\n` +
-        `┃ ➖ ᴋᴜʀᴀɴɢ: *-${formatNumber(amount)}*\n` +
-        `┃ ⚡ sɪsᴀ: *${formatNumber(newEnergi)}*\n` +
+        `✅ *ENERGÍA RESTADA*\n\n` +
+        `╭┈┈⬡「 📋 *DETALLES* 」\n` +
+        `┃ 👤 Usuario: @${targetJid.split('@')[0]}\n` +
+        `┃ ➖ Restado: *-${formatNumber(amount)}*\n` +
+        `┃ ⚡ Restante: *${formatNumber(newEnergi)}*\n` +
         `╰┈┈⬡`,
         { mentions: [targetJid] }
     )
