@@ -23,7 +23,7 @@ const pluginConfig = {
   name: "menu",
   alias: ["help", "bantuan", "commands", "m"],
   category: "main",
-  description: "Muestra el menu principal del bot",
+  description: "Muestra el menú principal del bot",
   usage: ".menu",
   example: ".menu",
   isOwner: false,
@@ -214,10 +214,10 @@ async function buildMenuText(m, botConfig, db, uptime, botMode = "md") {
   const totalCases = getCaseCount();
   const casesByCategory = getCasesByCategory();
   const totalFeatures = totalCommands + totalCases;
-  let userRole = "User",
+  let userRole = "Usuario",
     roleEmoji = "👤";
   if (m.isOwner) {
-    userRole = "Owner";
+    userRole = "Dueño";
     roleEmoji = "👑";
   } else if (m.isPremium) {
     userRole = "Premium";
@@ -242,7 +242,7 @@ Puedes usarme para buscar información, obtener datos o realizar tareas sencilla
   txt += `*│* ⚙️ ᴍᴏᴅᴏ      : *${(botConfig.mode || "público").toUpperCase()}*\n`;
   txt += `*│* 🧶 ᴘʀᴇꜰɪᴊᴏ   : *[ ${prefix} ]*\n`;
   txt += `*│* ⏱ ᴀᴄᴛɪᴠᴏ     : *${uptimeFormatted}*\n`;
-  txt += `*│* 👥 ᴛᴏᴛᴀʟ     : *${totalUsers} Usuarios*\n`;
+  txt += `*│* 👥 ᴛᴏᴛᴀʟ     : *${totalUsers} usuarios*\n`;
   txt += `*│* 🏷 ɢʀᴜᴘᴏ     : *${botMode.toUpperCase()}*\n`;
   txt += `*│* 👑 ᴅᴜᴇñᴏ     : *${botConfig.owner?.name || "KAORI MD"}*\n`;
   txt += `╰────────────────⬣\n\n`;
@@ -354,15 +354,15 @@ function getContextInfo(
 ) {
   const saluranId = botConfig.saluran?.id || "120363208449943317@newsletter";
   const saluranName =
-    botConfig.saluran?.name || botConfig.bot?.name || "Ourin-AI";
+    botConfig.saluran?.name || botConfig.bot?.name || "KAORI MD";
   const saluranLink = botConfig.saluran?.link || "";
   const ctx = {
     mentionedJid: [m.sender],
     forwardingScore: 9,
     isForwarded: true,
     externalAdReply: {
-      title: botConfig.bot?.name || "Ourin-AI",
-      body: `BOT WHATSAPP MULTI DEVICE`,
+      title: botConfig.bot?.name || "KAORI MD",
+      body: `BOT DE WHATSAPP MULTIDISPOSITIVO`,
       sourceUrl: saluranLink,
       previewType: "VIDEO",
       showAdAttribution: false,
@@ -403,10 +403,10 @@ async function sendFallback(
   let fallbackText = text;
   if (errorName === "V5") {
     const { sorted } = getSortedCategories(m, "md");
-    let catText = `📋 *ᴋᴀᴛᴇɢᴏʀɪ ᴍᴇɴᴜ*\n\n`;
+    let catText = `📋 *ᴄᴀᴛᴇɢᴏʀíᴀs ᴅᴇʟ ᴍᴇɴú*\n\n`;
     for (const { cat, cmds, emoji } of sorted)
       catText += `> ${emoji} \`${botConfig.command?.prefix || "."}menucat ${cat}\` - ${toMonoUpperBold(cat)} (${cmds.length})\n`;
-    catText += `\n_Ketik perintah kategori untuk melihat command_`;
+    catText += `\n_Escribe el comando de la categoría para ver sus comandos_`;
     fallbackText = text + "\n\n" + catText;
   }
   if (imageBuffer) {
@@ -544,7 +544,7 @@ async function handler(m, { sock, config: botConfig, db, uptime }) {
         const categoryRows = menuSorted.map(({ cat, cmds, emoji }) => ({
           title: `${emoji} ${toMonoUpperBold(cat)}`,
           id: `${prefix}menucat ${cat}`,
-          description: `${cmds.length} commands`,
+          description: `${cmds.length} comandos`,
         }));
         let headerText = `*@${m.pushName || "Usuario"}* 🪸
 Soy *KAORI MD*, un bot de WhatsApp listo para ayudarte.  
@@ -616,7 +616,7 @@ Puedes usarme para buscar información, obtener datos o realizar tareas sencilla
                       }),
                       footer:
                         proto.Message.InteractiveMessage.Footer.fromObject({
-                          text: `© ${botConfig.bot?.name || "Ourin-AI"} | ${menuSorted.length} Categories`,
+                          text: `© ${botConfig.bot?.name || "Ourin-AI"} | ${menuSorted.length} categorías`,
                         }),
                       header:
                         proto.Message.InteractiveMessage.Header.fromObject({
@@ -702,7 +702,7 @@ Puedes usarme para buscar información, obtener datos o realizar tareas sencilla
           },
           externalAdReply: {
             title: botConfig.bot?.name || "KAORI-MD",
-            body: `v${botConfig.bot?.version || "1.0.1"} • Fast Response Bot`,
+            body: `v${botConfig.bot?.version || "1.0.1"} • Bot de respuesta rápida`,
             sourceUrl: saluranLinkV6,
             mediaType: 1,
             showAdAttribution: false,
@@ -750,9 +750,9 @@ Puedes usarme para buscar información, obtener datos o realizar tareas sencilla
               cardBody += `◦ \`${prefix}${toSmallCaps(cmd)}\`\n`;
             }
             if (cmds.length > 15) {
-              cardBody += `\n_...dan ${cmds.length - 15} command lainnya_`;
+              cardBody += `\n_...y ${cmds.length - 15} comandos más_`;
             }
-            cardBody += `\n\n> Total: ${cmds.length} commands`;
+            cardBody += `\n\n> Total: ${cmds.length} comandos`;
             let cardMedia = null;
             try {
               const catThumbPath = path.join(
@@ -806,7 +806,7 @@ Puedes usarme para buscar información, obtener datos o realizar tareas sencilla
                     {
                       name: "quick_reply",
                       buttonParamsJson: JSON.stringify({
-                        display_text: `📋 Lihat ${categoryName}`,
+                        display_text: `📋 Ver ${categoryName}`,
                         id: `${prefix}menucat ${cat}`,
                       }),
                     },
@@ -831,7 +831,7 @@ Puedes usarme para buscar información, obtener datos o realizar tareas sencilla
                   interactiveMessage:
                     proto.Message.InteractiveMessage.fromObject({
                       body: proto.Message.InteractiveMessage.Body.fromObject({
-                        text: `${greeting} *${m.pushName}!*\n\n> Geser untuk melihat kategori menu\n> Ketuk tombol untuk melihat detail`,
+                        text: `${greeting} *${m.pushName}!*\n\n> Desliza para ver las categorías del menú\n> Toca el botón para ver los detalles`,
                       }),
                       footer:
                         proto.Message.InteractiveMessage.Footer.fromObject({
@@ -870,10 +870,10 @@ Puedes usarme para buscar información, obtener datos o realizar tareas sencilla
         const time = timeHelper.formatTime("HH:mm");
         const date = timeHelper.formatFull("DD/MM/YYYY");
         const user = db.getUser(m.sender);
-        let role = "𝙐𝙨𝙚𝙧",
+        let role = "𝙐𝙨𝙪𝙖𝙧𝙞𝙤",
           emojiRole = "◈";
         if (m.isOwner) {
-          role = "𝙊𝙬𝙣𝙚𝙧";
+          role = "𝘿𝙪𝙚ñ𝙤";
           emojiRole = "♚";
         } else if (m.isPremium) {
           role = "𝙋𝙧𝙚𝙢𝙞𝙪𝙢";
@@ -902,14 +902,14 @@ Puedes usarme para buscar información, obtener datos o realizar tareas sencilla
         menuText += `┃ ⏰ ${time}\n`;
         menuText += `┃ 📅 ${date}\n`;
         menuText += `┗━━━━━━━━━━━━━━━┛\n\n`;
-        menuText += `┏━━〔 ⚡ *𝗘𝗦𝗧𝗔𝗗𝗜𝗦𝗧𝗜𝗖𝗔𝗦* 〕━━┓\n`;
+        menuText += `┏━━〔 ⚡ *𝗘𝗦𝗧𝗔𝗗Í𝗦𝗧𝗜𝗖𝗔𝗦* 〕━━┓\n`;
         menuText += `┃ ⏱️ Activo   ➤ ${uptimeFormatted}\n`;
         menuText += `┃ 🔧 Modo     ➤ ${botMode.toUpperCase()}\n`;
         menuText += `┃ 📊 Total    ➤ ${totalCmds} Comandos\n`;
-        menuText += `┃ 👥 Usuarios ➤ ${db.getUserCount()} Activos\n`;
+        menuText += `┃ 👥 Usuarios ➤ ${db.getUserCount()} activos\n`;
         menuText += `┗━━━━━━━━━━━━━━━━━━━━━━┛\n\n`;
         menuText += `╭══════════════════════╮\n`;
-        menuText += `║  📋 *𝗟𝗜𝗦𝗧𝗔 𝗗𝗘 𝗠𝗘𝗡𝗨𝗦* ║\n`;
+        menuText += `║  📋 *𝗟𝗜𝗦𝗧𝗔 𝗗𝗘 𝗠𝗘𝗡Ú𝗦* ║\n`;
         menuText += `╰══════════════════════╯\n\n`;
         for (const { cat, cmds, emoji } of menuSorted) {
           menuText += `┌─────「 ${emoji} *${cat.toUpperCase()}* 」\n`;
@@ -950,8 +950,8 @@ Puedes usarme para buscar información, obtener datos o realizar tareas sencilla
               itemCount: totalCmds,
               status: "INQUIRY",
               surface: "CATALOG",
-              message: `${botConfig.bot?.name || "kaori-Md"} Menu`,
-              orderTitle: `📋 ${totalCmds} Commands`,
+              message: `${botConfig.bot?.name || "kaori-Md"} Menú`,
+              orderTitle: `📋 ${totalCmds} comandos`,
               sellerJid: botConfig.botNumber
                 ? `${botConfig.botNumber}@s.whatsapp.net`
                 : m.sender,
@@ -1012,7 +1012,7 @@ Puedes usarme para buscar información, obtener datos o realizar tareas sencilla
             {
               name: "cta_url",
               buttonParamsJson: JSON.stringify({
-                display_text: "Nomor Owner ku",
+                display_text: "Mi número de owner",
                 url: zannerz,
                 merchant_url: zannerz,
               }),
@@ -1020,7 +1020,7 @@ Puedes usarme para buscar información, obtener datos o realizar tareas sencilla
             {
               name: "quick_reply",
               buttonParamsJson: JSON.stringify({
-                display_text: "🧾 Tampilkan Semua Menu",
+                display_text: "🧾 Mostrar todo el menú",
                 id: `${prefix}allmenu`,
               }),
             },
@@ -1062,7 +1062,7 @@ Puedes usarme para buscar información, obtener datos o realizar tareas sencilla
                                 in_thread_buttons_energi: 2,
                                 divider_indices: [1, 2, 3, 4, 5, 999],
                                 list_title: botConfig.bot?.name || "kaori-md",
-                                button_title: "🍀 ριℓιн кαтєgσяι",
+                                button_title: "🍀 ᴇʟᴇɢɪʀ ᴄᴀᴛᴇɢᴏʀíᴀ",
                               },
                             }),
                             buttons: buttons,
@@ -1127,17 +1127,17 @@ Puedes usarme para buscar información, obtener datos o realizar tareas sencilla
             console.error("[Menu V10] Media prep error:", e.message);
           }
           const footerText = `
-Hai *@${m.pushName || "User"}* 🪸
-Aku ${botConfig.bot?.name || "Ourin-AI"}, bot WhatsApp yang siap bantu kamu.  
-Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana langsung lewat WhatsApp — praktis tanpa ribet.
+Hola *@${m.pushName || "Usuario"}* 🪸
+Soy ${botConfig.bot?.name || "Ourin-AI"}, un bot de WhatsApp listo para ayudarte.  
+Puedes usarme para buscar información, obtener datos o ayudarte con tareas simples directamente desde WhatsApp — práctico y sin complicaciones.
 ─────────────────────────
-Nama    : ${botConfig.bot?.name || "Ourin-AI"}
-Versi : v${botConfig.bot?.version || "1.9.0"}
-Runtime : Node.js ${process.version}
-Bot Up  : ${uptimeFormatted}
-Owner ku kak   : ${botConfig.owner?.name || "Lucky Archz"}
+Nombre    : ${botConfig.bot?.name || "Ourin-AI"}
+Versión   : v${botConfig.bot?.version || "1.9.0"}
+Entorno   : Node.js ${process.version}
+Activo    : ${uptimeFormatted}
+Mi owner  : ${botConfig.owner?.name || "Lucky Archz"}
 ─────────────────────────
-Klik tombol di bawah untuk menampilkan menu`;
+Haz clic en el botón de abajo para mostrar el menú`;
           const buttons = [
             {
               name: "quick_reply",
@@ -1164,14 +1164,14 @@ Klik tombol di bawah untuk menampilkan menu`;
                     proto.Message.InteractiveMessage.fromObject({
                       header:
                         proto.Message.InteractiveMessage.Header.fromObject({
-                          title: `${botConfig.bot?.name || "Ourin-AI"} Menu`,
+                          title: `${botConfig.bot?.name || "Ourin-AI"} Menú`,
                           hasMediaAttachment: !!productImage,
                           productMessage: {
                             product: {
                               productImage: productImage?.imageMessage || null,
                               productId: productId,
-                              title: `${botConfig.bot?.name || "Ourin-AI"} Menu`,
-                              description: "Menu",
+                              title: `${botConfig.bot?.name || "Ourin-AI"} Menú`,
+                              description: "Menú",
                               currencyCode: "USD",
                               priceAmount1000: "1000000000000000",
                               retailerId: botConfig.bot?.name || "Ourin",
@@ -1235,9 +1235,9 @@ Klik tombol di bawah untuk menampilkan menu`;
             header: "",
             title: `🍀 ${toMonoUpperBold(cat)}`,
             id: `${prefix}menucat ${cat}`,
-            description: `Berisi ${cmds.length} Perintah`,
+            description: `Contiene ${cmds.length} comandos`,
           }));
-          const titleText = `Hallo Kak *@${m.pushName}*\n\nSebelumnya, terima kasih yak sudah menggunakan bot kami\n\n╭─ \`INFORMASI BOT\` 𝜗ৎ\n┆ ᵎᵎ Nama Bot : *${botConfig.bot?.name || "Ourin-AI"}*\n┆ ᵎᵎ Owner Bot : *${botConfig.owner?.name || "Ourin-AI"}*\n┆ ᵎᵎ Prefix : *${prefix}*\n┆ ᵎᵎ Total Perintah : *${totalCmds}*\n┆ ᵎᵎ Role Kamu : ${m.isOwner ? "Owner" : m.isPremium ? "Premium" : "User Biasa"}\n╰─────\n\nsilahkan tekan tombol dibawah untuk memilih menu`;
+          const titleText = `Hola *@${m.pushName}*\n\nAntes que nada, gracias por usar nuestro bot\n\n╭─ \`INFORMACIÓN DEL BOT\` 𝜗ৎ\n┆ ᵎᵎ Nombre del bot : *${botConfig.bot?.name || "Ourin-AI"}*\n┆ ᵎᵎ Owner del bot : *${botConfig.owner?.name || "Ourin-AI"}*\n┆ ᵎᵎ Prefijo : *${prefix}*\n┆ ᵎᵎ Total de comandos : *${totalCmds}*\n┆ ᵎᵎ Tu rol : ${m.isOwner ? "Dueño" : m.isPremium ? "Premium" : "Usuario"}\n╰─────\n\npulsa el botón de abajo para elegir un menú`;
           await sock.sendMessage(
             m.chat,
             {
@@ -1276,7 +1276,7 @@ Klik tombol di bawah untuk menampilkan menu`;
                 nativeFlowMessage: {
                   messageParamsJson: JSON.stringify({
                     limited_time_offer: {
-                      text: `Gunakan bot ini dengan bijak yak`,
+                      text: `Usa este bot con responsabilidad`,
                       url: saluranLink,
                       copy_code: botConfig.bot?.name || "Ourin-AI",
                       expiration_time: Date.now() * 999,
@@ -1284,8 +1284,8 @@ Klik tombol di bawah untuk menampilkan menu`;
                     bottom_sheet: {
                       in_thread_buttons_limit: 2,
                       divider_indices: [1, 2, 3, 4, 5, 999],
-                      list_title: "Pilih Menu",
-                      button_title: "🍀 Pilih Menu Disini",
+                      list_title: "Elegir menú",
+                      button_title: "🍀 Elegir menú aquí",
                     },
                     tap_target_configuration: {
                       title: " X ",
@@ -1311,10 +1311,10 @@ Klik tombol di bawah untuk menampilkan menu`;
                     {
                       name: "single_select",
                       buttonParamsJson: JSON.stringify({
-                        title: "Pilihan Menu",
+                        title: "Opciones del menú",
                         sections: [
                           {
-                            title: "🍀 Silahkan pilih menu yang kamu inginkan",
+                            title: "🍀 Elige el menú que quieras",
                             highlight_label: botConfig.bot?.name || "Ourin-AI",
                             rows: catRows,
                           },
@@ -1325,7 +1325,7 @@ Klik tombol di bawah untuk menampilkan menu`;
                     {
                       name: "cta_url",
                       buttonParamsJson: JSON.stringify({
-                        display_text: "🌏 Kunjungi Saluran Kami",
+                        display_text: "🌏 Visita nuestro canal",
                         url: saluranLink,
                         merchant_url: saluranLink,
                       }),
@@ -1333,14 +1333,14 @@ Klik tombol di bawah untuk menampilkan menu`;
                     {
                       name: "quick_reply",
                       buttonParamsJson: JSON.stringify({
-                        display_text: "🖐 Owner Kami",
+                        display_text: "🖐 Nuestro owner",
                         id: `${prefix}owner`,
                       }),
                     },
                     {
                       name: "quick_reply",
                       buttonParamsJson: JSON.stringify({
-                        display_text: "🌺 Lihat Semua Menu",
+                        display_text: "🌺 Ver todo el menú",
                         id: `${prefix}allmenu`,
                       }),
                     },
@@ -1426,7 +1426,7 @@ Klik tombol di bawah untuk menampilkan menu`;
             {
               name: "quick_reply",
               buttonParamsJson: JSON.stringify({
-                display_text: "Lihat Semua Menu",
+                display_text: "Ver todo el menú",
                 id: `${m.prefix}allmenu`,
               }),
             },
@@ -1436,7 +1436,7 @@ Klik tombol di bawah untuk menampilkan menu`;
             m.chat,
             {
               interactiveMessage: {
-                title: `🌾 *𝘏𝘪! ${m.pushName}*\n\n𝘛𝘩𝘢𝘯𝘬𝘴 𝘧𝘰𝘳 𝘮𝘦𝘴𝘴𝘢𝘨𝘪𝘯𝘨 𝘶𝘴. 𝘠𝘰𝘶’𝘳𝘦 𝘯𝘰𝘸 𝘤𝘩𝘢𝘵𝘵𝘪𝘯𝘨 𝘸𝘪𝘵𝘩 𝘰𝘶𝘳 𝘈𝘶𝘵𝘰𝘮𝘢𝘵𝘪𝘤 𝘞𝘩𝘢𝘵𝘴𝘈𝘱𝘱 𝘉𝘰𝘵. \n\n╭─「 *${m.pushName}* 」\n│ • Bot Version     : *${botConfig.bot?.version || "2.1.0"}*\n│ • Database        : ${formatBytes(bytes)}\n╰──`,
+                title: `🌾 *𝘏𝘰𝘭𝘢! ${m.pushName}*\n\n𝘎𝘳𝘢𝘤𝘪𝘢𝘴 𝘱𝘰𝘳 𝘦𝘴𝘤𝘳𝘪𝘣𝘪𝘳𝘯𝘰𝘴. 𝘈𝘩𝘰𝘳𝘢 𝘦𝘴𝘵á𝘴 𝘩𝘢𝘣𝘭𝘢𝘯𝘥𝘰 𝘤𝘰𝘯 𝘯𝘶𝘦𝘴𝘵𝘳𝘰 𝘣𝘰𝘵 𝘢𝘶𝘵𝘰𝘮á𝘵𝘪𝘤𝘰 𝘥𝘦 𝘞𝘩𝘢𝘵𝘴𝘈𝘱𝘱. \n\n╭─「 *${m.pushName}* 」\n│ • Versión del bot : *${botConfig.bot?.version || "2.1.0"}*\n│ • Base de datos   : ${formatBytes(bytes)}\n╰──`,
                 footer:
                   botConfig.settings?.footer ||
                   `© ${botConfig.bot?.name || "Ourin-AI"} 2026`,
@@ -1458,7 +1458,7 @@ Klik tombol di bawah untuk menampilkan menu`;
                 },
                 externalAdReply: {
                   title: botConfig.bot?.name || "Ourin-AI",
-                  body: `🍃 OWNER BOT: ${botConfig.owner?.name || "Ourin-AI"}`,
+                  body: `🍃 OWNER DEL BOT: ${botConfig.owner?.name || "Ourin-AI"}`,
                   mediaType: 1,
                   thumbnail: fs.existsSync("./assets/images/ourin-v11.jpg")
                     ? fs.readFileSync("./assets/images/ourin-v11.jpg")
@@ -1472,8 +1472,8 @@ Klik tombol di bawah untuk menampilkan menu`;
                     bottom_sheet: {
                       in_thread_buttons_limit: 2,
                       divider_indices: [1, 2, 3, 4, 5, 999],
-                      list_title: "SIlahkan pilih category yang ingin dilihat",
-                      button_title: "🧾 Tap Here!",
+                      list_title: "Elige la categoría que quieres ver",
+                      button_title: "🧾 Toca aquí",
                     },
                     tap_target_configuration: {
                       title: " X ",
@@ -1788,7 +1788,7 @@ Klik tombol di bawah untuk menampilkan menu`;
           isForwarded: true,
           externalAdReply: {
             title: botConfig.bot?.name || "Ourin-AI",
-            body: `WhatsApp Bot Multi Device`,
+            body: `Bot de WhatsApp multidispositivo`,
             sourceUrl:
               botConfig.saluran?.link ||
               "https://whatsapp.com/channel/0029VbB37bgBfxoAmAlsgE0t",
@@ -1815,12 +1815,12 @@ Klik tombol di bawah untuk menampilkan menu`;
             m.chat,
             {
               image: bannerThumbV13,
-              caption: `🎄 ʜᴀʟʟᴏ *${m.pushName}*
-╭─ *✦* \`${toMonoUpperBold("biodata bot")}\` *✦*
+              caption: `🎄 ʜᴏʟᴀ *${m.pushName}*
+╭─ *✦* \`${toMonoUpperBold("datos del bot")}\` *✦*
 │ ʙᴏᴛ : *${botConfig.bot?.name || "Ourin-AI"}*
-│ ᴠᴇʀsɪᴏɴ : *${botConfig.bot?.version || "2.1.0"}*
+│ ᴠᴇʀsɪóɴ : *${botConfig.bot?.version || "2.1.0"}*
 ╰───
-╭─ *✦* \`${toMonoUpperBold(`list category`)}\` *✦*
+╭─ *✦* \`${toMonoUpperBold(`lista de categorías`)}\` *✦*
 ${menuSorted.map(({ cat }) => `│ *${prefix}menucat ${cat}*`).join("\n")}
 ╰─────────────`,
               contextInfo: contextInfoV13,
@@ -1893,7 +1893,7 @@ ${menuSorted.map(({ cat }) => `│ *${prefix}menucat ${cat}*`).join("\n")}
             {
               name: "quick_reply",
               buttonParamsJson: JSON.stringify({
-                display_text: "Lihat Semua Menu",
+                display_text: "Ver todo el menú",
                 id: `${m.prefix}allmenu`,
               }),
             },
@@ -1920,7 +1920,7 @@ ${menuSorted.map(({ cat }) => `│ *${prefix}menucat ${cat}*`).join("\n")}
                       },
                       externalAdReply: {
                         title: botConfig?.bot?.name,
-                        body: `🌾 Dikembangkan oleh ${botConfig?.bot?.developer}`,
+                        body: `🌾 Desarrollado por ${botConfig?.bot?.developer}`,
                         thumbnail: fs.readFileSync("./assets/images/ourin.jpg"),
                         sourceUrl: `https://instagram.com/ourin.md`,
                         mediaUrl: `https://instagram.com/ourin.md`,
@@ -1935,7 +1935,7 @@ ${menuSorted.map(({ cat }) => `│ *${prefix}menucat ${cat}*`).join("\n")}
                         degreesLongitude: 0,
                         name: `꫶ᥫ᭡꫶ ${m.pushName || "User"}`,
                         url: `https://ss.ss`,
-                        address: `Semoga harimu menyenangkan :3`,
+                        address: `Espero que tengas un bonito día :3`,
                         jpegThumbnail: await (await getSharp())(docuThumbV14)
                           .resize({ width: 300, height: 300 })
                           .toBuffer(),
@@ -1946,17 +1946,17 @@ ${menuSorted.map(({ cat }) => `│ *${prefix}menucat ${cat}*`).join("\n")}
                     body: { text: null },
                     footer: {
                       text:
-                        `Halo kak *${m.pushName}* ≽^• ˕ • ྀི≼\n` +
-                        `*⌞ INFO USER ⌝*\n` +
-                        `‧ Number    : +${m.sender.split("@")[0]}\n` +
-                        `‧ Name    : ${m.pushName}\n\n` +
-                        `*⌞ INFO BOT ⌝*\n` +
-                        `‧ Name    : ${botConfig.bot?.name || "Bot"}\n` +
-                        `‧ Version : ${botConfig.bot?.version || "v1.0.0"}\n` +
-                        `‧ Prefix  : ${m.prefix || "No Prefix"}\n\n` +
-                        `*⌞ CARA PAKAI ⌝*\n` +
-                        `‧ Klik tombol untuk melihat menu kategori\n` +
-                        `‧ Klik *LIHAT SEMUA MENU* untuk seluruh fitur`,
+                        `Hola *${m.pushName}* ≽^• ˕ • ྀི≼\n` +
+                        `*⌞ INFO DEL USUARIO ⌝*\n` +
+                        `‧ Número    : +${m.sender.split("@")[0]}\n` +
+                        `‧ Nombre    : ${m.pushName}\n\n` +
+                        `*⌞ INFO DEL BOT ⌝*\n` +
+                        `‧ Nombre    : ${botConfig.bot?.name || "Bot"}\n` +
+                        `‧ Versión   : ${botConfig.bot?.version || "v1.0.0"}\n` +
+                        `‧ Prefijo   : ${m.prefix || "Sin prefijo"}\n\n` +
+                        `*⌞ CÓMO USAR ⌝*\n` +
+                        `‧ Haz clic en el botón para ver el menú por categorías\n` +
+                        `‧ Haz clic en *VER TODO EL MENÚ* para ver todas las funciones`,
                     },
                     nativeFlowMessage:
                       proto.Message.InteractiveMessage.NativeFlowMessage.create(
@@ -2001,7 +2001,7 @@ ${menuSorted.map(({ cat }) => `│ *${prefix}menucat ${cat}*`).join("\n")}
         try {
           const catRows = menuSorted.map(({ cat, emoji }) => ({
             title: `[ ${emoji} ] - ${toMonoUpperBold(`${cat} MENU`)}`,
-            description: `Klik untuk membuka ${cat}`,
+            description: `Haz clic para abrir ${cat}`,
             id: `${prefix}menucat ${cat}`,
           }));
           const obj = JSON.parse(fs.readFileSync("./database/main/users.json"));
@@ -2035,17 +2035,17 @@ ${menuSorted.map(({ cat }) => `│ *${prefix}menucat ${cat}*`).join("\n")}
             {
               name: "quick_reply",
               buttonParamsJson: JSON.stringify({
-                display_text: "🎄 Lihat Semua Menu",
+                display_text: "🎄 Ver todo el menú",
                 id: `${m.prefix}allmenu`,
               }),
             },
             {
               name: "single_select",
               buttonParamsJson: JSON.stringify({
-                title: "📁 Lihat Kategori",
+                title: "📁 Ver categorías",
                 sections: [
                   {
-                    title: "📋 PILIH CATEGORY",
+                    title: "📋 ELIGE UNA CATEGORÍA",
                     rows: catRows,
                   },
                 ],
@@ -2055,7 +2055,7 @@ ${menuSorted.map(({ cat }) => `│ *${prefix}menucat ${cat}*`).join("\n")}
             {
               name: "quick_reply",
               buttonParamsJson: JSON.stringify({
-                display_text: "🌾 Owner Dari Bot ini",
+                display_text: "🌾 Owner de este bot",
                 id: `${m.prefix}owner`,
               }),
             },
@@ -2076,8 +2076,8 @@ ${menuSorted.map(({ cat }) => `│ *${prefix}menucat ${cat}*`).join("\n")}
                 itemCount: totalCmds,
                 status: "INQUIRY",
                 surface: "CATALOG",
-                message: `★ Terima kasih\n✦ Ada Error? Lapor owner`,
-                orderTitle: `📋 ${totalCmds} Commands`,
+                message: `★ Gracias\n✦ ¿Hay algún error? Repórtalo al owner`,
+                orderTitle: `📋 ${totalCmds} comandos`,
                 sellerJid: botConfig.botNumber
                   ? `${botConfig.botNumber}@s.whatsapp.net`
                   : m.sender,
@@ -2120,33 +2120,33 @@ ${menuSorted.map(({ cat }) => `│ *${prefix}menucat ${cat}*`).join("\n")}
             {
               interactiveMessage: {
                 title: ``,
-                footer: `🌿 Halo *${m.pushName}* 👋
-Selamat datang di *${botConfig.bot?.name}* ✨
-Bot ini siap bantu kamu dengan berbagai fitur menarik yang bisa kamu gunakan kapan saja 🚀
-Mulai dari hiburan, tools, hingga fitur keren lainnya sudah tersedia di sini 🎄
-Jangan ragu untuk eksplor semua menu yang ada ya!
-Gunakan bot dengan bijak dan tetap sopan saat berinteraksi 😊
-Semoga pengalaman kamu menyenangkan dan betah pakai bot ini 🌟
-☁︎ *STATISTIK BOT KAMI* ☁︎
-→ *Nama*: ${botConfig.bot?.name}
-→ *Versi*: ${botConfig.bot?.version}
-→ *Total Fitur*: ${totalCmds} Fitur
-→ *Pemilik*: ${botConfig?.owner?.name}
-→ *Prefix*: ${m?.prefix}
-☁︎ *STATISTIK KAMU* ☁︎
-→ *Username*: ${m?.pushName}
-→ *Role*: ${m?.isOwner ? "Owner" : m?.isPremium ? "Premium" : "User Biasa"}
-→ *Energi*: ${m?.isOwner || m?.isPremium ? "∞ Unlimited" : (db.getUser(m.sender)?.energi ?? 25)}
-→ *Level*: ${(Math.floor((db.getUser(m.sender)?.exp || 0) / 20000) + 1)}
+                footer: `🌿 Hola *${m.pushName}* 👋
+Bienvenido a *${botConfig.bot?.name}* ✨
+Este bot está listo para ayudarte con muchas funciones interesantes que puedes usar cuando quieras 🚀
+Desde entretenimiento y herramientas hasta otras funciones geniales, aquí ya tienes de todo 🎄
+No dudes en explorar todos los menús disponibles
+Usa el bot con responsabilidad y mantén siempre el respeto al interactuar 😊
+Espero que tu experiencia sea agradable y disfrutes usando este bot 🌟
+☁︎ *ESTADÍSTICAS DEL BOT* ☁︎
+→ *Nombre*: ${botConfig.bot?.name}
+→ *Versión*: ${botConfig.bot?.version}
+→ *Total de funciones*: ${totalCmds} funciones
+→ *Propietario*: ${botConfig?.owner?.name}
+→ *Prefijo*: ${m?.prefix}
+☁︎ *TUS ESTADÍSTICAS* ☁︎
+→ *Usuario*: ${m?.pushName}
+→ *Rol*: ${m?.isOwner ? "Dueño" : m?.isPremium ? "Premium" : "Usuario"}
+→ *Energía*: ${m?.isOwner || m?.isPremium ? "∞ Ilimitada" : (db.getUser(m.sender)?.energi ?? 25)}
+→ *Nivel*: ${(Math.floor((db.getUser(m.sender)?.exp || 0) / 20000) + 1)}
 → *Exp*: ${(db.getUser(m.sender)?.exp ?? 0).toLocaleString()}
-→ *Koin*: ${(db.getUser(m.sender)?.koin ?? 0).toLocaleString()}
+→ *Monedas*: ${(db.getUser(m.sender)?.koin ?? 0).toLocaleString()}
 ${(() => {
   const r = db.getUser(m.sender)?.rpg || {};
   return r.health !== undefined
-    ? `→ *HP*: ${r.health}/${r.maxHealth}\n→ *Mana*: ${r.mana}/${r.maxMana}\n→ *Stamina*: ${r.stamina}/${r.maxStamina}`
+    ? `→ *HP*: ${r.health}/${r.maxHealth}\n→ *Maná*: ${r.mana}/${r.maxMana}\n→ *Estamina*: ${r.stamina}/${r.maxStamina}`
     : "";
 })()}
-Silahkan tekan tombol dibawah untuk memilih category`,
+Pulsa el botón de abajo para elegir una categoría`,
                 document: fs.readFileSync("./package.json"),
                 mimetype: "image/png",
                 fileName: `${greeting}`,
@@ -2162,7 +2162,7 @@ Silahkan tekan tombol dibawah untuk memilih category`,
                 },
                 externalAdReply: {
                   title: titles,
-                  body: `Hai ${m.pushName}! Gunakan bot ini dengan bijak`,
+                  body: `Hola ${m.pushName}! Usa este bot con responsabilidad`,
                   previewType: "VIDEO",
                   thumbnail: fs.readFileSync("./assets/images/ourin.jpg"),
                   sourceUrl: config.info.website,
@@ -2181,8 +2181,8 @@ Silahkan tekan tombol dibawah untuk memilih category`,
                     bottom_sheet: {
                       in_thread_buttons_limit: 2,
                       divider_indices: [1, 2, 3, 4, 5, 999],
-                      list_title: "Silahkan pilih menu yang kamu inginkan",
-                      button_title: "🌥️ Lebih Lengkap",
+                      list_title: "Elige el menú que quieras",
+                      button_title: "🌥️ Más completo",
                     },
                     tap_target_configuration: {
                       title: " X ",
