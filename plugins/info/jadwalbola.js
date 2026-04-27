@@ -105,7 +105,7 @@ async function handler(m, { sock }) {
         }
         
         text += `Total: *${matches.length}* partidos encontrados\n`
-        text += `*KAORI MD — Deportes*`
+        text += `*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Deportes*`
         
         m.react('✅')
         
