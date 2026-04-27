@@ -64,7 +64,7 @@ ${title}
 
 ${itemnya}
 
-*KAORI MD — Guía de Héroes*`)
+*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Guía de Héroes*`)
 
   } catch (error) {
     console.error('BuildML Error:', error)
