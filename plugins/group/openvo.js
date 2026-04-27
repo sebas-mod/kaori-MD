@@ -1,10 +1,11 @@
 import { downloadContentFromMessage } from 'ourin'
+
 const pluginConfig = {
     name: 'rvo',
-    alias: [],
+    alias: ['veruna-vez', 'openvo', 'antiviewonce'],
     category: 'group',
-    description: 'Membuka pesan 1x lihat yang di-reply',
-    usage: '.rvo (reply pesan 1x lihat)',
+    description: 'Muestra el contenido de un mensaje de "ver una vez" que hayas respondido',
+    usage: '.rvo (respondiendo a un mensaje de ver una vez)',
     example: '.rvo',
     isOwner: false,
     isPremium: false,
@@ -20,9 +21,9 @@ async function handler(m, { sock }) {
 
     if (!quoted) {
         await m.reply(
-            `❌ *ɢᴀɢᴀʟ*\n\n` +
-            `> Balas pesan 1x lihat dengan perintah ini!\n` +
-            `> Gunakan: \`${m.prefix}openvo\` (reply pesan 1x lihat)`
+            `❌ *ꜰᴀʟʟᴏ*\n\n` +
+            `> ¡Responde a un mensaje de "ver una vez" con este comando!\n` +
+            `> Uso: \`${m.prefix}rvo\` (reply al mensaje 1x)`
         )
         return
     }
@@ -30,8 +31,8 @@ async function handler(m, { sock }) {
     const quotedMsg = quoted.message
     if (!quotedMsg) {
         await m.reply(
-            `❌ *ᴘᴇsᴀɴ ᴛɪᴅᴀᴋ ᴅɪᴛᴇᴍᴜᴋᴀɴ*\n\n` +
-            `> Tidak dapat membaca pesan yang di-reply.`
+            `❌ *ᴍᴇɴsᴀᴊᴇ ɴᴏ ᴇɴᴄᴏɴᴛʀᴀᴅᴏ*\n\n` +
+            `> No se pudo leer el contenido del mensaje respondido.`
         )
         return
     }
@@ -41,17 +42,18 @@ async function handler(m, { sock }) {
 
     if (!content) {
         await m.reply(
-            `❌ *ᴋᴏɴᴛᴇɴ ᴛɪᴅᴀᴋ ᴅɪᴛᴇᴍᴜᴋᴀɴ*\n\n` +
-            `> Konten pesan tidak dapat dibaca.`
+            `❌ *sɪɴ ᴄᴏɴᴛᴇɴɪᴅᴏ*\n\n` +
+            `> El contenido del mensaje está vacío o es ilegible.`
         )
         return
     }
 
+    // Verificamos si realmente es un mensaje de ViewOnce
     if (!content.viewOnce) {
         await m.reply(
-            `❌ *ʙᴜᴋᴀɴ ᴠɪᴇᴡᴏɴᴄᴇ*\n\n` +
-            `> Pesan yang di-reply bukan pesan 1x lihat!\n` +
-            `> Balas pesan dengan ikon 1x lihat (👁️).`
+            `❌ *ɴᴏ ᴇs ᴠɪᴇᴡᴏɴᴄᴇ*\n\n` +
+            `> El mensaje respondido no es de "ver una vez".\n` +
+            `> Responde a un mensaje con el icono (👁️).`
         )
         return
     }
@@ -70,7 +72,7 @@ async function handler(m, { sock }) {
 
         if (!mediaType) {
             await m.reply(
-                `Tipenya gak didukung, hanya support image, video, audio`
+                `❌ *ᴛɪᴘᴏ ɴᴏ sᴏᴘᴏʀᴛᴀᴅᴏ*\n\n> Solo puedo recuperar imágenes, videos y audios.`
             )
             return
         }
@@ -84,35 +86,38 @@ async function handler(m, { sock }) {
 
         if (!buffer || buffer.length < 100) {
             await m.reply(
-                `❌ *ɢᴀɢᴀʟ ᴍᴇɴɢᴜɴᴅᴜʜ*\n\n` +
-                `> Tidak dapat mengunduh media.\n` +
-                `> Media mungkin sudah kadaluarsa.`
+                `❌ *ᴇʀʀᴏʀ ᴅᴇ ᴅᴇsᴄᴀʀɢᴀ*\n\n` +
+                `> No se pudo descargar el archivo.\n` +
+                `> Es posible que el mensaje haya expirado o ya no esté en el servidor.`
             )
             return
         }
-        const quoted = m.quoted ? m.quoted : m
+
+        const targetQuoted = m.quoted ? m.quoted : m
 
         if (mediaType === 'image') {
-            await sock.sendMedia(m.chat, buffer, null, quoted, {
+            await sock.sendMedia(m.chat, buffer, null, targetQuoted, {
                 type: 'image'
             })
         } else if (mediaType === 'video') {
-            await sock.sendMedia(m.chat, buffer, null, quoted, {
+            await sock.sendMedia(m.chat, buffer, null, targetQuoted, {
                 type: 'video'
             })
         } else if (mediaType === 'audio') {
-            await sock.sendMedia(m.chat, buffer, null, quoted, {
+            await sock.sendMedia(m.chat, buffer, null, targetQuoted, {
                 type: 'audio',
                 mimetype: 'audio/mpeg',
                 ptt: true
             })
         }
 
+        await m.react('✅')
+
     } catch (error) {
         await m.reply(
-            `❌ *ᴇʀʀᴏʀ*\n\n` +
-            `> Gagal membuka pesan 1x lihat.\n` +
-            `> _${error.message}_`
+            `❌ *ᴇʀʀᴏʀ ɪɴᴛᴇʀɴᴏ*\n\n` +
+            `> Hubo un problema al procesar el mensaje.\n` +
+            `> _Detalle: ${error.message}_`
         )
     }
 }
