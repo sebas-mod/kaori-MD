@@ -7,8 +7,8 @@ const pluginConfig = {
     name: 'music',
     alias: MUSIC_LIST,
     category: 'media',
-    description: 'Koleksi musik 1-65',
-    usage: '.music1 sampai .music65',
+    description: 'Colección de música 1-65',
+    usage: '.music1 hasta .music65',
     example: '.music1',
     isOwner: false,
     isPremium: false,
@@ -24,7 +24,7 @@ async function handler(m, { sock, command }) {
     const num = parseInt(musicNum)
     
     if (isNaN(num) || num < 1 || num > 65) {
-        return m.reply(`🎵 *ᴍᴜsɪᴄ ᴄᴏʟʟᴇᴄᴛɪᴏɴ*\n\n> Tersedia: .music1 - .music65`)
+        return m.reply(`🎵 *COLECCIÓN DE MÚSICA*\n\n> Disponible: .music1 - .music65`)
     }
     
     m.react('🕕')
@@ -41,7 +41,7 @@ async function handler(m, { sock, command }) {
         
     } catch (err) {
         m.react('❌')
-        m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> Musik tidak ditemukan atau gagal diambil.`)
+        m.reply(`❌ *ERROR*\n\n> La música no se encontró o no se pudo cargar.`)
     }
 }
 
