@@ -46,7 +46,7 @@ function handler(m, { sock, db }) {
             `2. Sigue el horario en tiempo real basado en el servicio configurado.\n` +
             `3. Si el Estado Global está INACTIVO, el grupo no recibirá avisos aunque su estado sea ACTIVO.\n` +
             `4. Los administradores pueden apagarlo si consideran que interrumpe el chat.\n\n` +
-            `*KAORI MD — Espiritualidad*`
+            `*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Espiritualidad*`
         );
     }
 
