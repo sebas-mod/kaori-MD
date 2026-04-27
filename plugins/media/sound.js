@@ -10,8 +10,8 @@ const pluginConfig = {
     name: soundCommands,
     alias: [],
     category: 'media',
-    description: 'Kirim sound effect (sound1 - sound250)',
-    usage: '.sound1 atau .sound250',
+    description: 'Enviar efectos de sonido (sound1 - sound250)',
+    usage: '.sound1 o .sound250',
     example: '.sound1',
     isOwner: false,
     isPremium: false,
@@ -27,15 +27,15 @@ async function handler(m, { sock }) {
     
     if (command === 'sound' || !command.startsWith('sound')) {
         return m.reply(
-            `🔊 *sᴏᴜɴᴅ ᴇꜰꜰᴇᴄᴛ*\n\n` +
-            `> Tersedia: sound1 - sound250\n` +
-            `> Contoh: \`${m.prefix}sound1\``
+            `🔊 *EFECTOS DE SONIDO*\n\n` +
+            `> Disponible: sound1 - sound250\n` +
+            `> Ejemplo: \`${m.prefix}sound1\``
         )
     }
     
     const num = parseInt(command.replace('sound', ''))
     if (isNaN(num) || num < 1 || num > 250) {
-        return m.reply(`❌ Pilihan tidak valid. Gunakan sound1 sampai sound250.`)
+        return m.reply(`❌ Selección no válida. Usa desde sound1 hasta sound250.`)
     }
     
     m.react('🕕')
