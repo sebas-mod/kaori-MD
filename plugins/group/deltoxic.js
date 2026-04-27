@@ -1,11 +1,12 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
     name: 'deltoxic',
-    alias: ['hapustoxic', 'remtoxic', 'removetoxic'],
+    alias: ['hapustoxic', 'remtoxic', 'removetoxic', 'quitarinsulto', 'borrarinsulto'],
     category: 'group',
-    description: 'Hapus kata toxic dari daftar',
-    usage: '.deltoxic <kata>',
-    example: '.deltoxic kata_kasar',
+    description: 'Elimina una palabra prohibida de la lista de toxicidad del grupo',
+    usage: '.deltoxic <palabra>',
+    example: '.deltoxic groseria',
     isOwner: false,
     isPremium: false,
     isGroup: true,
@@ -22,9 +23,9 @@ async function handler(m, { sock }) {
     
     if (!word) {
         return m.reply(
-            `🗑️ *ᴅᴇʟ ᴛᴏxɪᴄ*\n\n` +
-            `> Gunakan: \`.deltoxic <kata>\`\n\n` +
-            `\`Contoh: ${m.prefix}deltoxic katakasar\``
+            `🗑️ *ᴅᴇʟ ᴛᴏxɪᴄ | ᴋᴀᴏʀɪ ᴍᴅ*\n\n` +
+            `> Uso: \`.deltoxic <palabra>\`\n\n` +
+            `\`Ejemplo: ${m.prefix}deltoxic groseria\``
         )
     }
     
@@ -34,19 +35,19 @@ async function handler(m, { sock }) {
     const index = toxicWords.indexOf(word)
     
     if (index === -1) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Kata \`${word}\` tidak ada di daftar`)
+        return m.reply(`❌ *ꜰᴀʟʟᴏ*\n\n> La palabra \`${word}\` no se encuentra en la lista de este grupo.`)
     }
     
     toxicWords.splice(index, 1)
-    db.setGroup(m.chat, { toxicWords })
+    db.setGroup(m.chat, { ...groupData, toxicWords })
     
     m.react('✅')
     
     await m.reply(
-        `✅ *ᴋᴀᴛᴀ ᴛᴏxɪᴄ ᴅɪʜᴀᴘᴜs*\n\n` +
-        `╭┈┈⬡「 📋 *ᴅᴇᴛᴀɪʟ* 」\n` +
-        `┃ 📝 ᴋᴀᴛᴀ: \`${word}\`\n` +
-        `┃ 📊 sɪsᴀ: \`${toxicWords.length}\` kata\n` +
+        `✅ *ᴘᴀʟᴀʙʀᴀ ᴇʟɪᴍɪɴᴀᴅᴀ*\n\n` +
+        `╭┈┈⬡「 📋 *ᴅᴇᴛᴀʟʟᴇs* 」\n` +
+        `┃ 📝 ᴘᴀʟᴀʙʀᴀ: \`${word}\`\n` +
+        `┃ 📊 ʀᴇsᴛᴀɴᴛᴇs: \`${toxicWords.length}\` palabras\n` +
         `╰┈┈⬡`
     )
 }
