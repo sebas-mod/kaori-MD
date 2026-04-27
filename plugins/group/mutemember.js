@@ -3,10 +3,10 @@ import { isLid, lidToJid, resolveAnyLidToJid } from '../../src/lib/ourin-lid.js'
 
 const pluginConfig = {
     name: 'mutemember',
-    alias: ['mutmember', 'silentmember', 'bisukanmember'],
+    alias: ['mutem', 'silenciarmar', 'muteuser'],
     category: 'group',
-    description: 'Bisukan member tertentu (pesan akan dihapus bot)',
-    usage: '.mutemember <@tag/reply/nomor>',
+    description: 'Silencia a un miembro específico (sus mensajes serán borrados por el bot)',
+    usage: '.mutemember <@tag/reply/número>',
     example: '.mutemember @user',
     isOwner: false,
     isPremium: false,
@@ -43,13 +43,13 @@ async function handler(m, { sock }) {
 
     if (!targetJid) {
         return m.reply(
-            `🔇 *MUTE MEMBER*\n\n` +
-            `> Bisukan member tertentu di grup ini\n` +
-            `> Pesan member yang dimute akan dihapus oleh bot\n\n` +
-            `\`Contoh:\`\n` +
+            `🔇 *sɪʟᴇɴᴄɪᴀʀ ᴍɪᴇᴍʙʀᴏ*\n\n` +
+            `> Silencia a un miembro específico en este grupo.\n` +
+            `> El bot borrará automáticamente cualquier mensaje del usuario.\n\n` +
+            `*Ejemplo:* \n` +
             `> ${m.prefix}mutemember @user\n` +
-            `> ${m.prefix}mutemember 6281234567890\n` +
-            `> Reply pesan member + ${m.prefix}mutemember`
+            `> ${m.prefix}mutemember 5491123456789\n` +
+            `> Responde a un mensaje + ${m.prefix}mutemember`
         )
     }
 
@@ -61,7 +61,7 @@ async function handler(m, { sock }) {
             return pJid === targetNumber && (p.admin === 'admin' || p.admin === 'superadmin')
         })
         if (isTargetAdmin) {
-            return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak dapat mute admin grup`)
+            return m.reply(`❌ *ꜰᴀʟʟᴏ*\n\n> No se puede silenciar a un administrador del grupo.`)
         }
     }
 
@@ -75,7 +75,7 @@ async function handler(m, { sock }) {
     })
 
     if (alreadyMuted) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Member @${targetNumber} sudah dimute`, { mentions: [targetJid] })
+        return m.reply(`❌ *ꜰᴀʟʟO*\n\n> El miembro @${targetNumber} ya está silenciado.`, { mentions: [targetJid] })
     }
 
     mutedMembers.push(targetJid)
@@ -83,14 +83,15 @@ async function handler(m, { sock }) {
 
     m.react('🔇')
     await m.reply(
-        `🔇 *MEMBER DIMUTE*\n\n` +
-        `╭┈┈⬡「 📋 *ᴅᴇᴛᴀɪʟ* 」\n` +
-        `┃ 👤 ᴍᴇᴍʙᴇʀ: @${targetNumber}\n` +
-        `┃ 🔇 sᴛᴀᴛᴜs: \`Muted\`\n` +
-        `┃ 📊 ᴛᴏᴛᴀʟ ᴍᴜᴛᴇ: \`${mutedMembers.length}\` ᴍᴇᴍʙᴇʀ\n` +
+        `🔇 *ᴍɪᴇᴍʙʀᴏ sɪʟᴇɴᴄɪᴀᴅᴏ*\n\n` +
+        `╭┈┈⬡「 📋 *ᴅᴇᴛᴀʟʟᴇ* 」\n` +
+        `┃ 👤 ᴜsᴜᴀʀɪᴏ: @${targetNumber}\n` +
+        `┃ 🔇 ᴇsᴛᴀᴅᴏ: \`Muted\`\n` +
+        `┃ 📊 ᴛᴏᴛᴀʟ: \`${mutedMembers.length}\` silenciados\n` +
         `╰┈┈⬡\n\n` +
-        `> Semua pesan dari member ini akan dihapus otomatis\n` +
-        `> Gunakan \`${m.prefix}unmutemember\` untuk unmute`,
+        `> Todo mensaje de este usuario será eliminado automáticamente.\n` +
+        `> Usa \`${m.prefix}unmutemember\` para quitar la restricción.\n\n` +
+        `*KAORI MD — Seguridad*`,
         { mentions: [targetJid] }
     )
 }
