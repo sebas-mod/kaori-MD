@@ -1,12 +1,13 @@
 import { getParticipantJid, getParticipantJids } from '../../src/lib/ourin-lid.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'tagall',
-    alias: ['all', 'everyone'],
+    alias: ['todos', 'everyone', 'all', 'tagall', 'mencionar'],
     category: 'group',
-    description: 'Tag semua member grup',
-    usage: '.tagall <pesan>',
-    example: '.tagall Halo semua!',
+    description: 'Menciona a todos los miembros del grupo',
+    usage: '.todos <mensaje>',
+    example: '.todos ¡Despierten!',
     isOwner: false,
     isPremium: false,
     isGroup: true,
@@ -19,23 +20,23 @@ const pluginConfig = {
 }
 
 async function handler(m, { sock }) {
-    const text = m.text || 'Tag All Members'
+    const text = m.text || 'Mención a todos los miembros'
 
     try {
         const groupMeta = m.groupMetadata
         const participants = groupMeta.participants || []
 
         if (participants.length === 0) {
-            await m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak ada member di grup ini.`)
+            await m.reply(`❌ *ꜰᴀʟʟᴏ*\n\n> No hay miembros en este grupo.`)
             return
         }
 
         const mentions = getParticipantJids(participants)
-        const memberList = participants.map((p, i) => `@${getParticipantJid(p).split('@')[0]}`).join('\n').trim()
+        const memberList = participants.map((p, i) => `${i + 1}. @${getParticipantJid(p).split('@')[0]}`).join('\n').trim()
 
-        await m.reply(`*Pesan:* ${text}\n\n` +
-            `\`\`\`━━━ ${participants.length} MEMBER TOTAL ━━━\`\`\`\n` +
-            memberList, { mentions: mentions })
+        await m.reply(`📢 *ᴍᴇɴsᴀᴊᴇ:* ${text}\n\n` +
+            `\`\`\`━━━ ${participants.length} MIEMBROS TOTAL ━━━\`\`\`\n` +
+            memberList + `\n\n*KAORI MD — Difusión*`, { mentions: mentions })
 
     } catch (error) {
         m.reply(te(m.prefix, m.command, m.pushName))
