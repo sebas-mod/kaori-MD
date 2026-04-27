@@ -112,7 +112,7 @@ async function handler(m, { sock }) {
                 `*Detalles:*\n` +
                 `> Infracciones: *${warnCount}/${maxWarns}*\n` +
                 `> Último motivo: *${reason}*\n\n` +
-                `*KAORI MD — Seguridad*`,
+                `*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Seguridad*`,
                 { mentions: [targetUser] }
             )
             delete warnings[targetUser]
