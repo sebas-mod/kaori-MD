@@ -4,8 +4,10 @@ import { fetchGroupsSafe } from '../../src/lib/ourin-jpm-helper.js'
 import config from '../../config.js'
 import fs from 'fs'
 import te from '../../src/lib/ourin-error.js'
+
 let cachedThumb = null
 try {
+    // Intenta cargar la miniatura personalizada si existe
     if (fs.existsSync('./assets/images/ourin.jpg')) {
         cachedThumb = fs.readFileSync('./assets/images/ourin.jpg')
     }
@@ -13,11 +15,11 @@ try {
 
 const pluginConfig = {
     name: 'jpm',
-    alias: ['jasher', 'jaser'],
-    category: 'jpm',
-    description: 'Kirim pesan ke semua grup (JPM)',
-    usage: '.jpm <pesan>',
-    example: '.jpm Halo semuanya!',
+    alias: ['broadcast', 'anunciar', 'difusion'],
+    category: 'admin',
+    description: 'Enviar un mensaje a todos los grupos (JPM)',
+    usage: '.jpm <mensaje>',
+    example: '.jpm ¡Hola a todos!',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -27,9 +29,9 @@ const pluginConfig = {
     isEnabled: true
 }
 
-function getContextInfo(title = '📢 ᴊᴘᴍ', body = 'Jasa Pesan Massal') {
+function getContextInfo(title = '📢 ᴊᴘᴍ', body = 'Difusión Masiva') {
     const saluranId = config.saluran?.id || '120363208449943317@newsletter'
-    const saluranName = config.saluran?.name || config.bot?.name || 'Ourin-AI'
+    const saluranName = config.saluran?.name || config.bot?.name || 'KAORI MD'
     
     const contextInfo = {
         forwardingScore: 9999,
@@ -61,30 +63,30 @@ async function handler(m, { sock }) {
     if (m.isGroup) {
         const groupMode = getGroupMode(m.chat, db)
         if (groupMode !== 'md' && groupMode !== 'all') {
-            return m.reply(`❌ *ᴍᴏᴅᴇ ᴛɪᴅᴀᴋ sᴇsᴜᴀɪ*\n\n> JPM hanya tersedia di mode MD\n\n\`${m.prefix}botmode md\``)
+            return m.reply(`❌ *ᴍᴏᴅᴏ ɴᴏ ᴄᴏᴍᴘᴀᴛɪʙʟᴇ*\n\n> JPM solo está disponible en modo MD.\n\nActívalo con: \`${m.prefix}botmode md\``)
         }
     }
     
     const text = m.fullArgs?.trim() || m.text?.trim()
     if (!text) {
         return m.reply(
-            `📢 *JPM (JASA PESAN MASSAL)*\n\n` +
-            `Sistem broadcast otomatis ke seluruh grup yang terdaftar.\n\n` +
-            `*PENGGUNAAN:*\n` +
-            `• *${m.prefix}jpm <pesan>* — Mengirim JPM teks biasa\n` +
-            `• *${m.prefix}jpm (reply foto/video)* — Mengirim JPM dengan media\n\n` +
-            `*FITUR LAIN:*\n` +
-            `• *${m.prefix}jpmht* — JPM dengan mode Hidetag (tag semua member)\n` +
-            `• *${m.prefix}autojpm* — Auto JPM dengan interval otomatis\n` +
-            `• *${m.prefix}setdelayjpm* — Mengatur jeda pengiriman per grup\n` +
-            `• *${m.prefix}stopjpm* — Menghentikan proses JPM yang sedang berjalan\n\n` +
-            `*CONTOH:*\n` +
-            `> \`${m.prefix}jpm Halo semuanya! Ini pesan otomatis dari owner.\``
+            `📢 *JPM (MENSAJE MASIVO)*\n\n` +
+            `Sistema de difusión automática a todos los grupos donde el bot está presente.\n\n` +
+            `*MODO DE USO:*\n` +
+            `• *${m.prefix}jpm <mensaje>* — Envía un mensaje de texto masivo.\n` +
+            `• *${m.prefix}jpm (responder a foto/video)* — Envía JPM con multimedia.\n\n` +
+            `*OTROS COMANDOS:*\n` +
+            `• *${m.prefix}jpmht* — JPM con Hidetag (menciona a todos).\n` +
+            `• *${m.prefix}autojpm* — Programar JPM por intervalos.\n` +
+            `• *${m.prefix}setdelayjpm* — Ajustar la pausa entre grupos.\n` +
+            `• *${m.prefix}stopjpm* — Detener el proceso de JPM actual.\n\n` +
+            `*EJEMPLO:*\n` +
+            `> \`${m.prefix}jpm ¡Hola a todos! Este es un mensaje oficial.\``
         )
     }
     
     if (global.statusjpm) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> JPM sedang berjalan. Ketik \`${m.prefix}stopjpm\` untuk menghentikan.`)
+        return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> Ya hay un proceso de JPM en curso. Escribe \`${m.prefix}stopjpm\` para detenerlo.`)
     }
     
     m.react('📢')
@@ -115,29 +117,27 @@ async function handler(m, { sock }) {
         
         if (groupIds.length === 0) {
             m.react('❌')
-            return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak ada grup yang ditemukan${blacklistedCount > 0 ? ` (${blacklistedCount} grup di-blacklist)` : ''}`)
+            return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> No se encontraron grupos disponibles${blacklistedCount > 0 ? ` (${blacklistedCount} en lista negra)` : ''}`)
         }
         
         const jedaJpm = db.setting('jedaJpm') || 5000
         
         await sock.sendMessage(m.chat, {
-            text: `📢 *ᴊᴘᴍ*\n\n` +
-                `╭┈┈⬡「 📋 *ᴅᴇᴛᴀɪʟ* 」\n` +
-                `┃ 📝 ᴘᴇsᴀɴ: \`${text.substring(0, 50)}${text.length > 50 ? '...' : ''}\`\n` +
-                `┃ 📷 ᴍᴇᴅɪᴀ: \`${mediaBuffer ? mediaType : 'Tidak'}\`\n` +
-                `┃ 👥 ᴛᴀʀɢᴇᴛ: \`${groupIds.length}\` grup\n` +
-                `┃ ⏱️ ᴊᴇᴅᴀ: \`${jedaJpm}ms\`\n` +
-                `┃ 📊 ᴇsᴛɪᴍᴀsɪ: \`${Math.ceil((groupIds.length * jedaJpm) / 60000)} menit\`\n` +
+            text: `📢 *ɪɴɪᴄɪᴀɴᴅᴏ ᴊᴘᴍ*\n\n` +
+                `╭┈┈⬡「 📋 *ᴅᴇᴛᴀʟʟᴇs* 」\n` +
+                `┃ 📝 ᴍᴇɴsᴀᴊᴇ: \`${text.substring(0, 50)}${text.length > 50 ? '...' : ''}\`\n` +
+                `┃ 📷 ᴍᴜʟᴛɪᴍᴇᴅɪᴀ: \`${mediaBuffer ? mediaType : 'No'}\`\n` +
+                `┃ 👥 ᴅᴇsᴛɪɴᴏs: \`${groupIds.length}\` grupos\n` +
+                `┃ ⏱️ ᴘᴀᴜsᴀ: \`${jedaJpm}ms\`\n` +
+                `┃ 📊 ᴇsᴛɪᴍᴀᴅᴏ: \`${Math.ceil((groupIds.length * jedaJpm) / 60000)} minutos\`\n` +
                 `╰┈┈⬡\n\n` +
-                `> Memulai JPM ke semua grup...`,
-            contextInfo: getContextInfo('📢 ᴊᴘᴍ', 'Sending...')
+                `> Procesando envío masivo...`,
+            contextInfo: getContextInfo('📢 ᴊᴘᴍ', 'Enviando...')
         }, { quoted: m })
         
         global.statusjpm = true
         let successCount = 0
         let failedCount = 0
-        
-        const contextInfo = getContextInfo('📢 ᴊᴘᴍ', config.bot?.name || 'Ourin')
         
         for (const groupId of groupIds) {
             if (global.stopjpm) {
@@ -145,13 +145,13 @@ async function handler(m, { sock }) {
                 delete global.statusjpm
                 
                 await sock.sendMessage(m.chat, {
-                    text: `⏹️ *ᴊᴘᴍ ᴅɪʜᴇɴᴛɪᴋᴀɴ*\n\n` +
-                        `╭┈┈⬡「 📊 *sᴛᴀᴛᴜs* 」\n` +
-                        `┃ ✅ ʙᴇʀʜᴀsɪʟ: \`${successCount}\`\n` +
-                        `┃ ❌ ɢᴀɢᴀʟ: \`${failedCount}\`\n` +
-                        `┃ ⏸️ sɪsᴀ: \`${groupIds.length - successCount - failedCount}\`\n` +
+                    text: `⏹️ *ᴊᴘᴍ ᴅᴇᴛᴇɴɪᴅᴏ*\n\n` +
+                        `╭┈┈⬡「 📊 *ᴇsᴛᴀᴅísᴛɪᴄᴀs* 」\n` +
+                        `┃ ✅ ᴇxɪᴛᴏsᴏs: \`${successCount}\`\n` +
+                        `┃ ❌ ꜰᴀʟʟɪᴅᴏs: \`${failedCount}\`\n` +
+                        `┃ ⏸️ ᴘᴇɴᴅɪᴇɴᴛᴇs: \`${groupIds.length - successCount - failedCount}\`\n` +
                         `╰┈┈⬡`,
-                    contextInfo: getContextInfo('⏹️ ᴅɪʜᴇɴᴛɪᴋᴀɴ')
+                    contextInfo: getContextInfo('⏹️ ᴅᴇᴛᴇɴɪᴅᴏ')
                 }, { quoted: m })
                 return
             }
@@ -185,13 +185,13 @@ async function handler(m, { sock }) {
         
         m.react('✅')
         await sock.sendMessage(m.chat, {
-            text: `✅ *ᴊᴘᴍ sᴇʟᴇsᴀɪ*\n\n` +
-                `╭┈┈⬡「 📊 *ʜᴀsɪʟ* 」\n` +
-                `┃ ✅ ʙᴇʀʜᴀsɪʟ: \`${successCount}\`\n` +
-                `┃ ❌ ɢᴀɢᴀʟ: \`${failedCount}\`\n` +
+            text: `✅ *ᴊᴘᴍ ꜰɪɴᴀʟɪᴢᴀᴅᴏ*\n\n` +
+                `╭┈┈⬡「 📊 *ʀᴇsᴜʟᴛᴀᴅᴏs* 」\n` +
+                `┃ ✅ ᴇxɪᴛᴏsᴏs: \`${successCount}\`\n` +
+                `┃ ❌ ꜰᴀʟʟɪᴅᴏs: \`${failedCount}\`\n` +
                 `┃ 📊 ᴛᴏᴛᴀʟ: \`${groupIds.length}\`\n` +
                 `╰┈┈⬡`,
-            contextInfo: getContextInfo('✅ sᴇʟᴇsᴀɪ', `${successCount}/${groupIds.length}`)
+            contextInfo: getContextInfo('✅ ᴄᴏᴍᴘʟᴇᴛᴀᴅᴏ', `${successCount}/${groupIds.length}`)
         }, { quoted: m })
         
     } catch (error) {
