@@ -56,7 +56,7 @@ async function handler(m, { sock }) {
         `> ¡Las advertencias de @${targetName} han sido eliminadas!\n` +
         `> Anteriormente: *${prevCount}/${maxWarns}*\n` +
         `> Actualmente: *0/${maxWarns}*\n\n` +
-        `*KAORI MD — Moderación*`,
+        `*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Moderación*`,
         { mentions: [targetUser] }
     )
 }
