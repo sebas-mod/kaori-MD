@@ -1,9 +1,10 @@
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'resetlinkgc',
-    alias: ['resetlink', 'revokelink', 'newlink'],
+    alias: ['resetlink', 'revocarenlace', 'nuevolink', 'revokelink'],
     category: 'group',
-    description: 'Reset link invite grup',
+    description: 'Restablece el enlace de invitación del grupo',
     usage: '.resetlinkgc',
     example: '.resetlinkgc',
     isOwner: false,
@@ -21,10 +22,16 @@ async function handler(m, { sock }) {
     m.react('🔄')
     
     try {
+        // Ejecuta la revocación del enlace actual
         await sock.groupRevokeInvite(m.chat)
         
         m.react('✅')
-        m.reply(`✅ *ʟɪɴᴋ ɢʀᴜᴘ ᴅɪʀᴇsᴇᴛ*\nLink grup lama sudah tidak berlaku.\nGunakan \`${m.prefix}linkgc\` untuk mendapatkan link baru.`)
+        m.reply(
+            `✅ *ᴇɴʟᴀᴄᴇ ʀᴇsᴛᴀʙʟᴇᴄɪᴅᴏ*\n\n` +
+            `> El enlace anterior ha sido invalidado con éxito.\n` +
+            `> Usa \`${m.prefix}linkgc\` para generar y obtener el nuevo enlace.\n\n` +
+            `*KAORI MD — Seguridad*`
+        )
         
     } catch (err) {
         m.react('☢')
