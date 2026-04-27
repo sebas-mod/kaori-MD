@@ -1,13 +1,14 @@
 import fs from 'fs'
 import path from 'path'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: 'ourin-large',
-    alias: ['setourinlarge', 'gantiourinlarge'],
+    name: 'kei-large',
+    alias: ['setkeilarge', 'cambiarkeilarge', 'bundle-kei'],
     category: 'owner',
-    description: 'Preset: Ganti gambar ourin.jpg, serta ourin-v7 hingga ourin-v11.jpg sekaligus',
-    usage: '.ourin-large (reply/kirim gambar)',
-    example: '.ourin-large',
+    description: 'Preset: Cambia la imagen principal y las versiones v7 a v11 de un solo golpe',
+    usage: '.kei-large (responder/enviar imagen)',
+    example: '.kei-large',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -21,7 +22,11 @@ async function handler(m, { sock }) {
     const isImage = m.isImage || (m.quoted && m.quoted.type === 'imageMessage')
     
     if (!isImage) {
-        return m.reply(`🖼️ *ᴏᴜʀɪɴ ʟᴀʀɢᴇ ᴘʀᴇsᴇᴛ*\n\n> Kirim/reply gambar untuk mengganti kumpulan foto besar (ourin.jpg, ourin-v7.jpg s/d ourin-v11.jpg) sekaligus.\n> Pastikan rasio gambar sesuai dengan yang diinginkan.`)
+        return m.reply(
+            `🖼️ *KEI LARGE PRESET*\n\n` +
+            `> Envía o responde a una imagen para reemplazar el paquete de fotos de **𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃** (ourin.jpg y versiones v7 a v11) simultáneamente.\n` +
+            `> Asegúrate de que la relación de aspecto sea la adecuada.`
+        )
     }
     
     await m.react('🕕')
@@ -36,7 +41,7 @@ async function handler(m, { sock }) {
         
         if (!buffer) {
             await m.react('❌')
-            return m.reply(`❌ Gagal mendownload gambar`)
+            return m.reply(`❌ No se pudo descargar la imagen.`)
         }
         
         const targetImages = [
@@ -59,7 +64,12 @@ async function handler(m, { sock }) {
         }
         
         await m.react('✅')
-        m.reply(`✅ *ʙᴇʀʜᴀsɪʟ*\n\n> Gambar bundle *ourin-large* berhasil diganti secara massal.\n> Mencakup: ${targetImages.join(', ')}\n> Restart bot jika gambar tidak langsung berubah.`)
+        m.reply(
+            `✅ *ÉXITO*\n\n` +
+            `> El paquete de imágenes *kei-large* de **𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃** se ha actualizado de forma masiva.\n` +
+            `> Archivos modificados: ${targetImages.join(', ')}\n` +
+            `> Reinicia el bot si los cambios no se reflejan de inmediato.`
+        )
         
     } catch (error) {
         await m.react('☢')
