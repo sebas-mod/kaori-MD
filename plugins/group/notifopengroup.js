@@ -1,10 +1,10 @@
 const pluginConfig = {
-    name: 'notifopengroup',
-    alias: ['notifopen'],
+    name: 'notifapertura',
+    alias: ['notifopengroup', 'notifopen', 'avisoabrir'],
     category: 'group',
-    description: 'Toggle notifikasi saat grup dibuka',
-    usage: '.notifopengroup on/off',
-    example: '.notifopengroup on',
+    description: 'Activa o desactiva la notificación cuando el grupo se abre',
+    usage: '.notifapertura on/off',
+    example: '.notifapertura on',
     isOwner: false,
     isPremium: false,
     isGroup: true,
@@ -16,27 +16,34 @@ const pluginConfig = {
 
 function handler(m, { sock, db }) {
     if (!m.isAdmin && !m.isOwner) {
-        return m.reply(`❌ Hanya admin grup yang bisa menggunakan fitur ini`)
+        return m.reply(`❌ Solo los administradores del grupo pueden usar esta función.`)
     }
     
     const args = m.args[0]?.toLowerCase()
     const group = db.getGroup(m.chat) || {}
     
-    if (!['on', 'off'].includes(args)) {
-        const status = group.notifOpenGroup === true ? '✅ Aktif' : '❌ Nonaktif'
-        return m.reply(`🔓 *ɴᴏᴛɪꜰ ᴏᴘᴇɴ ɢʀᴏᴜᴘ*\n\n> Status: ${status}\n\n*Penggunaan:*\n\`${m.prefix}notifopengroup on\` - Aktifkan\n\`${m.prefix}notifopengroup off\` - Nonaktifkan`)
+    if (!['on', 'off', 'activar', 'desactivar'].includes(args)) {
+        const status = group.notifOpenGroup === true ? '✅ Activado' : '❌ Desactivado'
+        return m.reply(
+            `🔓 *ɴᴏᴛɪꜰɪᴄᴀᴄɪᴏ́ɴ ᴅᴇ ᴀᴘᴇʀᴛᴜʀᴀ*\n\n` +
+            `> Estado actual: ${status}\n\n` +
+            `*Uso:*\n` +
+            `\`${m.prefix}notifapertura on\` - Para activar\n` +
+            `\`${m.prefix}notifapertura off\` - Para desactivar\n\n` +
+            `*KAORI MD — Ajustes*`
+        )
     }
     
-    if (args === 'on') {
+    if (args === 'on' || args === 'activar') {
         group.notifOpenGroup = true
         db.setGroup(m.chat, group)
-        return m.reply(`✅ *ɴᴏᴛɪꜰ ᴏᴘᴇɴ ɢʀᴏᴜᴘ ᴅɪᴀᴋᴛɪꜰᴋᴀɴ*`)
+        return m.reply(`✅ *ɴᴏᴛɪꜰɪᴄᴀᴄɪᴏ́ɴ ᴅᴇ ᴀᴘᴇʀᴛᴜʀᴀ ᴀᴄᴛɪᴠᴀᴅᴀ*\n\n> El bot avisará a los miembros cuando el grupo sea abierto para todos.`)
     }
     
-    if (args === 'off') {
+    if (args === 'off' || args === 'desactivar') {
         group.notifOpenGroup = false
         db.setGroup(m.chat, group)
-        return m.reply(`❌ *ɴᴏᴛɪꜰ ᴏᴘᴇɴ ɢʀᴏᴜᴘ ᴅɪɴᴏɴᴀᴋᴛɪꜰᴋᴀɴ*`)
+        return m.reply(`❌ *ɴᴏᴛɪꜰɪᴄᴀᴄɪᴏ́ɴ ᴅᴇ ᴀᴘᴇʀᴛᴜʀᴀ ᴅᴇsᴀᴄᴛɪᴠᴀᴅᴀ*\n\n> El bot ya no enviará avisos al abrir el grupo.`)
     }
 }
 
