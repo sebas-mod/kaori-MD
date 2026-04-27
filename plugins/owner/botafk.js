@@ -1,12 +1,13 @@
 import moment from 'moment-timezone'
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
     name: 'botafk',
     alias: ['afkbot', 'afkmode'],
     category: 'owner',
-    description: 'Mode AFK untuk bot - bot tidak merespon command, hanya reply pesan AFK',
-    usage: '.botafk <alasan>',
-    example: '.botafk Lagi istirahat',
+    description: 'Modo AFK para el bot: el bot no responderá comandos, solo enviará un mensaje de AFK',
+    usage: '.botafk <razón>',
+    example: '.botafk Tomando un descanso',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -28,12 +29,12 @@ async function handler(m, { sock }) {
         const duration = formatDuration(afkDuration)
         
         return m.reply(
-            `✅ *ʙᴏᴛ ᴋᴇᴍʙᴀʟɪ ᴏɴʟɪɴᴇ*\n\n` +
-            `╭┈┈⬡「 📊 *sᴛᴀᴛɪsᴛɪᴋ ᴀꜰᴋ* 」\n` +
-            `┃ ⏱️ ᴅᴜʀᴀsɪ: \`${duration}\`\n` +
-            `┃ 📝 ᴀʟᴀsᴀɴ: \`${currentAfk.reason || '-'}\`\n` +
+            `✅ *BOT DE NUEVO ONLINE*\n\n` +
+            `╭┈┈⬡「 📊 *ESTADÍSTICAS AFK* 」\n` +
+            `┃ ⏱️ Duración: \`${duration}\`\n` +
+            `┃ 📝 Razón: \`${currentAfk.reason || '-'}\`\n` +
             `╰┈┈⬡\n\n` +
-            `> Bot siap menerima command!`
+            `> ¡El bot está listo para recibir comandos!`
         )
     } else {
         const reason = m.args.join(' ') || 'AFK'
@@ -46,18 +47,18 @@ async function handler(m, { sock }) {
         
         await m.react('💤')
         return m.reply(
-            `💤 *ʙᴏᴛ ᴀꜰᴋ ᴀᴋᴛɪꜰ*\n\n` +
-            `╭┈┈⬡「 📋 *ɪɴꜰᴏ* 」\n` +
-            `┃ 📝 ᴀʟᴀsᴀɴ: \`${reason}\`\n` +
-            `┃ ⏰ sᴇᴊᴀᴋ: \`${moment().tz('Asia/Jakarta').format('HH:mm:ss')}\`\n` +
+            `💤 *MODO AFK ACTIVADO*\n\n` +
+            `╭┈┈⬡「 📋 *INFO* 」\n` +
+            `┃ 📝 Razón: \`${reason}\`\n` +
+            `┃ ⏰ Desde las: \`${moment().tz('America/Argentina/Buenos_Aires').format('HH:mm:ss')}\`\n` +
             `╰┈┈⬡\n\n` +
-            `╭┈┈⬡「 🔒 *ᴀᴋsᴇs* 」\n` +
-            `┃ ✅ Owner bot\n` +
-            `┃ ✅ Bot sendiri (fromMe)\n` +
-            `┃ ❌ Semua user lain\n` +
+            `╭┈┈⬡「 🔒 *ACCESO* 」\n` +
+            `┃ ✅ Propietario (Owner)\n` +
+            `┃ ✅ El propio bot (fromMe)\n` +
+            `┃ ❌ Todos los demás usuarios\n` +
             `╰┈┈⬡\n\n` +
-            `> User lain akan dapat pesan AFK\n` +
-            `> Ketik \`${m.prefix}botafk\` untuk kembali online`
+            `> Otros usuarios recibirán un mensaje de AFK\n` +
+            `> Escribe \`${m.prefix}botafk\` para volver a estar online`
         )
     }
 }
@@ -68,10 +69,10 @@ function formatDuration(ms) {
     const hours = Math.floor(minutes / 60)
     const days = Math.floor(hours / 24)
     
-    if (days > 0) return `${days} hari ${hours % 24} jam`
-    if (hours > 0) return `${hours} jam ${minutes % 60} menit`
-    if (minutes > 0) return `${minutes} menit ${seconds % 60} detik`
-    return `${seconds} detik`
+    if (days > 0) return `${days} día(s) ${hours % 24} hora(s)`
+    if (hours > 0) return `${hours} hora(s) ${minutes % 60} minuto(s)`
+    if (minutes > 0) return `${minutes} minuto(s) ${seconds % 60} segundo(s)`
+    return `${seconds} segundo(s)`
 }
 
 export { pluginConfig as config, handler }
