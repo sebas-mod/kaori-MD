@@ -38,7 +38,7 @@ async function handler(m) {
         `📌 *Asunto:* ${absen.keterangan}\n` +
         `👥 *Total presentes:* ${totalPeserta}\n\n` +
         `> La sesión de asistencia ha sido eliminada correctamente.\n` +
-        `_Powered by KAORI MD_`
+        `_Powered by 𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃_`
     )
 }
 
