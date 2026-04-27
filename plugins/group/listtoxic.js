@@ -1,10 +1,11 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { DEFAULT_TOXIC_WORDS } from './antitoxic.js'
+
 const pluginConfig = {
     name: 'listtoxic',
-    alias: ['toxiclist', 'katatoxic', 'lihatkata'],
+    alias: ['toxiclist', 'listainsultos', 'verinsultos', 'listatoxic'],
     category: 'group',
-    description: 'Lihat daftar kata toxic',
+    description: 'Muestra la lista de palabras prohibidas o tóxicas',
     usage: '.listtoxic',
     example: '.listtoxic',
     isOwner: false,
@@ -24,26 +25,27 @@ async function handler(m, { sock }) {
     const customWords = groupData.toxicWords || []
     const defaultWords = DEFAULT_TOXIC_WORDS || []
     
-    let text = `📋 *ᴅᴀꜰᴛᴀʀ ᴋᴀᴛᴀ ᴛᴏxɪᴄ*\n\n`
+    let text = `📋 *ʟɪsᴛᴀ ᴅᴇ ɪɴsᴜʟᴛᴏs*\n\n`
     
     if (customWords.length > 0) {
-        text += `╭┈┈⬡「 ✏️ *ᴄᴜsᴛᴏᴍ* (${customWords.length}) 」\n`
+        text += `╭┈┈⬡「 ✏️ *ᴘᴇʀsᴏɴᴀʟ* (${customWords.length}) 」\n`
         for (let i = 0; i < customWords.length; i++) {
             text += `┃ ${i + 1}. ${customWords[i]}\n`
         }
         text += `╰┈┈┈┈┈┈┈┈⬡\n\n`
     }
     
-    text += `╭┈┈⬡「 📦 *ᴅᴇꜰᴀᴜʟᴛ* (${defaultWords.length}) 」\n`
+    text += `╭┈┈⬡「 📦 *ʙᴀsᴇ* (${defaultWords.length}) 」\n`
     
     for (let i = 0; i < defaultWords.length; i++) {
         text += `┃ ${i + 1}. ${defaultWords[i]}\n`
     }
     text += `╰┈┈┈┈┈┈┈┈⬡\n\n`
     
-    text += `Total: *${customWords.length + defaultWords.length}* kata\n`
-    text += `\`.addtoxic <kata>\` untuk tambah\n`
-    text += `\`.deltoxic <kata>\` untuk hapus`
+    text += `Total: *${customWords.length + defaultWords.length}* palabras\n\n`
+    text += `> Usa \`${m.prefix}addtoxic <palabra>\` para agregar\n`
+    text += `> Usa \`${m.prefix}deltoxic <palabra>\` para eliminar\n\n`
+    text += `*KAORI MD — Moderación*`
     
     await m.reply(text)
 }
