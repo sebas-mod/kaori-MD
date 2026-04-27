@@ -84,7 +84,7 @@ async function handler(m, { sock }) {
             text += `🔗 Enlace: ${t.url}\n\n`
         }
 
-        text += `*KAORI MD — E-Sports*`
+        text += `*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — E-Sports*`
         
         const firstImage = tournaments[0]?.imageUrl
         
