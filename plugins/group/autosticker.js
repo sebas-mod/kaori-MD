@@ -1,11 +1,12 @@
 import config from '../../config.js'
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
     name: 'autosticker',
     alias: ['autostiker', 'as'],
     category: 'group',
-    description: 'Toggle auto sticker - otomatis jadikan gambar/video jadi sticker',
-    usage: '.autosticker on/off',
+    description: 'Activa o desactiva la creación automática de stickers a partir de imágenes/videos',
+    usage: '.autosticker <on/off>',
     example: '.autosticker on',
     isOwner: false,
     isPremium: false,
@@ -25,37 +26,36 @@ async function handler(m, { sock }) {
     const arg = args[0]?.toLowerCase()
     
     if (!arg) {
-        const status = current ? '✅ Aktif' : '❌ Nonaktif'
+        const status = current ? '✅ Activo' : '❌ Desactivado'
         return m.reply(
-            `🖼️ *ᴀᴜᴛᴏsᴛɪᴄᴋᴇʀ*\n\n` +
-            `> Status: ${status}\n\n` +
-            `> Gunakan:\n` +
-            `> \`${m.prefix}autosticker on\` - aktifkan\n` +
-            `> \`${m.prefix}autosticker off\` - nonaktifkan\n\n` +
-            `> _Otomatis jadikan gambar/video jadi sticker_`
+            `🖼️ *ᴀᴜᴛᴏsᴛɪᴄᴋᴇʀ | ᴋᴀᴏʀɪ ᴍᴅ*\n\n` +
+            `> Estado: ${status}\n\n` +
+            `> Uso:\n` +
+            `> \`${m.prefix}autosticker on\` - Activar\n` +
+            `> \`${m.prefix}autosticker off\` - Desactivar\n\n` +
+            `> _Las imágenes y videos se convertirán en stickers automáticamente._`
         )
     }
     
-    
-    if (arg === 'on' || arg === '1' || arg === 'aktif') {
+    if (arg === 'on' || arg === '1' || arg === 'activar') {
         if (current) {
-            return m.reply(`🖼️ *ᴀᴜᴛᴏsᴛɪᴄᴋᴇʀ*\n\n> Sudah aktif!`)
+            return m.reply(`🖼️ *ᴀᴜᴛᴏsᴛɪᴄᴋᴇʀ*\n\n> ¡Ya se encuentra activo!`)
         }
-        db.setGroup(m.chat, { autosticker: true })
+        db.setGroup(m.chat, { ...groupData, autosticker: true })
         await db.save()
-        return m.reply(`🖼️ *ᴀᴜᴛᴏsᴛɪᴄᴋᴇʀ*\n\n> ✅ Berhasil diaktifkan!\n> Gambar/video akan otomatis jadi sticker`)
+        return m.reply(`🖼️ *ᴀᴜᴛᴏsᴛɪᴄᴋᴇʀ*\n\n> ✅ ¡Activado con éxito!\n> Ahora las imágenes/videos se enviarán como stickers.`)
     }
     
-    if (arg === 'off' || arg === '0' || arg === 'nonaktif') {
+    if (arg === 'off' || arg === '0' || arg === 'desactivar') {
         if (!current) {
-            return m.reply(`🖼️ *ᴀᴜᴛᴏsᴛɪᴄᴋᴇʀ*\n\n> Sudah nonaktif!`)
+            return m.reply(`🖼️ *ᴀᴜᴛᴏsᴛɪᴄᴋᴇʀ*\n\n> ¡Ya se encuentra desactivado!`)
         }
-        db.setGroup(m.chat, { autosticker: false })
+        db.setGroup(m.chat, { ...groupData, autosticker: false })
         await db.save()
-        return m.reply(`🖼️ *ᴀᴜᴛᴏsᴛɪᴄᴋᴇʀ*\n\n> ❌ Berhasil dinonaktifkan!`)
+        return m.reply(`🖼️ *ᴀᴜᴛᴏsᴛɪᴄᴋᴇʀ*\n\n> ❌ Se ha desactivado correctamente.`)
     }
     
-    return m.reply(`❌ Gunakan: \`${m.prefix}autosticker on/off\``)
+    return m.reply(`❌ Uso incorrecto. Usa: \`${m.prefix}autosticker on/off\``)
 }
 
 async function autoStickerHandler(m, sock) {
@@ -89,21 +89,25 @@ async function autoStickerHandler(m, sock) {
         const buffer = await m.download()
         if (!buffer || buffer.length === 0) return false
         
+        // Límite de 10MB para evitar lentitud
         if (buffer.length > 10 * 1024 * 1024) return false
         
+        const packname = config.sticker?.packname || 'ᴋᴀᴏʀɪ ᴍᴅ'
+        const author = config.sticker?.author || 'ʙᴏᴛ'
+
         if (isImage) {
             await sock.sendImageAsSticker(m.chat, buffer, m, {
-                packname: config.sticker?.packname || 'Ourin',
-                author: config.sticker?.author || 'Bot'
+                packname: packname,
+                author: author
             })
         } else if (isVideo) {
             const videoMsg = msg.videoMessage || content?.message?.videoMessage
             const duration = videoMsg?.seconds || 0
-            if (duration > 10) return false
+            if (duration > 10) return false // No convertir videos de más de 10 seg
             
             await sock.sendVideoAsSticker(m.chat, buffer, m, {
-                packname: config.sticker?.packname || 'Ourin',
-                author: config.sticker?.author || 'Bot'
+                packname: packname,
+                author: author
             })
         }
         
