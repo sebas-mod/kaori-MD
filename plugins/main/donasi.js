@@ -2,13 +2,14 @@ import config from '../../config.js'
 import path from 'path'
 import fs from 'fs'
 import fetch from 'node-fetch'
+
 const pluginConfig = {
-    name: 'donasi',
-    alias: ['donate', 'donation', 'support', 'saweria', 'trakteer'],
+    name: 'donar',
+    alias: ['donate', 'donasi', 'donacion', 'support', 'apoyar'],
     category: 'main',
-    description: 'Informasi donasi untuk mendukung bot dengan QRIS',
-    usage: '.donasi',
-    example: '.donasi',
+    description: 'Información para apoyar el desarrollo del bot',
+    usage: '.donar',
+    example: '.donar',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -19,7 +20,7 @@ const pluginConfig = {
 }
 
 async function handler(m, { sock }) {
-    const botName = config.bot?.name || 'Ourin-AI'
+    const botName = config.bot?.name || 'KAORI MD'
     const ownerName = config.owner?.name || 'Owner'
     const saluranId = config.saluran?.id || '120363208449943317@newsletter'
     const saluranName = config.saluran?.name || botName
@@ -29,49 +30,54 @@ async function handler(m, { sock }) {
     const links = donasiConfig.links || []
     const qrisUrl = donasiConfig.qris || ''
     const benefits = donasiConfig.benefits || [
-        'Mendukung development',
-        'Server lebih stabil',
-        'Fitur baru lebih cepat',
-        'Priority support'
+        'Apoyar el desarrollo constante',
+        'Mantener el servidor estable',
+        'Nuevas funciones más rápido',
+        'Soporte prioritario'
     ]
     
-    let text = `DONASI KE OWNER ${botName} 🙏`
+    let text = `💖 *APOYA A ${botName.toUpperCase()}* 💖\n\n`
+    text += `Tu contribución ayuda a mantener el bot activo y gratuito para todos.\n\n`
     
     if (payments.length > 0 || links.length > 0) {
-        text += `Pembayaran\n`
+        text += `╭┈┈⬡「 💳 *MÉTODOS DE PAGO* 」\n`
         for (const pay of payments) {
-            text += `🏦 *${pay.name?.toLowerCase().split('').map((c,i) => i === 0 ? c.toUpperCase() : c).join('')}*\n`
-            text += `◦ ${pay.number} (a/n ${pay.holder})\n`
+            text += `┃ 🏦 *${pay.name?.toUpperCase()}*\n`
+            text += `┃ ◦ Número: \`${pay.number}\`\n`
+            text += `┃ ◦ Titular: ${pay.holder}\n`
+            text += `┃\n`
         }
         
         for (const link of links) {
-            const icons = { saweria: '☕', trakteer: '🍵', paypal: '💰', default: '🔗' }
+            const icons = { saweria: '☕', trakteer: '🍵', paypal: '💰', mercado: '💸', default: '🔗' }
             const icon = icons[link.name?.toLowerCase()] || icons.default
-            text += `${icon} *${link.name}*\n`
-            text += `${link.url}\n`
+            text += `┃ ${icon} *${link.name}*\n`
+            text += `┃ ${link.url}\n`
+            text += `┃\n`
         }
+        text += `╰┈┈┈┈┈┈┈┈⬡\n\n`
     } else {
-        text += `╭┈┈⬡「 💳 *ᴘᴀʏᴍᴇɴᴛ* 」\n`
+        text += `╭┈┈⬡「 💳 *MÉTODOS* 」\n`
         text += `┃\n`
-        text += `┃ > Belum dikonfigurasi\n`
-        text += `┃ > Edit config.donasi\n`
+        text += `┃ > Sin configurar actualmente\n`
+        text += `┃ > Edita config.donasi\n`
         text += `┃\n`
         text += `╰┈┈┈┈┈┈┈┈⬡\n\n`
     }
     
-    text += `🎁 *ʙᴇɴᴇꜰɪᴛ*\n`
+    text += `🎁 *BENEFICIOS*\n`
     for (const benefit of benefits) {
         text += `◦ ${benefit}\n`
     }
     text += `\n`
     
-    text += `_Donasi berapapun sangat berharga_\n`
-    text += `Contact: @${config.owner?.number?.[0] || 'owner'}`
+    text += `_Cualquier monto es sumamente valioso._\n`
+    text += `Contacto: @${config.owner?.number?.[0] || 'owner'}`
     
     const copyButtons = payments.map(pay => ({
         name: 'cta_copy',
         buttonParamsJson: JSON.stringify({
-            display_text: `📋 Copy No. ${pay.name}`,
+            display_text: `📋 Copiar No. ${pay.name}`,
             copy_code: pay.number
         })
     }))
