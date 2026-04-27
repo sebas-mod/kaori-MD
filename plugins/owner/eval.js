@@ -5,12 +5,13 @@ import os from 'os'
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import config from '../../config.js'
 import util from 'util'
+
 const pluginConfig = {
     name: 'eval',
     alias: ['$', 'ev', 'evaluate', '=>'],
     category: 'owner',
-    description: 'Jalankan kode JavaScript (Owner Only)',
-    usage: '=> <code> atau .$ <code>',
+    description: 'Ejecuta código JavaScript (Solo Propietario)',
+    usage: '=> <code> o .$ <code>',
     example: '=> m.chat',
     isOwner: true,
     isPremium: false,
@@ -24,17 +25,18 @@ const pluginConfig = {
 }
 
 async function handler(m, { sock, store }) {
+    // Verificación de seguridad adicional
     if (!config.isOwner(m.sender)) {
-        return m.reply('❌ *Owner Only!*')
+        return m.reply('❌ *¡Solo el Propietario puede usar esto!*')
     }
 
     const code = m.fullArgs?.trim() || m.text?.trim()
 
     if (!code) {
         return m.reply(
-            `⚙️ *ᴇᴠᴀʟ*\n\n` +
-            `> Masukkan kode JavaScript!\n\n` +
-            `*Contoh:*\n` +
+            `⚙️ *EJECUTOR EVAL*\n\n` +
+            `> ¡Ingresa el código JavaScript que deseas ejecutar!\n\n` +
+            `*Ejemplos:*\n` +
             `> .$ 1 + 1\n` +
             `> .$ m.chat\n` +
             `> .$ db.getUser(m.sender)`
@@ -47,6 +49,7 @@ async function handler(m, { sock, store }) {
     let isError = false
 
     try {
+        // Ejecución del código dentro de una función asíncrona
         result = await eval(`(async () => { ${code} })()`)
     } catch (e) {
         isError = true
@@ -68,18 +71,19 @@ async function handler(m, { sock, store }) {
         output = String(result)
     }
 
+    // Limitar la longitud de la respuesta para evitar errores de envío en WA
     if (output.length > 3000) {
-        output = output.slice(0, 3000) + '\n\n... (truncated)'
+        output = output.slice(0, 3000) + '\n\n... (recortado)'
     }
 
-    const status = isError ? '❌ Error' : '✅ Success'
+    const status = isError ? '❌ Error' : '✅ Éxito'
     const type = isError ? result?.name || 'Error' : typeof result
 
     await m.reply(
-        `⚙️ *ᴇᴠᴀʟ ʀᴇsᴜʟᴛ*\n\n` +
-        `╭┈┈⬡「 📋 *ɪɴғᴏ* 」\n` +
-        `┃ ${status}\n` +
-        `┃ Type: ${type}\n` +
+        `⚙️ *RESULTADO EVAL*\n\n` +
+        `╭┈┈⬡「 📋 *INFO* 」\n` +
+        `┃ Estado: ${status}\n` +
+        `┃ Tipo: ${type}\n` +
         `╰┈┈┈┈┈┈┈┈⬡\n\n` +
         `\`\`\`${output}\`\`\``
     )
