@@ -1,11 +1,12 @@
 import fs from 'fs'
 import path from 'path'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'clearsessions',
-    alias: ['clearsession', 'delsession', 'delsessions'],
+    alias: ['clearsession', 'borrarsesion', 'delsessions'],
     category: 'owner',
-    description: 'Menghapus semua session di storage/sessions/',
+    description: 'Elimina todos los archivos de sesión en storage/sessions/',
     usage: '.clearsessions',
     example: '.clearsessions',
     isOwner: true,
@@ -21,7 +22,7 @@ async function handler(m)  {
     const sessionsPath = path.join(process.cwd(), 'storage', 'sessions')
     
     if (!fs.existsSync(sessionsPath)) {
-        return m.reply(`❌ Folder sessions tidak ditemukan!`)
+        return m.reply(`❌ ¡La carpeta de sesiones no existe!`)
     }
     
     await m.react('🗑️')
@@ -30,13 +31,14 @@ async function handler(m)  {
         const files = fs.readdirSync(sessionsPath)
         
         if (files.length === 0) {
-            return m.reply(`📁 Folder sessions sudah kosong!`)
+            return m.reply(`📁 ¡La carpeta de sesiones ya está vacía!`)
         }
         
         let deleted = 0
         let skipped = 0
         
         for (const file of files) {
+            // Es vital saltar creds.json para no desloguear el bot
             if (file === 'creds.json') {
                 skipped++
                 continue
@@ -56,16 +58,16 @@ async function handler(m)  {
         
         await m.react('✅')
         await m.reply(
-            `╭┈┈⬡「 🗑️ *ᴄʟᴇᴀʀ sᴇssɪᴏɴs* 」
+            `╭┈┈⬡「 🗑️ *LIMPIEZA DE SESIONES* 」
 ┃
-┃ ㊗ ᴅᴇʟᴇᴛᴇᴅ: *${deleted}* file
-┃ ㊗ sᴋɪᴘᴘᴇᴅ: *${skipped}* file
-┃ ㊗ ɴᴏᴛᴇ: creds.json tidak dihapus
+┃ ㊗ ELIMINADOS: *${deleted}* archivos
+┃ ㊗ OMITIDOS: *${skipped}* archivos
+┃ ㊗ NOTA: creds.json no fue eliminado
 ┃
 ╰┈┈⬡
 
-> _Session files berhasil dibersihkan!_
-> _Restart bot jika diperlukan._`
+> _¡Archivos de sesión limpiados con éxito!_
+> _Reinicia el bot si es necesario._`
         )
         
     } catch (error) {
