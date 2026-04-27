@@ -22,7 +22,7 @@ const pluginConfig = {
     name: [...COMMANDS, ...Object.keys(other)],
     alias: [],
     category: 'nsfw',
-    description: 'Consolidated NSFW commands with fallback logic',
+    description: 'Comandos NSFW consolidados con lógica de respaldo',
     usage: `.${COMMANDS[0]}`,
     example: `.${COMMANDS[0]}`,
     isOwner: false,
@@ -42,10 +42,6 @@ function gifToMp4(gifBuffer) {
 
     try {
         fs.writeFileSync(gifPath, gifBuffer)
-        // FFmpeg command to convert GIF to MP4
-        // -movflags faststart: Enable streaming
-        // -pix_fmt yuv420p: Ensure compatibility
-        // -vf "scale=...": Ensure even dimensions (required for some encoders)
         const cmd = `ffmpeg -y -i "${gifPath}" -movflags faststart -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -c:v libx264 -preset ultrafast -crf 23 "${mp4Path}"`
         
         execSync(cmd, { stdio: 'pipe', timeout: 30000, windowsHide: true })
@@ -57,7 +53,7 @@ function gifToMp4(gifBuffer) {
             return mp4Buffer
         }
     } catch (e) {
-        console.error('[NSFW] FFmpeg conversion failed:', e.message)
+        console.error('[NSFW] La conversión de FFmpeg falló:', e.message)
         try { if (fs.existsSync(gifPath)) fs.unlinkSync(gifPath) } catch {}
         try { if (fs.existsSync(mp4Path)) fs.unlinkSync(mp4Path) } catch {}
     }
@@ -109,7 +105,7 @@ async function handler(m, { sock }) {
 
         if (!imageUrl) {
             m.react('❌')
-            return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Gambar tidak ditemukan untuk tag: ${command}`)
+            return m.reply(`❌ *ERROR*\n\n> Imagen no encontrada para la etiqueta: ${command}`)
         }
 
         const response = await axios.get(imageUrl, { responseType: 'arraybuffer' })
@@ -127,7 +123,7 @@ async function handler(m, { sock }) {
                  await sock.sendMessage(m.chat, {
                     video: mp4Buffer,
                     gifPlayback: true,
-                    caption: `🔞 *${command.toUpperCase()}*\n\n> Source: Automated (Rule34/Waifu.pics)`,
+                    caption: `🔞 *${command.toUpperCase()}*\n\n> Fuente: Automatizada (Rule34/Waifu.pics)`,
                     contextInfo: {
                         forwardingScore: 9999,
                         isForwarded: true,
@@ -139,11 +135,11 @@ async function handler(m, { sock }) {
                     }
                 }, { quoted: m })
              } else {
-                 // Fallback to sending as GIF document if conversion fails
+                 // Fallback si la conversión falla
                  await sock.sendMessage(m.chat, {
                     image: buffer,
                     mimetype: 'image/gif',
-                    caption: `🔞 *${command.toUpperCase()}*\n\n> Source: Automated (Rule34/Waifu.pics)\n> _(Conversion failed, sent as GIF)_`,
+                    caption: `🔞 *${command.toUpperCase()}*\n\n> Fuente: Automatizada (Rule34/Waifu.pics)\n> _(Conversión fallida, enviado como GIF)_`,
                     contextInfo: {
                         forwardingScore: 9999,
                         isForwarded: true,
@@ -158,7 +154,7 @@ async function handler(m, { sock }) {
         } else {
             await sock.sendMessage(m.chat, {
                 image: buffer,
-                caption: `🔞 *${command.toUpperCase()}*\n\n> Source: Automated (Rule34/Waifu.pics)`,
+                caption: `🔞 *${command.toUpperCase()}*\n\n> Fuente: Automatizada (Rule34/Waifu.pics)`,
                 contextInfo: {
                     forwardingScore: 9999,
                     isForwarded: true,
