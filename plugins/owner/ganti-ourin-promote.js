@@ -1,13 +1,14 @@
 import fs from 'fs'
 import path from 'path'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: 'ganti-ourin-promote.jpg',
-    alias: ['gantiourinpromote', 'setourinpromote'],
+    name: 'cambiar-img-promote',
+    alias: ['setimgpromote', 'cambiarpromoteimg', 'setkeipromote'],
     category: 'owner',
-    description: 'Ganti gambar ourin-promote.jpg',
-    usage: '.ganti-ourin-promote.jpg (reply/kirim gambar)',
-    example: '.ganti-ourin-promote.jpg',
+    description: 'Cambia la imagen de fondo para los anuncios de promoción en 𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃',
+    usage: '.cambiar-img-promote (responder o enviar imagen)',
+    example: '.cambiar-img-promote',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -19,13 +20,36 @@ const pluginConfig = {
 
 async function handler(m, { sock }) {
     const isImage = m.isImage || (m.quoted && m.quoted.type === 'imageMessage')
-    if (!isImage) return m.reply(`🖼️ *ɢᴀɴᴛɪ OURIN-PROMOTE.JPG*\n\n> Kirim/reply gambar untuk mengganti\n> File: assets/images/ourin-promote.jpg`)
+    
+    if (!isImage) {
+        return m.reply(
+            `🖼️ *CAMBIAR IMAGEN DE PROMOCIÓN*\n\n` +
+            `> Envía o responde a una imagen para actualizar el fondo de promoción.\n` +
+            `> Archivo: assets/images/ourin-promote.jpg`
+        )
+    }
+    
     try {
         let buffer = m.quoted && m.quoted.isMedia ? await m.quoted.download() : await m.download()
-        if (!buffer) return m.reply('❌ Gagal mendownload gambar')
+        
+        if (!buffer) {
+            return m.reply('❌ No se pudo descargar la imagen.')
+        }
+        
         const targetPath = path.join(process.cwd(), 'assets', 'images', 'ourin-promote.jpg')
+        
+        // Asegurar que el directorio existe
+        const dir = path.dirname(targetPath)
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true })
+        }
+        
         fs.writeFileSync(targetPath, buffer)
-        m.reply(`✅ *ʙᴇʀʜᴀsɪʟ*\n\n> Gambar ourin-promote.jpg telah diganti`)
+        
+        m.reply(
+            `✅ *ÉXITO*\n\n` +
+            `> La imagen de promoción para **𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃** ha sido actualizada correctamente.`
+        )
     } catch (error) {
         await m.reply(te(m.prefix, m.command, m.pushName))
     }
