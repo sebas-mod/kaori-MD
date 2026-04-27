@@ -1,11 +1,12 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { calculateLevel, getRole } from '../user/level.js'
+
 const pluginConfig = {
     name: 'dellevel',
-    alias: ['kuranglevel', 'removelevel', 'dellvl'],
+    alias: ['restar nivel', 'quitarnivel', 'quitarlevel', 'dellvl'],
     category: 'owner',
-    description: 'Kurangi level user (via exp)',
-    usage: '.dellevel <jumlah> @user',
+    description: 'Reduce el nivel de un usuario (ajustando su EXP)',
+    usage: '.dellevel <cantidad> @user',
     example: '.dellevel 5 @user',
     isOwner: true,
     isPremium: false,
@@ -26,23 +27,25 @@ async function handler(m, { sock }) {
     const db = getDatabase()
     const args = m.args
     
+    // Buscar argumento numérico que no sea una mención
     const numArg = args.find(a => !isNaN(a) && !a.startsWith('@'))
     let levels = parseInt(numArg) || 0
     
     let targetJid = await extractTarget(m)
     
+    // Si no hay mención, aplicar a uno mismo si hay cantidad
     if (!targetJid && levels > 0) {
         targetJid = m.sender
     }
     
     if (!targetJid || levels <= 0) {
         return m.reply(
-            `📊 *ᴅᴇʟ ʟᴇᴠᴇʟ*\n\n` +
-            `╭┈┈⬡「 📋 *ᴜsᴀɢᴇ* 」\n` +
-            `┃ > \`.dellevel <jumlah>\` - ke diri sendiri\n` +
-            `┃ > \`.dellevel <jumlah> @user\` - ke orang lain\n` +
+            `📊 *QUITAR NIVEL*\n\n` +
+            `╭┈┈⬡「 📋 *MODO DE USO* 」\n` +
+            `┃ > \`${m.prefix}dellevel <cantidad>\` - a ti mismo\n` +
+            `┃ > \`${m.prefix}dellevel <cantidad> @user\` - a otra persona\n` +
             `╰┈┈┈┈┈┈┈┈⬡\n\n` +
-            `> Contoh: \`${m.prefix}dellevel 5\``
+            `> Ejemplo: \`${m.prefix}dellevel 5\``
         )
     }
     
@@ -50,6 +53,7 @@ async function handler(m, { sock }) {
     if (!user.rpg) user.rpg = {}
     
     const oldLevel = calculateLevel(user.rpg.exp || 0)
+    // Se calcula la EXP a eliminar (basado en la lógica original de 20k por nivel)
     const expToRemove = levels * 20000
     user.rpg.exp = Math.max(0, (user.rpg.exp || 0) - expToRemove)
     const newLevel = calculateLevel(user.rpg.exp)
@@ -58,13 +62,13 @@ async function handler(m, { sock }) {
     await m.react('✅')
     
     await m.reply(
-        `✅ *ʟᴇᴠᴇʟ ᴅɪᴋᴜʀᴀɴɢɪ*\n\n` +
-        `╭┈┈⬡「 📋 *ᴅᴇᴛᴀɪʟ* 」\n` +
-        `┃ 👤 User: @${targetJid.split('@')[0]}\n` +
-        `┃ ➖ Kurang: *-${levels} Level*\n` +
-        `┃ 🚄 Exp Removed: *-${expToRemove.toLocaleString('id-ID')}*\n` +
-        `┃ 📊 Level: *${oldLevel} → ${newLevel}*\n` +
-        `┃ ${getRole(newLevel)}\n` +
+        `✅ *NIVEL REDUCIDO*\n\n` +
+        `╭┈┈⬡「 📋 *DETALLES* 」\n` +
+        `┃ 👤 Usuario: @${targetJid.split('@')[0]}\n` +
+        `┃ ➖ Quitado: *-${levels} Niveles*\n` +
+        `┃ 🚄 EXP Eliminada: *-${expToRemove.toLocaleString('es-ES')}*\n` +
+        `┃ 📊 Nivel: *${oldLevel} → ${newLevel}*\n` +
+        `┃ Rango: ${getRole(newLevel)}\n` +
         `╰┈┈┈┈┈┈┈┈⬡`,
         { mentions: [targetJid] }
     )
