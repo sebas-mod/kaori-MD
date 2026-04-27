@@ -1,11 +1,12 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
-    name: 'resetrulesgrup',
-    alias: ['resetgrouprules'],
+    name: 'resetreglas',
+    alias: ['resetrulesgrup', 'resetgrouprules', 'borrarreglas'],
     category: 'group',
-    description: 'Reset rules grup ke default (admin only)',
-    usage: '.resetrulesgrup',
-    example: '.resetrulesgrup',
+    description: 'Restablece las reglas del grupo al valor predeterminado (Solo Admins)',
+    usage: '.resetreglas',
+    example: '.resetreglas',
     isOwner: false,
     isPremium: false,
     isGroup: true,
@@ -22,9 +23,10 @@ function handler(m) {
     db.setGroup(m.chat, { groupRules: null })
     
     m.reply(
-        `✅ *ɢʀᴜᴘ ʀᴜʟᴇs ᴅɪʀᴇsᴇᴛ*\n` +
-        `Rules grup berhasil direset ke default!\n` +
-        `Ketik \`${m.prefix}rulesgrup\` untuk melihat.`
+        `✅ *ʀᴇɢʟᴀs ʀᴇsᴛᴀʙʟᴇᴄɪᴅᴀs*\n\n` +
+        `> ¡Las reglas del grupo se han restablecido al valor por defecto!\n` +
+        `> Escribe \`${m.prefix}rulesgrup\` para verlas.\n\n` +
+        `*KAORI MD — Gestión*`
     )
 }
 
