@@ -30,7 +30,7 @@ function handler(m, { sock }) {
     m.reply(
         `✅ El grupo *${groupName}* ha sido activado por @${m.sender.split('@')[0]}\n\n` +
         `> Todos los miembros pueden enviar mensajes ahora.\n\n` +
-        `*KAORI MD — Moderación*`, 
+        `*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Moderación*`, 
         { mentions: [m.sender] }
     )
 }
