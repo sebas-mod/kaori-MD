@@ -1,13 +1,14 @@
 import fs from 'fs'
 import path from 'path'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: 'ganti-ourin-rules.jpg',
-    alias: ['gantirules', 'setourinrules'],
+    name: 'cambiar-img-reglas',
+    alias: ['setimgreglas', 'cambiarreglasimg', 'setkeirules'],
     category: 'owner',
-    description: 'Ganti gambar ourin-rules.jpg (thumbnail rules)',
-    usage: '.ganti-ourin-rules.jpg (reply/kirim gambar)',
-    example: '.ganti-ourin-rules.jpg',
+    description: 'Cambia la imagen de miniatura para la sección de reglas de 𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃',
+    usage: '.cambiar-img-reglas (responder o enviar imagen)',
+    example: '.cambiar-img-reglas',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -21,7 +22,11 @@ async function handler(m, { sock }) {
     const isImage = m.isImage || (m.quoted && m.quoted.type === 'imageMessage')
     
     if (!isImage) {
-        return m.reply(`🖼️ *ɢᴀɴᴛɪ ᴏᴜʀɪɴ-ʀᴜʟᴇs.ᴊᴘɢ*\n\n> Kirim/reply gambar untuk mengganti\n> File: assets/images/ourin-rules.jpg`)
+        return m.reply(
+            `🖼️ *CAMBIAR IMAGEN DE REGLAS*\n\n` +
+            `> Envía o responde a una imagen para actualizar la miniatura de reglas.\n` +
+            `> Archivo: assets/images/ourin-rules.jpg`
+        )
     }
     
     try {
@@ -33,7 +38,7 @@ async function handler(m, { sock }) {
         }
         
         if (!buffer) {
-            return m.reply(`❌ Gagal mendownload gambar`)
+            return m.reply(`❌ No se pudo descargar la imagen.`)
         }
         
         const targetPath = path.join(process.cwd(), 'assets', 'images', 'ourin-rules.jpg')
@@ -45,7 +50,10 @@ async function handler(m, { sock }) {
         
         fs.writeFileSync(targetPath, buffer)
         
-        m.reply(`✅ *ʙᴇʀʜᴀsɪʟ*\n\n> Gambar ourin-rules.jpg telah diganti`)
+        m.reply(
+            `✅ *ÉXITO*\n\n` +
+            `> La imagen para la sección de reglas de **𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃** ha sido actualizada correctamente.`
+        )
         
     } catch (error) {
         await m.reply(te(m.prefix, m.command, m.pushName))
