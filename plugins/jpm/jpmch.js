@@ -4,19 +4,21 @@ import config from '../../config.js'
 import { getBinaryNodeChild } from 'ourin'
 import fs from 'fs'
 import te from '../../src/lib/ourin-error.js'
+
 let cachedThumb = null
 try {
     if (fs.existsSync('./assets/images/ourin.jpg')) {
         cachedThumb = fs.readFileSync('./assets/images/ourin.jpg')
     }
 } catch (e) {}
+
 const pluginConfig = {
     name: 'jpmch',
-    alias: ['jpmchannel'],
-    category: 'jpm',
-    description: 'Kirim pesan ke semua channel WhatsApp',
-    usage: '.jpmch <pesan>',
-    example: '.jpmch Halo semuanya!',
+    alias: ['jpmcanal', 'jpmchannel', 'difusioncanal'],
+    category: 'admin',
+    description: 'Enviar un mensaje a todos los canales de WhatsApp suscritos',
+    usage: '.jpmch <mensaje>',
+    example: '.jpmch ¡Hola a todos!',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -27,9 +29,9 @@ const pluginConfig = {
 }
 
 /**
- * Fetch semua channel yang di-subscribe (dari inibaileysnya)
+ * Fetch todos los canales suscritos
  * @param {Object} sock - Socket Baileys
- * @returns {Promise<Object>} Daftar channel
+ * @returns {Promise<Object>} Lista de canales
  */
 async function fetchAllSubscribedChannels(sock) {
     const data = {}
@@ -65,12 +67,11 @@ async function fetchAllSubscribedChannels(sock) {
                 || []
             
             if (newsletters.length > 0) {
-
                 for (const ch of newsletters) {
                     if (ch.id) {
                         data[ch.id] = {
                             id: ch.id,
-                            name: ch.thread_metadata?.name?.text || ch.name || 'Unknown',
+                            name: ch.thread_metadata?.name?.text || ch.name || 'Desconocido',
                             subscribers: ch.thread_metadata?.subscribers_count || 0
                         }
                     }
@@ -78,14 +79,11 @@ async function fetchAllSubscribedChannels(sock) {
                 break
             }
         } catch (e) {
-
             continue
         }
     }
-    
     return data
 }
-
 
 async function handler(m, { sock }) {
     const db = getDatabase()
@@ -93,25 +91,25 @@ async function handler(m, { sock }) {
     if (m.isGroup) {
         const groupMode = getGroupMode(m.chat, db)
         if (groupMode !== 'md' && groupMode !== 'all') {
-            return m.reply(`❌ *ᴍᴏᴅᴇ ᴛɪᴅᴀᴋ sᴇsᴜᴀɪ*\n\n> JPM hanya tersedia di mode MD\n\n\`${m.prefix}botmode md\``)
+            return m.reply(`❌ *ᴍᴏᴅᴏ ɴᴏ ᴄᴏᴍᴘᴀᴛɪʙʟᴇ*\n\n> JPM solo está disponible en modo MD.\n\nActívalo con: \`${m.prefix}botmode md\``)
         }
     }
     
     const text = m.fullArgs?.trim() || m.text?.trim()
     if (!text) {
         return m.reply(
-            `📢 *JPM CHANNEL (JASA PESAN MASSAL)*\n\n` +
-            `Sistem broadcast otomatis ke seluruh channel WhatsApp yang mensubscribe bot ini.\n\n` +
-            `*PENGGUNAAN:*\n` +
-            `• *${m.prefix}jpmch <pesan>* — Mengirim JPM teks ke channel\n` +
-            `• *${m.prefix}jpmch (reply foto/video)* — Mengirim JPM media ke channel\n\n` +
-            `*CONTOH:*\n` +
-            `> \`${m.prefix}jpmch Halo semua, ikuti update terbaru kami!\``
+            `📢 *JPM CANALES (MENSAJE MASIVO)*\n\n` +
+            `Sistema de difusión automática a todos los canales de WhatsApp suscritos al bot.\n\n` +
+            `*MODO DE USO:*\n` +
+            `• *${m.prefix}jpmch <mensaje>* — Envía texto a los canales.\n` +
+            `• *${m.prefix}jpmch (responder a foto/video)* — Envía multimedia a los canales.\n\n` +
+            `*EJEMPLO:*\n` +
+            `> \`${m.prefix}jpmch ¡Hola a todos, sigan nuestras actualizaciones!\``
         )
     }
     
     if (global.statusjpm) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> JPM sedang berjalan. Ketik \`${m.prefix}stopjpm\` untuk menghentikan.`)
+        return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> Ya hay un proceso de JPM en curso. Escribe \`${m.prefix}stopjpm\` para detenerlo.`)
     }
     
     m.react('📢')
@@ -138,27 +136,27 @@ async function handler(m, { sock }) {
             channels = await fetchAllSubscribedChannels(sock)
         } catch (e) {
             m.react('☢')
-            m.reply(te(m.prefix, m.command, m.pushName))
+            return m.reply(te(m.prefix, m.command, m.pushName))
         }
         
         const channelIds = Object.keys(channels)
         
         if (channelIds.length === 0) {
             m.react('❌')
-            return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak ada channel yang ditemukan atau bot belum subscribe channel apapun`)
+            return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> No se encontraron canales o el bot no está suscrito a ninguno.`)
         }
 
         const jedaJpm = db.setting('jedaJpm') || 5000
         
         await m.reply(
-            `📢 *ᴊᴘᴍ ᴄʜᴀɴɴᴇʟ*\n\n` +
-            `╭┈┈⬡「 📋 *ᴅᴇᴛᴀɪʟ* 」\n` +
-            `┃ 📝 ᴘᴇsᴀɴ: \`${text.substring(0, 50)}${text.length > 50 ? '...' : ''}\`\n` +
-            `┃ 📷 ᴍᴇᴅɪᴀ: \`${mediaBuffer ? mediaType : 'Tidak'}\`\n` +
-            `┃ 📺 ᴛᴀʀɢᴇᴛ: \`${channelIds.length}\` channel\n` +
-            `┃ ⏱️ ᴊᴇᴅᴀ: \`${jedaJpm}ms\`\n` +
+            `📢 *ᴊᴘᴍ ᴄᴀɴᴀʟᴇs*\n\n` +
+            `╭┈┈⬡「 📋 *ᴅᴇᴛᴀʟʟᴇs* 」\n` +
+            `┃ 📝 ᴍᴇɴsᴀᴊᴇ: \`${text.substring(0, 50)}${text.length > 50 ? '...' : ''}\`\n` +
+            `┃ 📷 ᴍᴜʟᴛɪᴍᴇᴅɪᴀ: \`${mediaBuffer ? mediaType : 'No'}\`\n` +
+            `┃ 📺 ᴛᴀʀɢᴇᴛ: \`${channelIds.length}\` canales\n` +
+            `┃ ⏱️ ᴘᴀᴜsᴀ: \`${jedaJpm}ms\`\n` +
             `╰┈┈⬡\n\n` +
-            `> Memulai JPM ke semua channel...`
+            `> Iniciando envío masivo a canales...`
         )
         
         global.statusjpm = true
@@ -166,42 +164,37 @@ async function handler(m, { sock }) {
         let failedCount = 0
         
         for (const chId of channelIds) {
-            const chName = channels[chId]?.name || chId
-
             if (global.stopjpm) {
                 delete global.stopjpm
                 delete global.statusjpm
                 
                 await m.reply(
-                    `⏹️ *ᴊᴘᴍ ᴅɪʜᴇɴᴛɪᴋᴀɴ*\n\n` +
-                    `> ✅ Berhasil: \`${successCount}\`\n` +
-                    `> ❌ Gagal: \`${failedCount}\``
+                    `⏹️ *ᴊᴘᴍ ᴅᴇᴛᴇɴɪᴅᴏ*\n\n` +
+                    `> ✅ Exitosos: \`${successCount}\`\n` +
+                    `> ❌ Fallidos: \`${failedCount}\``
                 )
                 return
             }
 
-            let contextInfo = {}
-            try {
-                contextInfo = {
-                    isForwarded: true,
-                    forwardingScore: 99,
-                    forwardedNewsletterMessageInfo: {
-                        newsletterName: config.saluran?.name || config.bot?.name,
-                        newsletterJid: config.saluran?.id || '',
-                    }
+            let contextInfo = {
+                isForwarded: true,
+                forwardingScore: 99,
+                forwardedNewsletterMessageInfo: {
+                    newsletterName: config.bot?.name || 'KAORI MD',
+                    newsletterJid: config.saluran?.id || '',
                 }
-                
-                if (cachedThumb) {
-                    contextInfo.externalAdReply = {
-                        title: '📢 JPM CHANNEL',
-                        body: 'Pesan Broadcast',
-                        thumbnail: cachedThumb,
-                        mediaType: 1,
-                        sourceUrl: config.saluran?.link || '',
-                        renderLargerThumbnail: true,
-                    }
+            }
+            
+            if (cachedThumb) {
+                contextInfo.externalAdReply = {
+                    title: '📢 JPM CANAL',
+                    body: 'Difusión Oficial',
+                    thumbnail: cachedThumb,
+                    mediaType: 1,
+                    sourceUrl: config.saluran?.link || '',
+                    renderLargerThumbnail: true,
                 }
-            } catch (e) {}
+            }
             
             try {
                 if (mediaBuffer) {
@@ -213,10 +206,8 @@ async function handler(m, { sock }) {
                 } else {
                     await sock.sendMessage(chId, { text: text, contextInfo })
                 }
-
                 successCount++
             } catch (err) {
-
                 failedCount++
             }
             
@@ -224,13 +215,12 @@ async function handler(m, { sock }) {
         }
         
         delete global.statusjpm
-        
         m.react('✅')
         await m.reply(
-            `✅ *ᴊᴘᴍ ᴄʜᴀɴɴᴇʟ sᴇʟᴇsᴀɪ*\n\n` +
-            `╭┈┈⬡「 📊 *ʜᴀsɪʟ* 」\n` +
-            `┃ ✅ ʙᴇʀʜᴀsɪʟ: \`${successCount}\`\n` +
-            `┃ ❌ ɢᴀɢᴀʟ: \`${failedCount}\`\n` +
+            `✅ *ᴊᴘᴍ ꜰɪɴᴀʟɪᴢᴀᴅᴏ*\n\n` +
+            `╭┈┈⬡「 📊 *ʀᴇsᴜʟᴛᴀᴅᴏs* 」\n` +
+            `┃ ✅ ᴇxɪᴛᴏsᴏs: \`${successCount}\`\n` +
+            `┃ ❌ ꜰᴀʟʟɪᴅᴏs: \`${failedCount}\`\n` +
             `┃ 📊 ᴛᴏᴛᴀʟ: \`${channelIds.length}\`\n` +
             `╰┈┈⬡`
         )
