@@ -1,10 +1,10 @@
 const pluginConfig = {
     name: 'getpp',
-    alias: ['pp', 'profilepic', 'avatar'],
+    alias: ['pp', 'profilepic', 'avatar', 'fotoperfil'],
     category: 'group',
-    description: 'Ambil foto profil target (mention/reply)',
+    description: 'Obtén la foto de perfil de un usuario (mención/reply)',
     usage: '.getpp @user',
-    example: '.getpp @628xxx',
+    example: '.getpp @549xxx',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -23,7 +23,8 @@ async function handler(m, { sock }) {
         target = m.mentionedJid[0]
     } else if (m.args[0]) {
         let num = m.args[0].replace(/[^0-9]/g, '')
-        if (num.startsWith('0')) num = '62' + num.slice(1)
+        // Adaptación lógica para prefijos si es necesario
+        if (num.startsWith('0')) num = '54' + num.slice(1) 
         target = num + '@s.whatsapp.net'
     }
     
@@ -33,10 +34,11 @@ async function handler(m, { sock }) {
     try {
         ppUrl = await sock.profilePictureUrl(target, 'image')
     } catch {
+        // Imagen por defecto si no tiene PP o es privada
         ppUrl = 'https://files.catbox.moe/ejy4ky.jpg'
     }
 
-    await sock.sendMedia(m.chat, ppUrl, `Foto profil milik @${targetNum}`, m, {
+    await sock.sendMedia(m.chat, ppUrl, `Foto de perfil de @${targetNum}`, m, {
         type: 'image',
         mentions: [target]
     })
