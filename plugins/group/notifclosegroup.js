@@ -1,10 +1,10 @@
 const pluginConfig = {
-    name: 'notifclosegroup',
-    alias: ['notifclose'],
+    name: 'notifcierre',
+    alias: ['notifclosegroup', 'notifclose', 'avisocierre'],
     category: 'group',
-    description: 'Toggle notifikasi saat grup ditutup',
-    usage: '.notifclosegroup on/off',
-    example: '.notifclosegroup on',
+    description: 'Activa o desactiva la notificación cuando el grupo se cierra',
+    usage: '.notifcierre on/off',
+    example: '.notifcierre on',
     isOwner: false,
     isPremium: false,
     isGroup: true,
@@ -16,27 +16,34 @@ const pluginConfig = {
 
 function handler(m, { sock, db }) {
     if (!m.isAdmin && !m.isOwner) {
-        return m.reply(`❌ Hanya admin grup yang bisa menggunakan fitur ini`)
+        return m.reply(`❌ Solo los administradores del grupo pueden usar esta función.`)
     }
     
     const args = m.args[0]?.toLowerCase()
     const group = db.getGroup(m.chat) || {}
     
-    if (!['on', 'off'].includes(args)) {
-        const status = group.notifCloseGroup === true ? '✅ Aktif' : '❌ Nonaktif'
-        return m.reply(`🔒 *ɴᴏᴛɪꜰ ᴄʟᴏsᴇ ɢʀᴏᴜᴘ*\n\n> Status: ${status}\n\n*Penggunaan:*\n\`${m.prefix}notifclosegroup on\` - Aktifkan\n\`${m.prefix}notifclosegroup off\` - Nonaktifkan`)
+    if (!['on', 'off', 'activar', 'desactivar'].includes(args)) {
+        const status = group.notifCloseGroup === true ? '✅ Activado' : '❌ Desactivado'
+        return m.reply(
+            `🔒 *ɴᴏᴛɪꜰɪᴄᴀᴄɪᴏ́ɴ ᴅᴇ ᴄɪᴇʀʀᴇ*\n\n` +
+            `> Estado actual: ${status}\n\n` +
+            `*Uso:*\n` +
+            `\`${m.prefix}notifcierre on\` - Para activar\n` +
+            `\`${m.prefix}notifcierre off\` - Para desactivar\n\n` +
+            `*KAORI MD — Ajustes*`
+        )
     }
     
-    if (args === 'on') {
+    if (args === 'on' || args === 'activar') {
         group.notifCloseGroup = true
         db.setGroup(m.chat, group)
-        return m.reply(`✅ *ɴᴏᴛɪꜰ ᴄʟᴏsᴇ ɢʀᴏᴜᴘ ᴅɪᴀᴋᴛɪꜰᴋᴀɴ*`)
+        return m.reply(`✅ *ɴᴏᴛɪꜰɪᴄᴀᴄɪᴏ́ɴ ᴅᴇ ᴄɪᴇʀʀᴇ ᴀᴄᴛɪᴠᴀᴅᴀ*\n\n> El bot avisará a los miembros cuando el grupo sea cerrado.`)
     }
     
-    if (args === 'off') {
+    if (args === 'off' || args === 'desactivar') {
         group.notifCloseGroup = false
         db.setGroup(m.chat, group)
-        return m.reply(`❌ *ɴᴏᴛɪꜰ ᴄʟᴏsᴇ ɢʀᴏᴜᴘ ᴅɪɴᴏɴᴀᴋᴛɪꜰᴋᴀɴ*`)
+        return m.reply(`❌ *ɴᴏᴛɪꜰɪᴄᴀᴄɪᴏ́ɴ ᴅᴇ ᴄɪᴇʀʀᴇ ᴅᴇsᴀᴄᴛɪᴠᴀᴅᴀ*\n\n> El bot ya no enviará avisos al cerrar el grupo.`)
     }
 }
 
