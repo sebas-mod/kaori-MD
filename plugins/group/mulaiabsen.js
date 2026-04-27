@@ -1,11 +1,12 @@
 import config from '../../config.js'
+
 const pluginConfig = {
-    name: 'mulaiabsen',
-    alias: ['startabsen', 'bukaabsen', 'openabsen'],
+    name: 'iniciarlista',
+    alias: ['startabsen', 'abrirlista', 'comenzarlista', 'lista'],
     category: 'group',
-    description: 'Mulai sesi absen di grup (admin only)',
-    usage: '.mulaiabsen [keterangan]',
-    example: '.mulaiabsen Rapat Mingguan',
+    description: 'Inicia una sesión de asistencia en el grupo (Solo Admins)',
+    usage: '.iniciarlista [motivo/título]',
+    example: '.iniciarlista Reunión de Staff',
     isOwner: false,
     isPremium: false,
     isGroup: true,
@@ -16,6 +17,7 @@ const pluginConfig = {
     isAdmin: true
 }
 
+// Inicialización global para manejar las listas activas
 if (!global.absensi) global.absensi = {}
 
 async function handler(m, { sock }) {
@@ -23,14 +25,15 @@ async function handler(m, { sock }) {
     
     if (global.absensi[chatId]) {
         return m.reply(
-            `❌ *ᴍᴀsɪʜ ᴀᴅᴀ ᴀʙsᴇɴ*\n\n` +
-            `> Masih ada sesi absen di grup ini!\n\n` +
-            `> Ketik *.hapusabsen* untuk menghapus\n` +
-            `> atau *.cekabsen* untuk melihat daftar`
+            `❌ *ʟᴀ ʟɪsᴛᴀ ʏᴀ ᴇsᴛᴀ́ ᴀᴄᴛɪᴠᴀ*\n\n` +
+            `> Ya hay una sesión de asistencia en curso en este grupo.\n\n` +
+            `> Usa \`${m.prefix}borrarlista\` para eliminarla\n` +
+            `> o \`${m.prefix}verlista\` para ver el estado actual.`
         )
     }
     
-    const keterangan = m.text?.trim() || 'Absen Harian'
+    // Obtenemos el texto del motivo, si no existe ponemos uno por defecto
+    const keterangan = m.fullArgs?.trim() || 'Asistencia Diaria'
     
     global.absensi[chatId] = {
         keterangan: keterangan,
@@ -39,17 +42,20 @@ async function handler(m, { sock }) {
         peserta: []
     }
     
-    const saluranId = config.saluran?.id || '120363208449943317@newsletter'
-    const saluranName = config.saluran?.name || config.bot?.name || 'Ourin-AI'
+    const botName = '𝐊𝐀𝐎𝐑𝐈 𝐌𝐃'
     
-    await m.reply(`📋 *ABSEN UDAH JALAN NIHH*\n\n` +
-            `「 📋 *ɪɴғᴏ* 」\n` +
-            `📝 ${keterangan}\n` +
-            `👑 Dibuat oleh: @${m.sender.split('@')[0]}\n` +
-            `👥 Peserta: 0\n\n` +
-            `Untuk kamu yang mau ikutan absen, silahkan ketik *${m.prefix}absen*` +
-            `Untuk admin yang mau cek absen, silahkan ketik *${m.prefix}cekabsen*` +
-            `Untuk admin yang mau hapus absen, silahkan ketik *${m.prefix}hapusabsen*`, {mentions: [m.sender]})
+    await m.reply(
+        `📋 *ʟɪsᴛᴀ ᴅᴇ ᴀsɪsᴛᴇɴᴄɪᴀ ɪɴɪᴄɪᴀᴅᴀ*\n\n` +
+        `「 📋 *ɪɴғᴏ* 」\n` +
+        `📝 *Motivo:* ${keterangan}\n` +
+        `👑 *Iniciado por:* @${m.sender.split('@')[0]}\n` +
+        `👥 *Presentes:* 0\n\n` +
+        `Para anotarte en la lista, escribe: *${m.prefix}presente*\n` +
+        `Para ver la lista actual, escribe: *${m.prefix}verlista*\n` +
+        `Para finalizar la lista, escribe: *${m.prefix}borrarlista*\n\n` +
+        `*${botName} — Gestión de Grupos*`, 
+        { mentions: [m.sender] }
+    )
 }
 
 export { pluginConfig as config, handler }
