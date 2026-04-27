@@ -42,7 +42,7 @@ async function handler(m, { sock }) {
         peserta: []
     }
     
-    const botName = '𝐊𝐀𝐎𝐑𝐈 𝐌𝐃'
+    const botName = '𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃'
     
     await m.reply(
         `📋 *ʟɪsᴛᴀ ᴅᴇ ᴀsɪsᴛᴇɴᴄɪᴀ ɪɴɪᴄɪᴀᴅᴀ*\n\n` +
