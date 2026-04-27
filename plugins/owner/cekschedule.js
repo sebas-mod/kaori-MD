@@ -3,11 +3,12 @@ import { initSholatScheduler, stopSholatScheduler } from '../../src/lib/ourin-sh
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { getTodaySchedule, extractPrayerTimes } from '../../src/lib/ourin-sholat-api.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'cekschedule',
-    alias: ['cekscheduler', 'schedulerstatus', 'schedstatus'],
+    alias: ['cekscheduler', 'estadoprogramador', 'schedstatus'],
     category: 'owner',
-    description: 'Melihat status semua scheduler bot',
+    description: 'Muestra el estado de todos los programadores (schedulers) del bot',
     usage: '.cekschedule',
     example: '.cekschedule',
     isOwner: true,
@@ -25,73 +26,84 @@ async function handler(m, { sock }) {
         const db = getDatabase();
         const sholatEnabled = db.setting('autoSholat') || false;
 
-        let text = `📊 *sᴄʜᴇᴅᴜʟᴇʀ sᴛᴀᴛᴜs*\n\n`;
+        let text = `📊 *ESTADO DE PROGRAMADORES*\n\n`;
 
         for (const sched of status.schedulers) {
             const statusIcon = sched.running ? '✅' : '❌';
             text += `${statusIcon} *${sched.name}*\n`;
-            text += `   └ Key: \`${sched.key}\`\n`;
+            text += `   └ Clave: \`${sched.key}\`\n`;
             text += `   └ ${sched.description}\n`;
 
             if (sched.lastRun && sched.lastRun !== '-' && sched.lastRun !== 'Never') {
-                text += `   └ Last: ${sched.lastRun}\n`;
+                text += `   └ Último: ${sched.lastRun}\n`;
             }
 
             if (sched.stats) {
                 if (sched.stats.totalResets) {
-                    text += `   └ Total Resets: ${sched.stats.totalResets}\n`;
+                    text += `   └ Reinicios Totales: ${sched.stats.totalResets}\n`;
                 }
                 if (sched.stats.activeMessages !== undefined) {
-                    text += `   └ Active: ${sched.stats.activeMessages} | Sent: ${sched.stats.totalSent}\n`;
+                    text += `   └ Activos: ${sched.stats.activeMessages} | Enviados: ${sched.stats.totalSent}\n`;
                 }
             }
             text += `\n`;
         }
 
         const sholatIcon = sholatEnabled ? '✅' : '❌';
-        text += `${sholatIcon} *Sholat Scheduler*\n`;
-        text += `   └ Key: \`sholat\`\n`;
-        text += `   └ Notifikasi waktu sholat (real-time)\n`;
+        text += `${sholatIcon} *Programador de Oraciones*\n`;
+        text += `   └ Clave: \`sholat\`\n`;
+        text += `   └ Notificación de tiempo de oración (tiempo real)\n`;
 
         if (sholatEnabled) {
-            const kotaSetting = db.setting('autoSholatKota') || { id: '1301', nama: 'KOTA JAKARTA' };
-            text += `   └ Lokasi: ${kotaSetting.nama}\n`;
+            const kotaSetting = db.setting('autoSholatKota') || { id: '1301', nama: 'CIUDAD DE YAKARTA' };
+            text += `   └ Ubicación: ${kotaSetting.nama}\n`;
 
             try {
                 const { schedule } = await getTodaySchedule(kotaSetting.id);
                 const times = extractPrayerTimes(schedule);
-                const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }));
+                
+                // Ajustar a la zona horaria del bot o servidor
+                const now = new Date();
                 const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
                 let nextSholat = null;
                 let nextTime = null;
 
+                const nombresEsp = {
+                    subuh: 'Alba (Subuh)',
+                    dzuhur: 'Mediodía (Dzuhur)',
+                    ashar: 'Tarde (Ashar)',
+                    maghrib: 'Ocaso (Maghrib)',
+                    isya: 'Noche (Isya)',
+                    imsak: 'Imsak'
+                };
+
                 for (const [name, time] of Object.entries(times)) {
                     if (time > currentTime && time !== '-') {
-                        nextSholat = name.charAt(0).toUpperCase() + name.slice(1);
+                        nextSholat = nombresEsp[name.toLowerCase()] || (name.charAt(0).toUpperCase() + name.slice(1));
                         nextTime = time;
                         break;
                     }
                 }
 
                 if (!nextSholat) {
-                    nextSholat = 'Imsak';
+                    nextSholat = 'Imsak (Mañana)';
                     nextTime = times.imsak;
                 }
 
-                text += `   └ Next: ${nextSholat} (${nextTime} WIB)\n`;
+                text += `   └ Próximo: ${nextSholat} (${nextTime})\n`;
             } catch {
-                text += `   └ _Gagal memuat jadwal_\n`;
+                text += `   └ _Error al cargar horario_\n`;
             }
         }
 
         text += `\n`;
         text += `━━━━━━━━━━━━━━━━━━━\n`;
-        text += `✅ Aktif: ${status.summary.totalActive + (sholatEnabled ? 1 : 0)}\n`;
-        text += `❌ Nonaktif: ${status.summary.totalInactive + (!sholatEnabled ? 1 : 0)}\n\n`;
+        text += `✅ Activos: ${status.summary.totalActive + (sholatEnabled ? 1 : 0)}\n`;
+        text += `❌ Inactivos: ${status.summary.totalInactive + (!sholatEnabled ? 1 : 0)}\n\n`;
 
-        text += `> Gunakan \`.stopschedule <key>\` untuk stop\n`;
-        text += `> Gunakan \`.startschedule <key>\` untuk start`;
+        text += `> Usa \`.stopschedule <clave>\` para detener\n`;
+        text += `> Usa \`.startschedule <clave>\` para iniciar`;
 
         await m.reply(text);
     } catch (error) {
