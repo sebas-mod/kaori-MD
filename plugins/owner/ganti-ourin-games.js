@@ -1,13 +1,14 @@
 import fs from 'fs'
 import path from 'path'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: 'ganti-ourin-games.jpg',
-    alias: ['gantigames', 'setouringames'],
+    name: 'cambiar-img-juegos',
+    alias: ['setimgjuegos', 'cambiarjuegosimg', 'setkeigames'],
     category: 'owner',
-    description: 'Ganti gambar ourin-games.jpg (thumbnail games)',
-    usage: '.ganti-ourin-games.jpg (reply/kirim gambar)',
-    example: '.ganti-ourin-games.jpg',
+    description: 'Cambia la imagen de miniatura para la sección de juegos de 𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃',
+    usage: '.cambiar-img-juegos (responder o enviar imagen)',
+    example: '.cambiar-img-juegos',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -21,7 +22,11 @@ async function handler(m, { sock }) {
     const isImage = m.isImage || (m.quoted && m.quoted.type === 'imageMessage')
     
     if (!isImage) {
-        return m.reply(`🖼️ *ɢᴀɴᴛɪ ᴏᴜʀɪɴ-ɢᴀᴍᴇs.ᴊᴘɢ*\n\n> Kirim/reply gambar untuk mengganti\n> File: assets/images/ourin-games.jpg`)
+        return m.reply(
+            `🖼️ *CAMBIAR IMAGEN DE JUEGOS*\n\n` +
+            `> Envía o responde a una imagen para actualizar la miniatura de juegos.\n` +
+            `> Archivo: assets/images/ourin-games.jpg`
+        )
     }
     
     try {
@@ -33,7 +38,7 @@ async function handler(m, { sock }) {
         }
         
         if (!buffer) {
-            return m.reply(`❌ Gagal mendownload gambar`)
+            return m.reply(`❌ No se pudo descargar la imagen.`)
         }
         
         const targetPath = path.join(process.cwd(), 'assets', 'images', 'ourin-games.jpg')
@@ -45,7 +50,10 @@ async function handler(m, { sock }) {
         
         fs.writeFileSync(targetPath, buffer)
         
-        m.reply(`✅ *ʙᴇʀʜᴀsɪʟ*\n\n> Gambar ourin-games.jpg telah diganti`)
+        m.reply(
+            `✅ *ÉXITO*\n\n` +
+            `> La imagen para la sección de juegos de **𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃** ha sido actualizada.`
+        )
         
     } catch (error) {
         await m.reply(te(m.prefix, m.command, m.pushName))
