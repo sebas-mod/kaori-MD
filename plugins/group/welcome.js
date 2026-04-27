@@ -95,7 +95,7 @@ Nuestra familia crece un poco más hoy 🤍
       .replace(/{date}/gi, now.format("DD/MM/YYYY"))
       .replace(/{time}/gi, now.format("HH:mm"))
       .replace(/{day}/gi, dayEs)
-      .replace(/{bot}/gi, config.bot?.name || "KAORI MD")
+      .replace(/{bot}/gi, config.bot?.name || "𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃")
       .replace(/{prefix}/gi, prefix);
   }
 
