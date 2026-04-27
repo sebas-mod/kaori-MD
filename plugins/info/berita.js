@@ -1,13 +1,14 @@
 import axios from 'axios'
 import * as cheerio from 'cheerio'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: ['antara', 'cnn', 'cnbc', 'sindonews', 'berita'],
-    alias: [],
-    category: 'berita',
-    description: 'Mendapatkan berita terkini dari berbagai sumber',
-    usage: '.berita <sumber>',
-    example: '.kompas atau .berita cnn',
+    alias: ['noticias', 'news'],
+    category: 'info',
+    description: 'Obtén las últimas noticias de diversas fuentes',
+    usage: '.noticias <fuente>',
+    example: '.cnn o .noticias cnbc',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -72,7 +73,7 @@ async function fetchRSS(url) {
 function formatDate(dateStr) {
     try {
         const date = new Date(dateStr)
-        return date.toLocaleString('id-ID', {
+        return date.toLocaleString('es-ES', {
             day: 'numeric',
             month: 'short',
             year: 'numeric',
@@ -88,26 +89,26 @@ async function handler(m) {
     const cmd = m.command.toLowerCase()
     let source = cmd
     
-    if (cmd === 'berita') {
+    if (cmd === 'berita' || cmd === 'noticias' || cmd === 'news') {
         const arg = m.text?.toLowerCase()?.trim()
         if (!arg) {
-            let txt = `📰 *ᴅᴀꜰᴛᴀʀ sᴜᴍʙᴇʀ ʙᴇʀɪᴛᴀ*\n\n`
+            let txt = `📰 *ʟɪsᴛᴀ ᴅᴇ ꜰᴜᴇɴᴛᴇs ᴅᴇ ɴᴏᴛɪᴄɪᴀs*\n\n`
             for (const [key, val] of Object.entries(NEWS_SOURCES)) {
                 txt += `> ${val.emoji} \`${m.prefix}${key}\` - ${val.name}\n`
             }
-            txt += `\n_Atau gunakan: \`${m.prefix}berita <sumber>\`_`
+            txt += `\n_O usa: \`${m.prefix}noticias <fuente>\`_`
             return m.reply(txt)
         }
         
         if (!NEWS_SOURCES[arg]) {
-            return m.reply(`❌ Sumber berita tidak ditemukan.\n> Gunakan: \`${m.prefix}berita\` untuk melihat daftar.`)
+            return m.reply(`❌ Fuente no encontrada.\n> Usa: \`${m.prefix}noticias\` para ver la lista.`)
         }
         source = arg
     }
     
     const newsSource = NEWS_SOURCES[source]
     if (!newsSource) {
-        return m.reply(`❌ Sumber berita tidak valid.`)
+        return m.reply(`❌ Fuente de noticias no válida.`)
     }
     
     await m.react('🕕')
@@ -116,7 +117,7 @@ async function handler(m) {
         const articles = await fetchRSS(newsSource.url)
         
         if (articles.length === 0) {
-            return m.reply(`❌ Tidak ada berita ditemukan.`)
+            return m.reply(`❌ No se encontraron noticias en este momento.`)
         }
         
         let txt = `${newsSource.emoji} *${newsSource.name.toUpperCase()}*\n`
@@ -136,7 +137,7 @@ async function handler(m) {
         }
         
         txt += `━━━━━━━━━━━━━━━\n`
-        txt += `_Total: ${articles.length} artikel tersedia_`
+        txt += `_Total: ${articles.length} artículos disponibles_`
         
         await m.reply(txt)
         m.react('📰')
