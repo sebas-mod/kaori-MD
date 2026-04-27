@@ -1,11 +1,12 @@
 import config from '../../config.js'
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'addpremall',
     alias: ['addpremiumall', 'setpremall'],
     category: 'owner',
-    description: 'Menambahkan semua member grup ke premium',
+    description: 'Añadir a todos los miembros del grupo a premium',
     usage: '.addprem all',
     example: '.addprem all',
     isOwner: true,
@@ -23,7 +24,7 @@ async function handler(m, { sock }) {
         const participants = groupMeta.participants || []
         
         if (participants.length === 0) {
-            return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak ada member di grup ini`)
+            return m.reply(`❌ *ERROR*\n\n> No hay miembros en este grupo`)
         }
         
         await m.react('🕕')
@@ -62,14 +63,14 @@ async function handler(m, { sock }) {
         
         await m.react('💎')
         await m.reply(
-            `💎 *ᴀᴅᴅ ᴘʀᴇᴍɪᴜᴍ ᴀʟʟ*\n\n` +
-            `╭┈┈⬡「 📋 *ʜᴀsɪʟ* 」\n` +
-            `┃ 👥 ᴛᴏᴛᴀʟ ᴍᴇᴍʙᴇʀ: \`${participants.length}\`\n` +
-            `┃ ✅ ᴅɪᴛᴀᴍʙᴀʜᴋᴀɴ: \`${addedCount}\`\n` +
-            `┃ ⏭️ sᴜᴅᴀʜ ᴘʀᴇᴍɪᴜᴍ: \`${alreadyPremCount}\`\n` +
-            `┃ 💎 ᴛᴏᴛᴀʟ ᴘʀᴇᴍɪᴜᴍ: \`${db.data.premium.length}\`\n` +
+            `💎 *AÑADIR PREMIUM TOTAL*\n\n` +
+            `╭┈┈⬡「 📋 *RESULTADOS* 」\n` +
+            `┃ 👥 Total Miembros: \`${participants.length}\`\n` +
+            `┃ ✅ Añadidos: \`${addedCount}\`\n` +
+            `┃ ⏭️ Ya eran Premium: \`${alreadyPremCount}\`\n` +
+            `┃ 💎 Total Premium: \`${db.data.premium.length}\`\n` +
             `╰┈┈⬡\n\n` +
-            `> Grup: ${groupMeta.subject}`
+            `> Grupo: ${groupMeta.subject}`
         )
         
     } catch (error) {
