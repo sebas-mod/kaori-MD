@@ -1,10 +1,11 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import config from '../../config.js'
+
 const pluginConfig = {
     name: 'antisticker',
     alias: ['as', 'nosticker'],
     category: 'group',
-    description: 'Mengatur antisticker di grup',
+    description: 'Configura la protección anti-stickers en el grupo',
     usage: '.antisticker <on/off>',
     example: '.antisticker on',
     isOwner: false,
@@ -20,7 +21,7 @@ const pluginConfig = {
 
 function gpMsg(key, replacements = {}) {
     const defaults = {
-        antisticker: '⚠ *AntiSticker* — Sticker dari @%user% dihapus.',
+        antisticker: '⚠ *ᴀɴᴛɪ-sᴛɪᴄᴋᴇʀ* — El sticker de @%user% ha sido eliminado.',
     }
     let text = config.groupProtection?.[key] || defaults[key] || ''
     for (const [k, v] of Object.entries(replacements)) {
@@ -57,26 +58,26 @@ async function handler(m, { sock }) {
     const groupData = db.getGroup(m.chat) || {}
 
     if (!action) {
-        const status = groupData.antisticker ? '✅ ON' : '❌ OFF'
-        await m.reply(`🎭 *AntiSticker*\n\n> Status: *${status}*\n\n> \`.antisticker on/off\``)
+        const status = groupData.antisticker ? '✅ ACTIVADO' : '❌ DESACTIVADO'
+        await m.reply(`🎭 *ᴀɴᴛɪ-sᴛɪᴄᴋᴇʀ | ᴋᴀᴏʀɪ ᴍᴅ*\n\n> Estado: *${status}*\n\n> Usa: \`.antisticker on/off\``)
         return
     }
 
     if (action === 'on') {
-        db.setGroup(m.chat, { antisticker: true })
+        db.setGroup(m.chat, { ...groupData, antisticker: true })
         m.react('✅')
-        await m.reply(`✅ *AntiSticker diaktifkan*`)
+        await m.reply(`✅ *AntiSticker activado*\n> Los stickers enviados por miembros (no admins) serán eliminados automáticamente.`)
         return
     }
 
     if (action === 'off') {
-        db.setGroup(m.chat, { antisticker: false })
+        db.setGroup(m.chat, { ...groupData, antisticker: false })
         m.react('❌')
-        await m.reply(`❌ *AntiSticker dinonaktifkan*`)
+        await m.reply(`❌ *AntiSticker desactivado*`)
         return
     }
 
-    await m.reply(`❌ Gunakan \`.antisticker on\` atau \`.antisticker off\``)
+    await m.reply(`❌ Opción no válida. Usa \`.antisticker on\` o \`.antisticker off\``)
 }
 
 export { pluginConfig as config, handler, checkAntisticker }
