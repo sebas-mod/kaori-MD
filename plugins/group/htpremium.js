@@ -1,13 +1,15 @@
 import { getParticipantJids } from '../../src/lib/ourin-lid.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: ['htpremium', 'hidetagpremium', 'htprem'],
+    name: 'htpremium',
+    alias: ['htprem', 'hidetagpremium', 'hprem'],
     category: 'group',
-    description: 'Hidetag dengan support reply pesan (teks/media)',
-    usage: '.htprem [pesan] atau reply pesan',
-    example: '.htprem atau reply pesan lalu .htprem',
+    description: 'Hidetag Premium con soporte para etiquetas personalizadas y media',
+    usage: '.htprem [etiqueta] | [mensaje] o respondiendo a un mensaje',
+    example: '.htprem Todos | ¡Hola! o responde a un mensaje y usa .htprem',
     isOwner: false,
-    isPremium: false,
+    isPremium: true,
     isGroup: true,
     isPrivate: false,
     cooldown: 30,
@@ -23,119 +25,118 @@ async function handler(m, { sock }) {
         const participants = groupMeta.participants || []
         const mentions = getParticipantJids(participants)
         const quoted = m.quoted
-        const [cmd, text] = m.text?.split('|')
+        
+        // Separamos el argumento por "|" para manejar etiqueta personalizada y mensaje
+        const args = m.fullArgs?.split('|')
+        const customTag = args[0]?.trim()
+        const text = args[1]?.trim()
+
         if (quoted) {
             const qMsg = quoted.message || {}
             const type = Object.keys(qMsg)[0]
+            const captionText = text || customTag || '' // Prioriza mensaje tras el "|" si existe
+
+            // ===== IMAGEN =====
             if (type === 'imageMessage') {
                 const media = await quoted.download()
-                const caption = qMsg.imageMessage?.caption || text || ''
                 return sock.sendMessage(m.chat, {
                     image: media,
-                    caption,
+                    caption: qMsg.imageMessage?.caption || captionText,
                     mentions
                 })
             }
+
+            // ===== VIDEO =====
             if (type === 'videoMessage') {
                 const media = await quoted.download()
-                const caption = qMsg.videoMessage?.caption || text || ''
                 return sock.sendMessage(m.chat, {
                     video: media,
-                    caption,
+                    caption: qMsg.videoMessage?.caption || captionText,
                     mentions
                 })
             }
+
+            // ===== STICKER =====
             if (type === 'stickerMessage') {
                 const media = await quoted.download()
                 await sock.sendMessage(m.chat, {
                     sticker: media,
                     mentions
                 })
-                if (text) {
-                    await sock.sendMessage(m.chat, {
-                        text,
-                        mentions
-                    })
+                if (captionText) {
+                    await sock.sendMessage(m.chat, { text: captionText, mentions })
                 }
                 return
             }
+
+            // ===== AUDIO =====
             if (type === 'audioMessage') {
                 const media = await quoted.download()
                 const audioMsg = qMsg.audioMessage || {}
-
                 await sock.sendMessage(m.chat, {
                     audio: media,
                     mimetype: audioMsg.mimetype,
                     ptt: audioMsg.ptt || false,
                     mentions
                 })
-
-                if (text) {
-                    await sock.sendMessage(m.chat, {
-                        text,
-                        mentions
-                    })
+                if (captionText) {
+                    await sock.sendMessage(m.chat, { text: captionText, mentions })
                 }
                 return
             }
+
+            // ===== DOCUMENTO =====
             if (type === 'documentMessage') {
                 const media = await quoted.download()
                 const docMsg = qMsg.documentMessage || {}
-
                 await sock.sendMessage(m.chat, {
                     document: media,
                     mimetype: docMsg.mimetype,
-                    fileName: docMsg.fileName || 'file',
+                    fileName: docMsg.fileName || 'archivo',
                     mentions
                 })
-
-                if (text) {
-                    await sock.sendMessage(m.chat, {
-                        text,
-                        mentions
-                    })
+                if (captionText) {
+                    await sock.sendMessage(m.chat, { text: captionText, mentions })
                 }
                 return
             }
-            const quotedText =
-                quoted.text ||
-                qMsg.conversation ||
-                qMsg.extendedTextMessage?.text ||
-                ''
 
-            const finalText = text || quotedText
+            const quotedText = quoted.text || qMsg.conversation || qMsg.extendedTextMessage?.text || ''
+            const finalText = captionText || quotedText
 
-            if (!finalText) {
-                return m.reply('❌ *Pesan kosong*')
-            }
+            if (!finalText) return m.reply('❌ *El mensaje está vacío*')
 
-            return sock.sendMessage(m.chat, {
-                text: finalText,
-                mentions
-            })
+            return sock.sendMessage(m.chat, { text: finalText, mentions })
         }
-        if (!text) {
+
+        // ===== MODO TEXTO PREMIUM (Etiqueta personalizada) =====
+        if (!customTag) {
             return m.reply(
-                `📢 *HIDETAG PREMIUM*\n\n` +
-                `• Reply pesan lalu ketik \`${m.prefix}ht\`\n` +
-                `• Atau ketik \`${m.prefix}ht <custom tag> | <pesan>\`\n\n` +
-                `• Contoh: \`${m.prefix}ht everyone | hai semua\`\n\n` +
-                `Support: teks, gambar, video, sticker, audio, dokumen`
+                `📢 *ʜɪᴅᴇᴛᴀɢ ᴘʀᴇᴍɪᴜᴍ*\n\n` +
+                `• Responde a un mensaje y usa \`${m.prefix}htprem\`\n` +
+                `• O usa: \`${m.prefix}htprem <etiqueta> | <mensaje>\`\n\n` +
+                `*Ejemplo:* \`${m.prefix}htprem Todos | aviso importante\`\n\n` +
+                `> Soporta: texto, imágenes, videos, stickers, audios y documentos.`
             )
         }
 
+        // Si no hay "|", usamos el texto completo como mensaje y el chat como etiqueta
+        const displayTag = text ? customTag : 'Notificación'
+        const displayMsg = text ? text : customTag
+
         await sock.sendMessage(m.chat, {
-            text: `@${m.chat} ${text} `,
+            text: `@${m.chat} ${displayMsg}`,
             contextInfo: {
                 groupMentions: [{
                     groupJid: m.chat,
-                    groupSubject: cmd
+                    groupSubject: displayTag
                 }],
                 mentionedJid: mentions
             }
         }, { quoted: m })
 
     } catch (err) {
+        console.error(err)
         m.reply(te(m.prefix, m.command, m.pushName))
     }
 }
