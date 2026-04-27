@@ -1,9 +1,10 @@
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: ['clearchat', 'cc', 'cleangc', 'deletechat', 'delchat'],
+    name: ['clearchat', 'cc', 'limpiarchat', 'borrarchat', 'delchat'],
     alias: [],
     category: 'group',
-    description: 'Membersihkan chat grup',
+    description: 'Limpia el historial de chat del bot en el grupo',
     usage: '.clearchat',
     example: '.clearchat',
     isOwner: false,
@@ -31,7 +32,7 @@ async function handler(m, { sock }) {
             }] 
         }, m.chat)
         
-        await m.reply(`✅ *ᴄʜᴀᴛ ᴅɪʙᴇʀsɪʜᴋᴀɴ*\n\n> Chat grup telah dibersihkan oleh @${m.sender.split('@')[0]}`, { mentions: [m.sender] })
+        await m.reply(`✅ *ᴄʜᴀᴛ ʟɪᴍᴘɪᴀᴅᴏ*\n\n> El historial del grupo ha sido vaciado por @${m.sender.split('@')[0]}`, { mentions: [m.sender] })
         
     } catch (error) {
         try {
@@ -45,7 +46,7 @@ async function handler(m, { sock }) {
                 } 
             }, m.chat)
             
-            await m.reply(`✅ *ᴄʜᴀᴛ ᴅɪʙᴇʀsɪʜᴋᴀɴ*\n\nChat grup di wa bot telah dibersihkan oleh @${m.sender.split('@')[0]}\nSilahkan lihat sendiri di wa bot kamu`, { mentions: [m.sender] })
+            await m.reply(`✅ *ᴄʜᴀᴛ ʟɪᴍᴘɪᴀᴅᴏ*\n\n> Se ha vaciado el historial de mensajes en el bot por @${m.sender.split('@')[0]}.\n> Puedes verificarlo en el chat del bot.`, { mentions: [m.sender] })
         } catch (e) {
             m.react('☢')
             m.reply(te(m.prefix, m.command, m.pushName))
