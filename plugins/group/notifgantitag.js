@@ -3,19 +3,21 @@ import { isToxic, handleToxicMessage, DEFAULT_TOXIC_WORDS } from './antitoxic.js
 import config from '../../config.js'
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: 'notifgantitag',
-    alias: ['notiflabel', 'notiftag', 'labeltag'],
+    name: 'notiftag',
+    alias: ['notiflabel', 'notifgantitag', 'labeltag'],
     category: 'group',
-    description: 'Mengatur notifikasi perubahan label/tag member',
-    usage: '.notifgantitag <on/off>',
-    example: '.notifgantitag on',
+    description: 'Configura las notificaciones de cambio de etiqueta/label de los miembros',
+    usage: '.notiftag <on/off>',
+    example: '.notiftag on',
     isGroup: true,
     isAdmin: true,
     cooldown: 5,
     energi: 0,
     isEnabled: true
 }
+
 async function handler(m, { sock }) {
     const db = getDatabase()
     const args = m.args || []
@@ -23,9 +25,10 @@ async function handler(m, { sock }) {
     const sub2 = args[1]?.toLowerCase()
     const groupData = db.getGroup(m.chat) || {}
     const currentStatus = groupData.notifLabelChange === true
+
     if (sub === 'on' && sub2 === 'all') {
         if (!m.isOwner) {
-            return m.reply(`❌ Hanya owner yang bisa menggunakan fitur ini!`)
+            return m.reply(`❌ ¡Solo el propietario puede usar esta función global!`)
         }
         m.react('🕕')
         try {
@@ -39,16 +42,17 @@ async function handler(m, { sock }) {
             m.react('✅')
             return m.reply(
                 `✅ *ɴᴏᴛɪꜰ ʟᴀʙᴇʟ ɢʟᴏʙᴀʟ ᴏɴ*\n\n` +
-                `> Notifikasi ganti label diaktifkan di *${count}* grup!`
+                `> ¡Notificación de cambio de etiqueta activada en *${count}* grupos!`
             )
         } catch (err) {
             m.react('☢')
             return m.reply(te(m.prefix, m.command, m.pushName))
         }
     }
+
     if (sub === 'off' && sub2 === 'all') {
         if (!m.isOwner) {
-            return m.reply(`❌ Hanya owner yang bisa menggunakan fitur ini!`)
+            return m.reply(`❌ ¡Solo el propietario puede usar esta función global!`)
         }
         m.react('🕕')
         try {
@@ -62,59 +66,63 @@ async function handler(m, { sock }) {
             m.react('✅')
             return m.reply(
                 `❌ *ɴᴏᴛɪꜰ ʟᴀʙᴇʟ ɢʟᴏʙᴀʟ ᴏꜰꜰ*\n\n` +
-                `> Notifikasi ganti label dinonaktifkan di *${count}* grup!`
+                `> ¡Notificación de cambio de etiqueta desactivada en *${count}* grupos!`
             )
         } catch (err) {
             m.react('☢')
             return m.reply(te(m.prefix, m.command, m.pushName))
         }
     }
+
     if (sub === 'on') {
         if (currentStatus) {
             return m.reply(
-                `⚠️ *ɴᴏᴛɪꜰ ʟᴀʙᴇʟ ᴀʟʀᴇᴀᴅʏ ᴀᴄᴛɪᴠᴇ*\n\n` +
-                `> Status: *✅ ON*\n` +
-                `> Notifikasi ganti label sudah aktif di grup ini.\n\n` +
-                `_Gunakan \`${m.prefix}notifgantitag off\` untuk menonaktifkan._`
+                `⚠️ *ɴᴏᴛɪꜰ ʟᴀʙᴇʟ ʏᴀ ᴀᴄᴛɪᴠᴀ*\n\n` +
+                `> Estado: *✅ ON*\n` +
+                `> Las notificaciones de cambio de etiqueta ya están activas en este grupo.\n\n` +
+                `_Usa \`${m.prefix}notiftag off\` para desactivar._`
             )
         }
         db.setGroup(m.chat, { notifLabelChange: true })
         return m.reply(
-            `✅ *ɴᴏᴛɪꜰ ʟᴀʙᴇʟ ᴀᴋᴛɪꜰ*\n\n` +
-            `> Notifikasi perubahan label member berhasil diaktifkan!\n` +
-            `> Bot akan memberitahu ketika ada member yang labelnya diganti.\n\n` +
-            `_Contoh: Admin menambahkan tag "VIP" ke member_`
+            `✅ *ɴᴏᴛɪꜰ ʟᴀʙᴇʟ ᴀᴋᴛɪᴠᴀ*\n\n` +
+            `> ¡Notificación de cambio de etiqueta activada con éxito!\n` +
+            `> **KAORI MD** te avisará cuando un miembro cambie su etiqueta.\n\n` +
+            `_Ejemplo: Un administrador añade la etiqueta "VIP" a un miembro._`
         )
     }
+
     if (sub === 'off') {
         if (!currentStatus) {
             return m.reply(
-                `⚠️ *ɴᴏᴛɪꜰ ʟᴀʙᴇʟ ᴀʟʀᴇᴀᴅʏ ɪɴᴀᴄᴛɪᴠᴇ*\n\n` +
-                `> Status: *❌ OFF*\n` +
-                `> Notifikasi ganti label sudah nonaktif di grup ini.\n\n` +
-                `_Gunakan \`${m.prefix}notifgantitag on\` untuk mengaktifkan._`
+                `⚠️ *ɴᴏᴛɪꜰ ʟᴀʙᴇʟ ʏᴀ ɪɴᴀᴄᴛɪᴠᴀ*\n\n` +
+                `> Estado: *❌ OFF*\n` +
+                `> Las notificaciones ya están desactivadas en este grupo.\n\n` +
+                `_Usa \`${m.prefix}notiftag on\` para activar._`
             )
         }
         db.setGroup(m.chat, { notifLabelChange: false })
         return m.reply(
-            `❌ *ɴᴏᴛɪꜰ ʟᴀʙᴇʟ ɴᴏɴᴀᴋᴛɪꜰ*\n\n` +
-            `> Notifikasi perubahan label member berhasil dinonaktifkan.`
+            `❌ *ɴᴏᴛɪꜰ ʟᴀʙᴇʟ ᴅᴇsᴀᴄᴛɪᴠᴀᴅᴀ*\n\n` +
+            `> Se han desactivado las notificaciones de cambio de etiqueta.`
         )
     }
+
     m.reply(
-        `🏷️ *ɴᴏᴛɪꜰ ɢᴀɴᴛɪ ᴛᴀɢ/ʟᴀʙᴇʟ*\n\n` +
-        `> Status: *${currentStatus ? '✅ ON' : '❌ OFF'}*\n\n` +
-        `\`\`\`━━━ ᴘɪʟɪʜᴀɴ ━━━\`\`\`\n` +
-        `> \`${m.prefix}notifgantitag on\` → Aktifkan\n` +
-        `> \`${m.prefix}notifgantitag off\` → Nonaktifkan\n` +
-        `> \`${m.prefix}notifgantitag on all\` → Global ON (owner)\n` +
-        `> \`${m.prefix}notifgantitag off all\` → Global OFF (owner)\n\n` +
-        `> 📋 *Fitur ini akan memberitahu saat:*\n` +
-        `> • Admin menambahkan label ke member\n` +
-        `> • Admin menghapus label dari member\n` +
-        `> • Label member berubah`
+        `🏷️ *ɴᴏᴛɪꜰɪᴄᴀᴄɪᴏ́ɴ ᴅᴇ ᴇᴛɪǫᴜᴇᴛᴀ/ʟᴀʙᴇʟ*\n\n` +
+        `> Estado actual: *${currentStatus ? '✅ ON' : '❌ OFF'}*\n\n` +
+        `\`\`\`━━━ ᴏᴘᴄɪᴏɴᴇs ━━━\`\`\`\n` +
+        `> \`${m.prefix}notiftag on\` → Activar\n` +
+        `> \`${m.prefix}notiftag off\` → Desactivar\n` +
+        `> \`${m.prefix}notiftag on all\` → Global ON (Owner)\n` +
+        `> \`${m.prefix}notiftag off all\` → Global OFF (Owner)\n\n` +
+        `> 📋 *Esta función avisará cuando:*\n` +
+        `> • Un admin añade una etiqueta a un miembro.\n` +
+        `> • Un admin elimina la etiqueta de un miembro.\n` +
+        `> • El texto de la etiqueta cambia.`
     )
 }
+
 async function handleLabelChange(msg, sock) {
     try {
         const db = getDatabase()
@@ -128,12 +136,14 @@ async function handleLabelChange(msg, sock) {
         const groupData = db.getGroup(groupJid) || {}
         const participant = msg.key.participant || msg.participant || 'Unknown'
         const label = memberLabel.label || ''
+
+        // Chequeo de Toxicidad en la etiqueta
         if (groupData.antitoxic && label && label.trim()) {
             try {
                 const toxicWords = groupData.toxicWords || DEFAULT_TOXIC_WORDS
                 const toxicCheck = isToxic(label, toxicWords)
                 if (toxicCheck.toxic) {
-                    await sock.sendText(groupJid, `Hei @${participant.split('@')[0]}, Tag kamu mengandung kata toxic !`, null, {
+                    await sock.sendText(groupJid, `¡Hey @${participant.split('@')[0]}, tu etiqueta contiene palabras prohibidas!`, null, {
                         mentions: [participant],
                         contextInfo: {
                             mentionedJid: [participant],
@@ -143,8 +153,8 @@ async function handleLabelChange(msg, sock) {
                                 mediaType: 1,
                                 mediaUrl: null,
                                 sourceUrl: null,
-                                title: "LABEL WARNING",
-                                body: null,
+                                title: "ADVERTENCIA DE ETIQUETA",
+                                body: "KAORI MD - SISTEMA ANTI-TOXIC",
                                 thumbnail: fs.readFileSync('./assets/images/ourin.jpg'),
                                 renderLargerThumbnail: true,
                             }
@@ -154,18 +164,16 @@ async function handleLabelChange(msg, sock) {
                 }
             } catch {}
         }
+
         if (groupData.notifLabelChange !== true) return false
-        let groupMeta = null
-        try {
-            groupMeta = await sock.groupMetadata(groupJid)
-        } catch {}
+        
         let notifText = ''
         if (label && label.trim()) {
-            notifText = `🎉 @${participant.split('@')[0]} telah mengubah label menjadi *${label}*`
+            notifText = `🎉 @${participant.split('@')[0]} ahora tiene la etiqueta: *${label}*`
         } else {
-            notifText = `🥗 @${participant.split('@')[0]} telah menghapus label`
+            notifText = `🥗 @${participant.split('@')[0]} ya no tiene etiqueta (removida)`
         }
-        console.log(notifText)
+
         await sock.sendText(groupJid, notifText, null, {
             mentions: [participant],
             contextInfo: {
@@ -176,8 +184,8 @@ async function handleLabelChange(msg, sock) {
                     mediaType: 1,
                     mediaUrl: null,
                     sourceUrl: null,
-                    title: "LABEL WARNING",
-                    body: null,
+                    title: "AVISO DE ETIQUETA",
+                    body: "KAORI MD - GESTIÓN DE GRUPO",
                     thumbnail: fs.readFileSync('./assets/images/ourin.jpg'),
                     renderLargerThumbnail: true,
                 }
@@ -189,4 +197,5 @@ async function handleLabelChange(msg, sock) {
         return false
     }
 }
+
 export { pluginConfig as config, handler, handleLabelChange }
