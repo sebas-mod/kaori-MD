@@ -1,8 +1,8 @@
 const pluginConfig = {
     name: 'notifdemote',
-    alias: [],
+    alias: ['avisodemote', 'notifquitaradmin'],
     category: 'group',
-    description: 'Toggle notifikasi saat ada yang dicopot dari admin',
+    description: 'Activa o desactiva la notificación cuando alguien deja de ser administrador',
     usage: '.notifdemote on/off',
     example: '.notifdemote on',
     isOwner: false,
@@ -16,27 +16,34 @@ const pluginConfig = {
 
 function handler(m, { sock, db }) {
     if (!m.isAdmin && !m.isOwner) {
-        return m.reply(`❌ Hanya admin grup yang bisa menggunakan fitur ini`)
+        return m.reply(`❌ Solo los administradores del grupo pueden usar esta función.`)
     }
     
     const args = m.args[0]?.toLowerCase()
     const group = db.getGroup(m.chat) || {}
     
-    if (!['on', 'off'].includes(args)) {
-        const status = group.notifDemote === true ? '✅ Aktif' : '❌ Nonaktif'
-        return m.reply(`👤 *ɴᴏᴛɪꜰ ᴅᴇᴍᴏᴛᴇ*\n\n> Status: ${status}\n\n*Penggunaan:*\n\`${m.prefix}notifdemote on\` - Aktifkan\n\`${m.prefix}notifdemote off\` - Nonaktifkan`)
+    if (!['on', 'off', 'activar', 'desactivar'].includes(args)) {
+        const status = group.notifDemote === true ? '✅ Activado' : '❌ Desactivado'
+        return m.reply(
+            `👤 *ɴᴏᴛɪꜰɪᴄᴀᴄɪᴏ́ɴ ᴅᴇ ᴅᴇᴍᴏᴛᴇ*\n\n` +
+            `> Estado actual: ${status}\n\n` +
+            `*Uso:*\n` +
+            `\`${m.prefix}notifdemote on\` - Para activar\n` +
+            `\`${m.prefix}notifdemote off\` - Para desactivar\n\n` +
+            `*KAORI MD — Ajustes*`
+        )
     }
     
-    if (args === 'on') {
+    if (args === 'on' || args === 'activar') {
         group.notifDemote = true
         db.setGroup(m.chat, group)
-        return m.reply(`✅ *ɴᴏᴛɪꜰ ᴅᴇᴍᴏᴛᴇ ᴅɪᴀᴋᴛɪꜰᴋᴀɴ*`)
+        return m.reply(`✅ *ɴᴏᴛɪꜰɪᴄᴀᴄɪᴏ́ɴ ᴅᴇ ᴅᴇᴍᴏᴛᴇ ᴀᴄᴛɪᴠᴀᴅᴀ*\n\n> El bot avisará cuando un administrador sea degradado a usuario común.`)
     }
     
-    if (args === 'off') {
+    if (args === 'off' || args === 'desactivar') {
         group.notifDemote = false
         db.setGroup(m.chat, group)
-        return m.reply(`❌ *ɴᴏᴛɪꜰ ᴅᴇᴍᴏᴛᴇ ᴅɪɴᴏɴᴀᴋᴛɪꜰᴋᴀɴ*`)
+        return m.reply(`❌ *ɴᴏᴛɪꜰɪᴄᴀᴄɪᴏ́ɴ ᴅᴇ ᴅᴇᴍᴏᴛᴇ ᴅᴇsᴀᴄᴛɪᴠᴀᴅᴀ*\n\n> El bot ya no enviará avisos cuando alguien deje de ser admin.`)
     }
 }
 
