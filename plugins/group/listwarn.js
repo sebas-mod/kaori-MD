@@ -1,11 +1,12 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import * as timeHelper from '../../src/lib/ourin-time.js'
+
 const pluginConfig = {
   name: "listwarn",
-  alias: ["warnings", "cekwarn", "warnlist"],
+  alias: ["warnings", "advertencias", "verwarns", "warnlist"],
   category: "group",
-  description: "Melihat daftar warning member",
-  usage: ".listwarn atau .listwarn @user",
+  description: "Muestra la lista de advertencias de los miembros",
+  usage: ".listwarn o .listwarn @user",
   example: ".listwarn @user",
   isOwner: false,
   isPremium: false,
@@ -29,47 +30,49 @@ async function handler(m, { sock }) {
   } else if (m.mentionedJid && m.mentionedJid.length > 0) {
     targetUser = m.mentionedJid[0];
   }
+
   if (targetUser) {
     const userWarnings = warnings[targetUser] || [];
     const targetName = targetUser.split("@")[0];
 
     if (userWarnings.length === 0) {
-      await m.reply(`✅ @${targetName} tidak memiliki warning.`, {
+      await m.reply(`✅ @${targetName} no tiene ninguna advertencia.`, {
         mentions: [targetUser],
       });
       return;
     }
 
-    let txt = `⚠️ *ᴡᴀʀɴɪɴɢ @${targetName}*\n\n`;
+    let txt = `⚠️ *ᴀᴅᴠᴇʀᴛᴇɴᴄɪᴀs ᴅᴇ @${targetName}*\n\n`;
     txt += `> Total: *${userWarnings.length}/${maxWarns}*\n\n`;
 
     userWarnings.forEach((w, i) => {
       const date = timeHelper.fromTimestamp(w.time, "DD/MM/YYYY");
-      txt += `*${i + 1}.* ${w.reason}\n`;
-      txt += `   └ _${date}_\n`;
+      txt += `*${i + 1}.* Motivo: ${w.reason}\n`;
+      txt += `    └ _Fecha: ${date}_\n`;
     });
 
     await m.reply(txt, { mentions: [targetUser] });
   } else {
-    // Show all users with warnings
+    // Mostrar todos los usuarios con advertencias
     const usersWithWarnings = Object.keys(warnings).filter(
       (u) => warnings[u].length > 0,
     );
 
     if (usersWithWarnings.length === 0) {
-      await m.reply(`✅ Tidak ada member dengan warning di grup ini.`);
+      await m.reply(`✅ No hay miembros con advertencias en este grupo.`);
       return;
     }
 
-    let txt = `⚠️ *ᴅᴀꜰᴛᴀʀ ᴡᴀʀɴɪɴɢ*\n\n`;
+    let txt = `⚠️ *ʟɪsᴛᴀ ᴅᴇ ᴀᴅᴠᴇʀᴛᴇɴᴄɪᴀs*\n\n`;
 
     usersWithWarnings.forEach((user, i) => {
       const count = warnings[user].length;
       const name = user.split("@")[0];
-      txt += `*${i + 1}.* @${name} - *${count}/${maxWarns}* warning\n`;
+      txt += `*${i + 1}.* @${name} — *${count}/${maxWarns}* warns\n`;
     });
 
-    txt += `\n> Ketik \`${m.prefix}listwarn @user\` untuk detail`;
+    txt += `\n> Usa \`${m.prefix}listwarn @user\` para ver el detalle.`;
+    txt += `\n\n*KAORI MD — Sistema de Control*`;
 
     await m.reply(txt, { mentions: usersWithWarnings });
   }
