@@ -1,11 +1,12 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import config from '../../config.js'
 import moment from 'moment-timezone'
+
 const pluginConfig = {
     name: 'intro',
-    alias: ['perkenalan', 'selamatdatang'],
+    alias: ['presentacion', 'bienvenida', 'reglas'],
     category: 'group',
-    description: 'Tampilkan pesan intro grup',
+    description: 'Muestra el mensaje de introducción del grupo',
     usage: '.intro',
     example: '.intro',
     isOwner: false,
@@ -17,32 +18,28 @@ const pluginConfig = {
     isEnabled: true
 }
 
-const DEFAULT_INTRO = `halo kak @user 🖐
+const DEFAULT_INTRO = `Hola @user 🖐
 
-Kenalan dulu yukk
-- Nama : 
-- Umur : 
-- Asal : 
-- Hobi : 
-- Status : 
+¡Bienvenido/a al grupo! Preséntate para conocerte:
+- *Nombre:* - *Edad:* - *País/Ciudad:* - *Hobby:* - *Estado:* Esperamos que te diviertas en el grupo: *@group*
 
-Semoga betah yahh, di grup @group
+> *Nota para Admins:*
+Puedes cambiar este mensaje usando el comando: `.setintro <texto>``
 
-> Untuk Owner:
-ganti intro bawaan dengan .setintro <text>`
- function parsePlaceholders(text, m, groupMeta) {
-    const now = moment().tz('Asia/Jakarta')
-    const dateStr = now.format('D MMMM YYYY')
+function parsePlaceholders(text, m, groupMeta) {
+    // Ajustado a la zona horaria local
+    const now = moment().tz('America/Argentina/Buenos_Aires')
+    const dateStr = now.format('D [de] MMMM [de] YYYY')
     const timeStr = now.format('HH:mm')
     
     return text
         .replace(/@user/gi, `@${m.sender.split('@')[0]}`)
-        .replace(/@group/gi, groupMeta?.subject || 'Grup')
+        .replace(/@group/gi, groupMeta?.subject || 'este grupo')
         .replace(/@count/gi, groupMeta?.participants?.length || '0')
         .replace(/@date/gi, dateStr)
         .replace(/@time/gi, timeStr)
-        .replace(/@desc/gi, groupMeta?.desc || 'Tidak ada deskripsi')
-        .replace(/@botname/gi, config.bot?.name || 'Ourin-AI')
+        .replace(/@desc/gi, groupMeta?.desc || 'Sin descripción')
+        .replace(/@botname/gi, '𝐊𝐀𝐎𝐑𝐈 𝐌𝐃')
 }
 
 async function handler(m, { sock }) {
