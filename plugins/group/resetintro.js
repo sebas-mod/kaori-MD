@@ -1,10 +1,11 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { DEFAULT_INTRO } from './intro.js'
+
 const pluginConfig = {
     name: 'resetintro',
-    alias: ['introdel', 'delintro', 'deleteintro'],
+    alias: ['introdel', 'delintro', 'deleteintro', 'borrarintro'],
     category: 'group',
-    description: 'Reset intro grup ke default (admin only)',
+    description: 'Restablece la introducción del grupo al valor predeterminado (Solo Admins)',
     usage: '.resetintro',
     example: '.resetintro',
     isOwner: false,
@@ -22,17 +23,19 @@ async function handler(m) {
     const groupData = db.getGroup(m.chat) || db.setGroup(m.chat)
     
     if (!groupData.intro) {
-        return m.reply(`❌ Grup ini sudah menggunakan intro default!`)
+        return m.reply(`❌ ¡Este grupo ya está utilizando la introducción predeterminada!`)
     }
     
+    // Eliminamos la intro personalizada
     delete groupData.intro
     db.setGroup(m.chat, groupData)
     db.save()
     
     await m.reply(
-        `✅ *ɪɴᴛʀᴏ ᴅɪʀᴇsᴇᴛ!*\n` +
-        `Intro grup dikembalikan ke default.\n\n` +
-        `Ketik *${m.prefix}intro* untuk melihat hasilnya.`
+        `✅ *ɪɴᴛʀᴏ ʀᴇsᴛᴀʙʟᴇᴄɪᴅᴀ*\n\n` +
+        `> La introducción personalizada ha sido eliminada.\n` +
+        `> Ahora se mostrará el mensaje por defecto de **KAORI MD**.\n\n` +
+        `Escribe *${m.prefix}intro* para ver el resultado.`
     )
 }
 
