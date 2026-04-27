@@ -1,9 +1,10 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
     name: 'resetwarn',
-    alias: ['clearwarn', 'hapuswarn', 'delwarn'],
+    alias: ['clearwarn', 'quitarwarn', 'delwarn', 'borrarwarn'],
     category: 'group',
-    description: 'Reset warning member',
+    description: 'Restablece las advertencias de un miembro',
     usage: '.resetwarn @user',
     example: '.resetwarn @user',
     isOwner: false,
@@ -28,9 +29,9 @@ async function handler(m, { sock }) {
     
     if (!targetUser) {
         await m.reply(
-            `⚠️ *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ*\n\n` +
-            `> Reply pesan user + \`${m.prefix}resetwarn\`\n` +
-            `> Atau: \`${m.prefix}resetwarn @user\``
+            `⚠️ *ᴍᴏᴅᴏ ᴅᴇ ᴜsᴏ*\n\n` +
+            `> Responde al mensaje del usuario + \`${m.prefix}resetwarn\`\n` +
+            `> O usa: \`${m.prefix}resetwarn @user\``
         )
         return
     }
@@ -42,7 +43,7 @@ async function handler(m, { sock }) {
     const targetName = targetUser.split('@')[0]
     
     if (!warnings[targetUser] || warnings[targetUser].length === 0) {
-        await m.reply(`✅ @${targetName} tidak memiliki warning.`, { mentions: [targetUser] })
+        await m.reply(`✅ @${targetName} no tiene advertencias acumuladas.`, { mentions: [targetUser] })
         return
     }
     
@@ -51,10 +52,11 @@ async function handler(m, { sock }) {
     db.setGroup(m.chat, { ...groupData, warnings: warnings })
     
     await m.reply(
-        `✅ *ᴡᴀʀɴɪɴɢ ᴅɪʀᴇsᴇᴛ*\n` +
-        `Warning @${targetName} berhasil direset!\n` +
-        `Sebelumnya: *${prevCount}/${maxWarns}*\n` +
-        `Sekarang: *0/${maxWarns}*`,
+        `✅ *ᴡᴀʀɴɪɴɢs ʀᴇsᴛᴀʙʟᴇᴄɪᴅᴀs*\n\n` +
+        `> ¡Las advertencias de @${targetName} han sido eliminadas!\n` +
+        `> Anteriormente: *${prevCount}/${maxWarns}*\n` +
+        `> Actualmente: *0/${maxWarns}*\n\n` +
+        `*KAORI MD — Moderación*`,
         { mentions: [targetUser] }
     )
 }
