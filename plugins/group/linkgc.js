@@ -29,7 +29,7 @@ async function handler(m, { sock }) {
         const response = `✨ *ᴇɴʟᴀᴄᴇ ᴅᴇʟ ɢʀᴜᴘᴏ*\n\n` +
                          `Aquí tienes el link de invitación para este grupo:\n` +
                          `> ${urlGrup}\n\n` +
-                         `*KAORI MD — Asistente Grupal*`
+                         `*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Asistente Grupal*`
 
         await m.reply(response)
         
