@@ -1,12 +1,13 @@
 import config from '../../config.js'
 import axios from 'axios'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
   name: 'buildml',
-  alias: [],
+  alias: ['mlbuild', 'build'],
   category: 'info',
-  description: 'Build hero Mobile Legends',
-  usage: '.buildml <hero>',
+  description: 'Muestra la mejor build para un héroe de Mobile Legends',
+  usage: '.buildml <héroe>',
   example: '.buildml gusion',
   isOwner: false,
   isPremium: false,
@@ -21,7 +22,7 @@ async function handler(m, { sock }) {
   let text = m.args?.join(" ")
   if (!text) {
     return m.reply(
-      `📚 *BUILD ML*\n\n> Masukan nama karakter\n\nContoh: ${m.prefix}buildml gusion`
+      `📚 *ᴍᴏʙɪʟᴇ ʟᴇɢᴇɴᴅs ʙᴜɪʟᴅs*\n\n> Por favor, ingresa el nombre de un héroe.\n\n*Ejemplo:* ${m.prefix}buildml gusion`
     )
   }
 
@@ -34,33 +35,36 @@ async function handler(m, { sock }) {
 
     const heroes = data.builds
     if (!heroes || !heroes.length) {
-      return m.reply("❌ Build tidak ditemukan")
+      return m.reply("❌ No se encontró ninguna build para este héroe. Verifica que el nombre esté bien escrito.")
     }
 
+    // Selecciona una build aleatoria de las disponibles en la API
     const pickRandom = heroes[Math.floor(Math.random() * heroes.length)]
     const title = pickRandom.title
 
     const itemnya = pickRandom.items?.map(v => {
-      return `*ITEM NYA*
-🌿 \`Nama\`: ${v.name}
-🔮 \`Tipe\`: ${v.type}
-💵 \`Harga\`: ${v.price}
+      return `*DETALLES DEL ÍTEM*
+🌿 \`Nombre\`: ${v.name}
+🔮 \`Tipo\`: ${v.type}
+💵 \`Precio\`: ${v.price}
 
-*STATS*
-🚧 \`Magic Power\`: ${v.stats?.magic_power || "-"}
-👻 \`Movement Speed\`: ${v.stats?.movement_speed || "-"}
-🎗️ \`Magic Penetration\`: ${v.stats?.magic_penetration || "-"}
+*ESTADÍSTICAS*
+🚧 \`Poder Mágico\`: ${v.stats?.magic_power || "-"}
+👻 \`Velocidad Mov.\`: ${v.stats?.movement_speed || "-"}
+🎗️ \`Penetración Mág.\`: ${v.stats?.magic_penetration || "-"}
 
-*PASSIVE*
+*PASIVA*
 ${v.passive_description || "-"}`
     }).join("\n\n")
 
-    m.reply(`*BUILD ${text.toUpperCase()}*
+    m.reply(`⚔️ *BUILD PARA ${text.toUpperCase()}*
 
-🍯 *Title*
+🍯 *Título de la Build:*
 ${title}
 
-${itemnya}`)
+${itemnya}
+
+*KAORI MD — Guía de Héroes*`)
 
   } catch (error) {
     console.error('BuildML Error:', error)
