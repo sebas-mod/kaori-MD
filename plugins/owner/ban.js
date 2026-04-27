@@ -4,11 +4,11 @@ import { isLid, lidToJid, resolveAnyLidToJid } from '../../src/lib/ourin-lid.js'
 
 const pluginConfig = {
     name: 'ban',
-    alias: ['addban', 'block'],
+    alias: ['addban', 'block', 'banear'],
     category: 'owner',
-    description: 'Memblokir user dari menggunakan bot',
-    usage: '.ban <nomor/@tag>',
-    example: '.ban 6281234567890',
+    description: 'Bloquea a un usuario para que no pueda usar el bot',
+    usage: '.ban <número/@tag>',
+    example: '.ban 34612345678',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -33,8 +33,9 @@ function resolveTarget(m) {
 
     if (isLid(raw)) raw = lidToJid(raw)
     let num = raw.replace(/[^0-9]/g, '')
-    if (num.startsWith('08')) num = '62' + num.slice(1)
-    if (num.startsWith('0')) num = '62' + num.slice(1)
+    
+    // Mantiene compatibilidad con prefijos automáticos si es necesario
+    if (num.startsWith('0')) num = num.slice(1) 
 
     return num
 }
@@ -42,16 +43,16 @@ function resolveTarget(m) {
 async function handler(m, { sock }) {
     const targetNumber = resolveTarget(m)
 
-    if (!targetNumber || targetNumber.length < 10 || targetNumber.length > 15) {
+    if (!targetNumber || targetNumber.length < 8 || targetNumber.length > 15) {
         return m.reply(
-            `🚫 *ʙᴀɴ ᴜsᴇʀ*\n\n` +
-            `> Masukkan nomor atau tag user\n\n` +
-            `\`Contoh: ${m.prefix}ban 6281234567890\``
+            `🚫 *BANEAR USUARIO*\n\n` +
+            `> Ingresa el número o etiqueta a un usuario\n\n` +
+            `\`Ejemplo: ${m.prefix}ban 34612345678\``
         )
     }
 
     if (config.isOwner(targetNumber)) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak dapat ban owner`)
+        return m.reply(`❌ *ERROR*\n\n> No se puede banear al propietario (Owner)`)
     }
 
     const db = getDatabase()
@@ -63,7 +64,7 @@ async function handler(m, { sock }) {
     })
 
     if (alreadyBanned) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Nomor \`${targetNumber}\` sudah dibanned`)
+        return m.reply(`❌ *ERROR*\n\n> El número \`${targetNumber}\` ya está en la lista negra`)
     }
 
     bannedList.push(targetNumber)
@@ -73,11 +74,11 @@ async function handler(m, { sock }) {
     await m.react('🚫')
 
     await m.reply(
-        `🚫 *ᴜsᴇʀ ᴅɪʙᴀɴɴᴇᴅ*\n\n` +
-        `╭┈┈⬡「 📋 *ᴅᴇᴛᴀɪʟ* 」\n` +
-        `┃ 📱 ɴᴏᴍᴏʀ: \`${targetNumber}\`\n` +
-        `┃ 🚫 sᴛᴀᴛᴜs: \`Banned\`\n` +
-        `┃ 📊 ᴛᴏᴛᴀʟ: \`${bannedList.length}\` ᴜsᴇʀ\n` +
+        `🚫 *USUARIO BANEADO*\n\n` +
+        `╭┈┈⬡「 📋 *DETALLES* 」\n` +
+        `┃ 📱 Número: \`${targetNumber}\`\n` +
+        `┃ 🚫 Estado: \`Baneado\`\n` +
+        `┃ 📊 Total: \`${bannedList.length}\` usuarios\n` +
         `╰┈┈⬡`
     )
 }
