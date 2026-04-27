@@ -55,7 +55,7 @@ async function handler(m, { sock, args }) {
             ? `${Math.floor(duration / 86400)} día(s)` 
             : `${Math.floor(duration / 3600)} hora(s)`;
         
-        const successMsg = `✅ *ᴍᴇɴsᴀᴊᴇ ғɪᴊᴀᴅᴏ*\n\n> El mensaje ha sido fijado con éxito.\n> Duración: *${durationText}*.\n\n*KAORI MD — Moderación*`;
+        const successMsg = `✅ *ᴍᴇɴsᴀᴊᴇ ғɪᴊᴀᴅᴏ*\n\n> El mensaje ha sido fijado con éxito.\n> Duración: *${durationText}*.\n\n*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Moderación*`;
         
         await m.reply(successMsg, { mentions: [m.sender] });
         
