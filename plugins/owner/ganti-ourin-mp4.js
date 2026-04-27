@@ -1,13 +1,14 @@
 import fs from 'fs'
 import path from 'path'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: 'ganti-ourin.mp4',
-    alias: ['gantiourinvideo', 'setourinvideo'],
+    name: 'cambiar-video-kei',
+    alias: ['setkeivideo', 'cambiarvideokei', 'setvideo'],
     category: 'owner',
-    description: 'Ganti video ourin.mp4',
-    usage: '.ganti-ourin.mp4 (reply/kirim video)',
-    example: '.ganti-ourin.mp4',
+    description: 'Cambia el archivo de video principal (ourin.mp4) de 𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃',
+    usage: '.cambiar-video-kei (responder/enviar video)',
+    example: '.cambiar-video-kei',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -21,7 +22,11 @@ async function handler(m, { sock }) {
     const isVideo = m.type === 'videoMessage' || (m.quoted && m.quoted.type === 'videoMessage')
     
     if (!isVideo) {
-        return m.reply(`🎬 *ɢᴀɴᴛɪ ᴏᴜʀɪɴ.ᴍᴘ4*\n\n> Kirim/reply video untuk mengganti\n> File: assets/video/ourin.mp4`)
+        return m.reply(
+            `🎬 *CAMBIAR VIDEO PRINCIPAL*\n\n` +
+            `> Envía o responde a un video para reemplazar el archivo principal.\n` +
+            `> Archivo: assets/video/ourin.mp4`
+        )
     }
     
     try {
@@ -33,7 +38,7 @@ async function handler(m, { sock }) {
         }
         
         if (!buffer) {
-            return m.reply(`❌ Gagal mendownload video`)
+            return m.reply(`❌ No se pudo descargar el video.`)
         }
         
         const targetPath = path.join(process.cwd(), 'assets', 'video', 'ourin.mp4')
@@ -45,7 +50,10 @@ async function handler(m, { sock }) {
         
         fs.writeFileSync(targetPath, buffer)
         
-        m.reply(`✅ *ʙᴇʀʜᴀsɪʟ*\n\n> Video ourin.mp4 telah diganti`)
+        m.reply(
+            `✅ *ÉXITO*\n\n` +
+            `> El video principal para **𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃** ha sido actualizado correctamente.`
+        )
         
     } catch (error) {
         await m.reply(te(m.prefix, m.command, m.pushName))
