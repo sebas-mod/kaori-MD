@@ -1,12 +1,13 @@
 import axios from 'axios'
 import config from '../../config.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'bluearchive-char',
-    alias: ['bachar'],
+    alias: ['bachar', 'ba-char', 'personaje-ba'],
     category: 'info',
-    description: 'Lihat info character Blue Archive',
-    usage: '.bluearchive-char <nama>',
+    description: 'Ver información de personajes de Blue Archive',
+    usage: '.bluearchive-char <nombre>',
     example: '.bluearchive-char shiroko',
     isOwner: false,
     isPremium: false,
@@ -46,7 +47,7 @@ class BluArchive {
         
         if (!foundUrl) {
             const suggestions = urls.filter(u => u.includes(name.toLowerCase().split(' ')[0])).slice(0, 5)
-            throw new Error(`Character "${name}" tidak ditemukan.\n\n> Mungkin maksud: ${suggestions.join(', ') || 'tidak ada'}`)
+            throw new Error(`El personaje "${name}" no fue encontrado.\n\n> Quizás quisiste decir: ${suggestions.join(', ') || 'ninguno'}`)
         }
         
         const { data } = await axios.get(`https://api.dotgg.gg/bluearchive/characters/${foundUrl}`)
@@ -64,11 +65,11 @@ async function handler(m, { sock }) {
     if (!name) {
         return m.reply(
             `🎮 *ʙʟᴜᴇ ᴀʀᴄʜɪᴠᴇ ᴄʜᴀʀᴀᴄᴛᴇʀ*\n\n` +
-            `> Lihat info character Blue Archive\n\n` +
-            `> *Contoh:*\n` +
+            `> Consulta los datos de los estudiantes de Blue Archive.\n\n` +
+            `> *Ejemplos:*\n` +
             `> ${m.prefix}bluearchive-char shiroko\n` +
             `> ${m.prefix}bachar hoshino\n` +
-            `> ${m.prefix}ba aru`
+            `> ${m.prefix}bachar aru`
         )
     }
     
@@ -79,7 +80,7 @@ async function handler(m, { sock }) {
         const char = await ba.char(name)
         
         const saluranId = config.saluran?.id || '120363208449943317@newsletter'
-        const saluranName = config.saluran?.name || config.bot?.name || 'Ourin-AI'
+        const saluranName = config.saluran?.name || config.bot?.name || 'KAORI MD'
         
         let caption = `🎮 *${char.name?.toUpperCase()}*\n\n`
         
@@ -87,31 +88,33 @@ async function handler(m, { sock }) {
             caption += `> ${char.bio.substring(0, 200)}${char.bio.length > 200 ? '...' : ''}\n\n`
         }
         
-        caption += `╭┈┈⬡「 📋 *ᴘʀᴏꜰɪʟᴇ* 」\n`
-        if (char.profile?.familyName) caption += `┃ 👤 Family: *${char.profile.familyName}*\n`
-        if (char.profile?.age) caption += `┃ 🎂 Age: *${char.profile.age}*\n`
-        if (char.profile?.height) caption += `┃ 📏 Height: *${char.profile.height}*\n`
-        if (char.profile?.school) caption += `┃ 🏫 School: *${char.profile.school}*\n`
+        caption += `╭┈┈⬡「 📋 *ᴘᴇʀꜰɪʟ* 」\n`
+        if (char.profile?.familyName) caption += `┃ 👤 Apellido: *${char.profile.familyName}*\n`
+        if (char.profile?.age) caption += `┃ 🎂 Edad: *${char.profile.age}*\n`
+        if (char.profile?.height) caption += `┃ 📏 Altura: *${char.profile.height}*\n`
+        if (char.profile?.school) caption += `┃ 🏫 Escuela: *${char.profile.school}*\n`
         if (char.profile?.club) caption += `┃ 🎯 Club: *${char.profile.club}*\n`
         if (char.profile?.hobby) caption += `┃ ⭐ Hobby: *${char.profile.hobby}*\n`
         if (char.profile?.CV) caption += `┃ 🎤 CV: *${char.profile.CV}*\n`
         caption += `╰┈┈┈┈┈┈┈┈⬡\n\n`
         
-        caption += `╭┈┈⬡「 ⚔️ *ʙᴀᴛᴛʟᴇ* 」\n`
-        if (char.type) caption += `┃ 🏷️ Type: *${char.type}*\n`
-        if (char.role) caption += `┃ 🎭 Role: *${char.role}*\n`
-        if (char.position) caption += `┃ 📍 Position: *${char.position}*\n`
-        if (char.profile?.weaponType) caption += `┃ 🔫 Weapon: *${char.profile.weaponType}*\n`
-        if (char.profile?.weaponName) caption += `┃ ⚔️ Weapon Name: *${char.profile.weaponName}*\n`
+        caption += `╭┈┈⬡「 ⚔️ *ᴄᴏᴍʙᴀᴛᴇ* 」\n`
+        if (char.type) caption += `┃ 🏷️ Tipo: *${char.type}*\n`
+        if (char.role) caption += `┃ 🎭 Rol: *${char.role}*\n`
+        if (char.position) caption += `┃ 📍 Posición: *${char.position}*\n`
+        if (char.profile?.weaponType) caption += `┃ 🔫 Arma: *${char.profile.weaponType}*\n`
+        if (char.profile?.weaponName) caption += `┃ ⚔️ Nombre Arma: *${char.profile.weaponName}*\n`
         caption += `╰┈┈┈┈┈┈┈┈⬡\n\n`
         
         if (char.skills && char.skills.length > 0) {
-            caption += `╭┈┈⬡「 ✨ *sᴋɪʟʟs* 」\n`
+            caption += `╭┈┈⬡「 ✨ *ʜᴀʙɪʟɪᴅᴀᴅᴇs* 」\n`
             for (const skill of char.skills.slice(0, 4)) {
                 caption += `┃ 🔹 *${skill.name}* (${skill.type})\n`
             }
-            caption += `╰┈┈┈┈┈┈┈┈⬡`
+            caption += `╰┈┈┈┈┈┈┈┈⬡\n\n`
         }
+
+        caption += `*KAORI MD — Base de datos*`
         
         if (char.img) {
             await sock.sendMessage(m.chat, {
@@ -135,6 +138,10 @@ async function handler(m, { sock }) {
         
     } catch (error) {
         await m.react('☢')
+        // Si el error es lanzado por la clase BluArchive, lo enviamos directamente
+        if (error.message.includes('encontrado')) {
+            return m.reply(`❌ ${error.message}`)
+        }
         m.reply(te(m.prefix, m.command, m.pushName))
     }
 }
