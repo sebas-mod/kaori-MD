@@ -1,10 +1,11 @@
 import * as pakasir from '../../src/lib/ourin-pakasir.js'
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
     name: 'botmode',
-    alias: ['setmode', 'mode'],
+    alias: ['setmode', 'mode', 'modobot'],
     category: 'group',
-    description: 'Atur mode bot untuk grup ini',
+    description: 'Configura el modo operativo del bot para este grupo',
     usage: '.botmode <md/cpanel/pushkontak/store/otp/all>',
     example: '.botmode store',
     isOwner: false,
@@ -20,37 +21,37 @@ const pluginConfig = {
 const MODES = {
     md: {
         name: 'Multi-Device',
-        desc: 'Mode default dengan semua fitur standar',
+        desc: 'Modo predeterminado con todas las funciones estándar',
         allowedCategories: null,
         excludeCategories: ['cpanel', 'pushkontak', 'store']
     },
     all: {
-        name: 'All Features',
-        desc: 'Semua fitur dari semua mode bisa diakses',
+        name: 'Todas las Funciones',
+        desc: 'Se puede acceder a todas las funciones de todos los modos',
         allowedCategories: null,
         excludeCategories: null
     },
     cpanel: {
         name: 'CPanel Pterodactyl',
-        desc: 'Mode khusus untuk panel server',
+        desc: 'Modo especializado para gestión de paneles de servidores',
         allowedCategories: ['main', 'group', 'sticker', 'owner', 'tools', 'panel'],
         excludeCategories: null
     },
     pushkontak: {
-        name: 'Push Kontak',
-        desc: 'Mode khusus untuk push kontak ke member',
+        name: 'Push Contactos',
+        desc: 'Modo exclusivo para difusión y push de contactos',
         allowedCategories: ['owner', 'main', 'group', 'sticker', 'pushkontak'],
         excludeCategories: null
     },
     store: {
-        name: 'Store/Toko',
-        desc: 'Mode khusus untuk toko online',
+        name: 'Tienda / Store',
+        desc: 'Modo especializado para ventas y comercio online',
         allowedCategories: ['main', 'group', 'sticker', 'owner', 'store'],
         excludeCategories: null
     },
     otp: {
-        name: 'OTP Service',
-        desc: 'Mode layanan OTP otomatis',
+        name: 'Servicio OTP',
+        desc: 'Modo para servicios de mensajería OTP automática',
         allowedCategories: ['main', 'group', 'sticker', 'owner'],
         excludeCategories: null
     }
@@ -76,24 +77,24 @@ function handler(m, { sock }) {
         const autoorderStatus = groupData.storeConfig?.autoorder ? '✅ ON' : '❌ OFF'
 
         return m.reply(
-            `🔧 *ʙᴏᴛ ᴍᴏᴅᴇ*\n\n` +
-            `> Mode saat ini: *${currentMode.toUpperCase()}* (${MODES[currentMode]?.name || 'Unknown'})\n` +
-            (currentMode === 'store' ? `> Autoorder: *${autoorderStatus}*\n` : '') +
-            `\n╭─「 📋 *ᴘɪʟɪʜᴀɴ* 」\n` +
+            `🔧 *ʙᴏᴛ ᴍᴏᴅᴇ | ᴋᴀᴏʀɪ ᴍᴅ*\n\n` +
+            `> Modo actual: *${currentMode.toUpperCase()}* (${MODES[currentMode]?.name || 'Desconocido'})\n` +
+            (currentMode === 'store' ? `> Auto-pedido: *${autoorderStatus}*\n` : '') +
+            `\n╭─「 📋 *ᴏᴘᴄɪᴏɴᴇs ᴅɪsᴘᴏɴɪʙʟᴇs* 」\n` +
             `${modeList}` +
             `╰───────────────\n\n` +
-            `*ꜰʟᴀɢ sᴛᴏʀᴇ:*\n` +
-            `> \`${m.prefix}botmode store\` - Manual order\n` +
-            `> \`${m.prefix}botmode store --autoorder\` - Auto payment\n\n` +
-            `> _Pengaturan per-grup_`
+            `*ꜰʟᴀɢs ᴅᴇ ᴛɪᴇɴᴅᴀ (sᴛᴏʀᴇ):*\n` +
+            `> \`${m.prefix}botmode store\` - Pedido manual\n` +
+            `> \`${m.prefix}botmode store --autoorder\` - Pago automático\n\n` +
+            `> _La configuración es individual por grupo._`
         )
     }
 
     if (!Object.keys(MODES).includes(mode)) {
-        return m.reply(`❌ Mode tidak valid. Pilihan: \`${Object.keys(MODES).join(', ')}\``)
+        return m.reply(`❌ Modo no válido. Elige entre: \`${Object.keys(MODES).join(', ')}\``)
     }
 
-    const isAutoorder = false
+    const isAutoorder = flags.includes('--autoorder')
 
     const newGroupData = {
         ...groupData,
@@ -103,19 +104,18 @@ function handler(m, { sock }) {
     if (mode === 'store') {
         let pakasirEnabled = false
         try {
-
             pakasirEnabled = pakasir.isEnabled()
         } catch (e) {}
 
         if (isAutoorder && !pakasirEnabled) {
             return m.reply(
-                `⚠️ *ᴀᴜᴛᴏᴏʀᴅᴇʀ ᴛɪᴅᴀᴋ ʙɪsᴀ ᴅɪᴀᴋᴛɪꜰᴋᴀɴ*\n\n` +
-                `> Pakasir belum dikonfigurasi!\n\n` +
-                `*ᴄᴀʀᴀ sᴇᴛᴜᴘ:*\n` +
-                `1. Buka \`config.js\`\n` +
-                `2. Set \`pakasir.slug\` dan \`pakasir.apiKey\`\n` +
-                `3. Restart bot\n\n` +
-                `> Atau gunakan mode manual:\n` +
+                `⚠️ *ɴᴏ sᴇ ᴘᴜᴇᴅᴇ ᴀᴄᴛɪᴠᴀʀ ᴀᴜᴛᴏᴏʀᴅᴇʀ*\n\n` +
+                `> ¡Pakasir no ha sido configurado correctamente!\n\n` +
+                `*ᴘᴀsᴏs ᴅᴇ ᴄᴏɴꜰɪɢᴜʀᴀᴄɪóɴ:*\n` +
+                `1. Abre \`config.js\`\n` +
+                `2. Configura \`pakasir.slug\` y \`pakasir.apiKey\`\n` +
+                `3. Reinicia el bot\n\n` +
+                `> O usa el modo manual:\n` +
                 `\`${m.prefix}botmode store\``
             )
         }
@@ -136,26 +136,26 @@ function handler(m, { sock }) {
     if (mode === 'store') {
         const products = newGroupData.storeConfig?.products || []
         if (isAutoorder) {
-            extraInfo = `\n\n✅ *Autoorder aktif!*\n` +
-                `> Pembayaran otomatis via Pakasir\n` +
-                `> Product: \`${products.length}\` item`
+            extraInfo = `\n\n✅ *¡Auto-pedido activo!*\n` +
+                `> Pago automático mediante Pakasir\n` +
+                `> Productos: \`${products.length}\` ítems configurados`
         } else {
-            extraInfo = `\n\n📋 *Manual mode*\n` +
-                `> Admin perlu confirm order manual\n` +
-                `> Product: \`${products.length}\` item\n\n` +
-                `*ᴘᴀɴᴅᴜᴀɴ:*\n` +
-                `> \`${m.prefix}addprod <kode> <harga> <nama>\`\n` +
-                `> \`${m.prefix}listprod\` - Lihat produk`
+            extraInfo = `\n\n📋 *Modo Manual*\n` +
+                `> El admin debe confirmar los pedidos manualmente\n` +
+                `> Productos: \`${products.length}\` ítems configurados\n\n` +
+                `*ɢᴜíᴀ ʀáᴘɪᴅᴀ:*\n` +
+                `> \`${m.prefix}addprod <código> <precio> <nombre>\`\n` +
+                `> \`${m.prefix}listprod\` - Ver catálogo`
         }
     }
 
     return m.reply(
-        `✅ *ᴍᴏᴅᴇ ᴅɪᴜʙᴀʜ*\n\n` +
-        `> Mode: *${mode.toUpperCase()}* (${MODES[mode].name})\n` +
-        `> Grup: *${m.chat.split('@')[0]}*\n` +
-        (mode === 'store' ? `> Autoorder: *${isAutoorder ? 'ON' : 'OFF'}*` : '') +
+        `✅ *ᴍᴏᴅᴇ ᴄᴀᴍʙɪᴀᴅᴏ*\n\n` +
+        `> Modo: *${mode.toUpperCase()}* (${MODES[mode].name})\n` +
+        `> Grupo: *${m.chat.split('@')[0]}*\n` +
+        (mode === 'store' ? `> Auto-pedido: *${isAutoorder ? 'ON' : 'OFF'}*` : '') +
         extraInfo +
-        `\n\n> Ketik \`${m.prefix}menu\` untuk melihat menu.`
+        `\n\n> Escribe \`${m.prefix}menu\` para ver las funciones disponibles.`
     )
 }
 
