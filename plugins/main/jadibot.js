@@ -2,10 +2,10 @@ import { startJadibot, isJadibotActive } from '../../src/lib/ourin-jadibot-manag
 
 const pluginConfig = {
     name: 'jadibot',
-    alias: ['jadibotqr', 'becomebot', 'bot'],
+    alias: ['serbot', 'becomebot', 'bot', 'subbot'],
     category: 'main',
-    description: 'Jadikan nomor kamu menjadi bot (Pairing Code / QR)',
-    usage: '.jadibot atau .jadibot qr',
+    description: 'Convierte tu número en un sub-bot (Código de vinculación / QR)',
+    usage: '.jadibot o .jadibot qr',
     example: '.jadibot',
     isOwner: false,
     isPremium: false,
@@ -18,13 +18,13 @@ const pluginConfig = {
 
 async function handler(m, { sock }) {
     const sender = m.sender
-    if (!sender) return m.reply('❌ Gagal mengidentifikasi nomor kamu')
+    if (!sender) return m.reply('❌ Error al identificar tu número de teléfono.')
 
     if (isJadibotActive(sender)) {
         return m.reply(
-            `⚠️ *ᴊᴀᴅɪʙᴏᴛ ꜱᴜᴅᴀʜ ᴀᴋᴛɪꜰ*\n\n` +
-            `> Nomor kamu sudah menjadi bot\n` +
-            `> Ketik \`${m.prefix}stopjadibot\` untuk menghentikan`
+            `⚠️ *ᴊᴀᴅɪʙᴏᴛ ʏᴀ ᴇsᴛá ᴀᴄᴛɪᴠᴏ*\n\n` +
+            `> Tu número ya está funcionando como un sub-bot.\n` +
+            `> Escribe \`${m.prefix}stopjadibot\` para detenerlo.`
         )
     }
 
@@ -33,14 +33,15 @@ async function handler(m, { sock }) {
 
     if (useQR) {
         await m.reply(
-            `🤖 *ᴊᴀᴅɪʙᴏᴛ — Qʀ ᴍᴏᴅᴇ*\n\n` +
-            `> Menyiapkan koneksi...\n` +
-            `> Scan QR Code yang akan dikirim`
+            `🤖 *ᴊᴀᴅɪʙᴏᴛ — ᴍᴏᴅᴏ Qʀ*\n\n` +
+            `> Preparando conexión...\n` +
+            `> Escanea el código QR que se enviará a continuación.`
         )
     } else {
         await m.reply(
-            `🤖 *ᴊᴀᴅɪʙᴏᴛ — ᴘᴀɪʀɪɴɢ ᴄᴏᴅᴇ*\n\n` +
-            `> Menyiapkan koneksi...`
+            `🤖 *ᴊᴀᴅɪʙᴏᴛ — ᴄóᴅɪɢᴏ ᴅᴇ ᴠɪɴᴄᴜʟᴀᴄɪóɴ*\n\n` +
+            `> Preparando conexión...\n` +
+            `> Espera un momento para recibir tu código.`
         )
     }
 
@@ -48,9 +49,9 @@ async function handler(m, { sock }) {
         await startJadibot(sock, m, sender, !useQR)
     } catch (e) {
         await m.reply(
-            `❌ *ᴊᴀᴅɪʙᴏᴛ ɢᴀɢᴀʟ*\n\n` +
-            `> ${e.message || 'Terjadi kesalahan'}\n\n` +
-            `Coba lagi dalam beberapa menit.`
+            `❌ *ᴊᴀᴅɪʙᴏᴛ ꜰᴀʟʟɪᴅᴏ*\n\n` +
+            `> ${e.message || 'Ocurrió un error inesperado'}\n\n` +
+            `Por favor, inténtalo de nuevo en unos minutos.`
         )
     }
 }
