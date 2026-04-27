@@ -4,8 +4,8 @@ const pluginConfig = {
     name: 'addenergi',
     alias: ['tambahenergi', 'giveenergi', 'addenergy'],
     category: 'owner',
-    description: 'Tambah energi user',
-    usage: '.addenergi <jumlah> @user',
+    description: 'Añadir energía a un usuario',
+    usage: '.addenergi <cantidad> @user',
     example: '.addenergi 100 @user',
     isOwner: true,
     isPremium: false,
@@ -17,7 +17,7 @@ const pluginConfig = {
 }
 
 function formatNumber(num) {
-    if (num === -1) return '∞ Unlimited'
+    if (num === -1) return '∞ Ilimitado'
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
 }
 
@@ -53,11 +53,11 @@ async function handler(m, { sock }) {
 
     if (!targetJid || (!isUnlimited && amount <= 0)) {
         return m.reply(
-            `⚡ *ᴀᴅᴅ ᴇɴᴇʀɢɪ*\n\n` +
-            `> \`.addenergi <jumlah>\` - ke diri sendiri\n` +
-            `> \`.addenergi <jumlah> @user\` - ke user\n` +
-            `> \`.addenergi --unlimited\` - unlimited\n\n` +
-            `\`Contoh: ${m.prefix}addenergi 100\``
+            `⚡ *AÑADIR ENERGÍA*\n\n` +
+            `> \`.addenergi <cantidad>\` - a ti mismo\n` +
+            `> \`.addenergi <cantidad> @user\` - a un usuario\n` +
+            `> \`.addenergi --unlimited\` - energía ilimitada\n\n` +
+            `\`Ejemplo: ${m.prefix}addenergi 100\``
         )
     }
 
@@ -69,9 +69,9 @@ async function handler(m, { sock }) {
 
     if (!isUnlimited && effectiveUnlimited) {
         return m.reply(
-            `⚡ *INFORMASI*\n` +
-            `@${targetJid.split('@')[0]} sudah memiliki energi *∞ Unlimited*\n` +
-            `Tidak perlu menambahkan energi lagi`,
+            `⚡ *INFORMACIÓN*\n` +
+            `@${targetJid.split('@')[0]} ya tiene energía *∞ Ilimitada*\n` +
+            `No es necesario añadir más energía.`,
             { mentions: [targetJid] }
         )
     }
@@ -81,7 +81,7 @@ async function handler(m, { sock }) {
 
         await m.react('✅')
         await m.reply(
-            `✅ *Energi @${targetJid.split('@')[0]} sekarang unlimited / tidak terbatas*`,
+            `✅ *La energía de @${targetJid.split('@')[0]} ahora es ilimitada*`,
             { mentions: [targetJid] }
         )
     } else {
@@ -89,7 +89,7 @@ async function handler(m, { sock }) {
 
         await m.react('✅')
         await m.reply(
-            `✅ Energi *@${targetJid.split('@')[0]}* berhasil di tambahkan sebanyak *${formatNumber(amount)}*!\nSekarang dia mempunyai *${formatNumber(newEnergi)}* energi`,
+            `✅ ¡Se han añadido *${formatNumber(amount)}* de energía a *@${targetJid.split('@')[0]}*!\nAhora tiene *${formatNumber(newEnergi)}* de energía.`,
             { mentions: [targetJid] }
         )
     }
