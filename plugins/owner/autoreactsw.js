@@ -2,9 +2,9 @@ import { getDatabase } from '../../src/lib/ourin-database.js'
 
 const pluginConfig = {
     name: 'autoreactsw',
-    alias: ['autoreaksi', 'reactsw', 'autoreactstory'],
+    alias: ['autoreaccion', 'reactsw', 'autoreactstory'],
     category: 'owner',
-    description: 'Auto react semua status/story WA',
+    description: 'Reacciona automáticamente a todos los estados/stories de WA',
     usage: '.autoreactsw on/off [emoji]',
     example: '.autoreactsw on 🔥',
     isOwner: true,
@@ -26,13 +26,13 @@ async function handler(m) {
 
     if (!action) {
         return m.reply(
-            `👁️ *ᴀᴜᴛᴏ ʀᴇᴀᴄᴛ sᴛᴏʀʏ*\n\n` +
-            `> Status: *${current.enabled ? '✅ ON' : '❌ OFF'}*\n` +
+            `👁️ *REACCIÓN AUTOMÁTICA DE ESTADOS*\n\n` +
+            `> Estado: *${current.enabled ? '✅ ACTIVADO' : '❌ DESACTIVADO'}*\n` +
             `> Emoji: *${current.emoji}*\n\n` +
-            `*ᴄᴀʀᴀ ᴘᴀᴋᴀɪ:*\n` +
-            `> \`${m.prefix}autoreactsw on\` — Aktifkan (emoji default 🔥)\n` +
-            `> \`${m.prefix}autoreactsw on 😍\` — Aktifkan dengan emoji\n` +
-            `> \`${m.prefix}autoreactsw off\` — Matikan`
+            `*MODO DE USO:*\n` +
+            `> \`${m.prefix}autoreactsw on\` — Activar (emoji por defecto 🔥)\n` +
+            `> \`${m.prefix}autoreactsw on 😍\` — Activar con un emoji específico\n` +
+            `> \`${m.prefix}autoreactsw off\` — Desactivar`
         )
     }
 
@@ -41,9 +41,9 @@ async function handler(m) {
         db.save()
         await m.react('✅')
         return m.reply(
-            `✅ *ᴀᴜᴛᴏ ʀᴇᴀᴄᴛ sᴛᴏʀʏ ᴀᴋᴛɪꜰ*\n\n` +
+            `✅ *REACCIÓN AUTO DE ESTADOS ACTIVADA*\n\n` +
             `> Emoji: *${emoji}*\n` +
-            `> Bot akan otomatis react semua story WA`
+            `> El bot reaccionará automáticamente a todos los estados de WA.`
         )
     }
 
@@ -51,10 +51,10 @@ async function handler(m) {
         db.setting('autoReactSW', { enabled: false, emoji: current.emoji })
         db.save()
         await m.react('✅')
-        return m.reply(`❌ *ᴀᴜᴛᴏ ʀᴇᴀᴄᴛ sᴛᴏʀʏ ᴅɪᴍᴀᴛɪᴋᴀɴ*`)
+        return m.reply(`❌ *REACCIÓN AUTO DE ESTADOS DESACTIVADA*`)
     }
 
-    return m.reply(`❌ Gunakan \`on\` atau \`off\``)
+    return m.reply(`❌ ¡Usa \`on\` u \`off\`!`)
 }
 
 export { pluginConfig as config, handler }
