@@ -1,10 +1,10 @@
 const pluginConfig = {
     name: 'setnamegc',
-    alias: ['setnamegrup', 'setgcname', 'setnamegroup', 'setnamagrup'],
+    alias: ['setnamegrup', 'setgcname', 'setnamegroup', 'setnombregc', 'setnombre'],
     category: 'group',
-    description: 'Mengubah nama grup',
-    usage: '.setnamegc <nama baru>',
-    example: '.setnamegc Grup Keren',
+    description: 'Cambia el nombre del grupo',
+    usage: '.setnamegc <nuevo nombre>',
+    example: '.setnamegc Grupo Oficial',
     isOwner: false,
     isPremium: false,
     isGroup: true,
@@ -21,16 +21,16 @@ async function handler(m, { sock }) {
     
     if (!newName) {
         await m.reply(
-            `⚠️ *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ*\n\n` +
-            `> \`${m.prefix}setnamegc Nama Grup Baru\``
+            `⚠️ *ᴍᴏᴅᴏ ᴅᴇ ᴜsᴏ*\n\n` +
+            `> \`${m.prefix}setnamegc Nuevo Nombre del Grupo\``
         )
         return
     }
     
     if (newName.length < 1 || newName.length > 100) {
         await m.reply(
-            `⚠️ *ᴠᴀʟɪᴅᴀsɪ*\n\n` +
-            `> Nama grup harus 1-100 karakter.`
+            `⚠️ *ᴠᴀʟɪᴅᴀᴄɪᴏ́ɴ*\n\n` +
+            `> El nombre del grupo debe tener entre 1 y 100 caracteres.`
         )
         return
     }
@@ -39,13 +39,13 @@ async function handler(m, { sock }) {
         await sock.groupUpdateSubject(m.chat, newName)
         
         await m.reply(
-            `✅ Berhasil mengubah nama grup menjadi *${newName}*`
+            `✅ ¡Se ha cambiado el nombre del grupo a: *${newName}*!`
         )
     } catch (error) {
         await m.reply(
-            `❌ *ɢᴀɢᴀʟ*\n\n` +
-            `> Tidak dapat mengubah nama grup.\n` +
-            `> _${error.message}_`
+            `❌ *ꜰᴀʟʟᴏ*\n\n` +
+            `> No se pudo cambiar el nombre del grupo.\n` +
+            `> _Detalle: ${error.message}_`
         )
     }
 }
