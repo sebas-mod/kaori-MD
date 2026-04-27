@@ -1,11 +1,12 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
-    name: 'setrulesgrup',
-    alias: ['setgrouprules', 'setaturangrup'],
+    name: 'setreglas',
+    alias: ['setrulesgrup', 'setgrouprules', 'setreglasgrup'],
     category: 'group',
-    description: 'Set rules/aturan grup custom (admin only)',
-    usage: '.setrulesgrup <text>',
-    example: '.setrulesgrup 1. Jangan spam\n2. Hormati sesama',
+    description: 'Configura reglas personalizadas para el grupo (Solo Admins)',
+    usage: '.setreglas <texto>',
+    example: '.setreglas 1. No spam\n2. Respetar a todos',
     isOwner: false,
     isPremium: false,
     isGroup: true,
@@ -23,18 +24,19 @@ function handler(m) {
     if (!text) {
         return m.reply(
             `📝 *sᴇᴛ ɢʀᴜᴘ ʀᴜʟᴇs*\n\n` +
-            `> Masukkan teks rules yang baru\n\n` +
-            `\`Contoh:\`\n` +
-            `\`${m.prefix}setrulesgrup 1. Jangan spam\\n2. Hormati sesama\``
+            `> ¡Ingresa el nuevo texto de las reglas!\n\n` +
+            `*Ejemplo:*\n` +
+            `> \`${m.prefix}setreglas 1. No hacer spam\\n2. Respetar a los miembros\``
         )
     }
     
     db.setGroup(m.chat, { groupRules: text })
     
     m.reply(
-        `✅ *ɢʀᴜᴘ ʀᴜʟᴇs ᴅɪᴜᴘᴅᴀᴛᴇ*\n\n` +
-        `Rules grup berhasil diubah!\n` +
-        `Ketik \`${m.prefix}rulesgrup\` untuk melihat.`
+        `✅ *ʀᴇɢʟᴀs ᴀᴄᴛᴜᴀʟɪᴢᴀᴅᴀs*\n\n` +
+        `> ¡Las reglas del grupo han sido modificadas con éxito!\n` +
+        `> Escribe \`${m.prefix}rulesgrup\` para ver el resultado.\n\n` +
+        `*KAORI MD — Gestión*`
     )
 }
 
