@@ -1,9 +1,10 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
     name: 'mute',
-    alias: ['bisukan'],
+    alias: ['silenciar', 'cerrar', 'bisukan'],
     category: 'group',
-    description: 'Bisukan seluruh grup (hanya admin yang bisa kirim pesan)',
+    description: 'Silencia el grupo (solo administradores podrán enviar mensajes)',
     usage: '.mute',
     example: '.mute',
     isOwner: false,
@@ -22,10 +23,17 @@ function handler(m, { sock }) {
     const group = db.getGroup(m.chat) || {}
     const groupName = m.groupMetadata.subject
 
-    if (group.mute) return m.reply('❌ Grup sudah dalam keadaan mute.')
+    if (group.mute) return m.reply('❌ El grupo ya se encuentra silenciado.')
 
     db.setGroup(m.chat, { ...group, mute: true })
-    m.reply(`✅ Grup *${groupName}* berhasil di-mute oleh @${m.sender.split('@')[0]}\n\nHanya admin yang bisa mengirim pesan.\nKetik *${m.prefix}unmute* untuk membuka kembali.`, { mentions: [m.sender] })
+    
+    const response = `✅ *ɢʀᴜᴘᴏ sɪʟᴇɴᴄɪᴀᴅᴏ*\n\n` +
+                     `El grupo *${groupName}* ha sido silenciado por @${m.sender.split('@')[0]}.\n\n` +
+                     `> Ahora solo los administradores pueden enviar mensajes.\n` +
+                     `> Usa \`${m.prefix}unmute\` para habilitar el chat de nuevo.\n\n` +
+                     `*KAORI MD — Moderación*`
+
+    m.reply(response, { mentions: [m.sender] })
 }
 
 function isMuted(groupJid, db) {
