@@ -1,10 +1,11 @@
-import { getParticipantJid } from '../../src/lib/ourin-lid.js'
+import { getParticipantJids } from '../../src/lib/ourin-lid.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'listadmin',
-    alias: ['admins', 'adminlist'],
+    alias: ['admins', 'adminlist', 'listaadmins'],
     category: 'group',
-    description: 'Menampilkan daftar admin grup',
+    description: 'Muestra la lista de administradores del grupo',
     usage: '.listadmin',
     example: '.listadmin',
     isOwner: false,
@@ -22,36 +23,40 @@ async function handler(m, { sock }) {
     try {
         const groupMeta = m.groupMetadata
         const participants = groupMeta.participants || []
+        // Filtrar participantes que tengan rango de admin o superadmin
         const admins = participants.filter(p => p.admin)
 
         if (admins.length === 0) {
-            await m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak ada admin di grup ini.`)
+            await m.reply(`❌ *ꜰᴀʟʟᴏ*\n\n> No se encontraron administradores en este grupo.`)
             return
         }
 
         const owner = admins.find(a => a.admin === 'superadmin')
         const regularAdmins = admins.filter(a => a.admin === 'admin')
 
-        let adminList = `👑 *ʟɪsᴛ ᴀᴅᴍɪɴ*\n\n`
+        let adminList = `👑 *ʟɪsᴛᴀ ᴅᴇ ᴀᴅᴍɪɴs*\n\n`
 
         if (owner) {
-            adminList += `\`\`\`━━━ ᴏᴡɴᴇʀ ━━━\`\`\`\n`
-            adminList += `\`\`\`👑 @${getParticipantJid(owner).split('@')[0]}\`\`\`\n\n`
+            adminList += `\`\`\`━━━ CREADOR ━━━\`\`\`\n`
+            adminList += `\`\`\`👑 @${owner.id.split('@')[0]}\`\`\`\n\n`
         }
 
         if (regularAdmins.length > 0) {
-            adminList += `\`\`\`━━━ ᴀᴅᴍɪɴ ━━━\`\`\`\n`
+            adminList += `\`\`\`━━━ ADMINS ━━━\`\`\`\n`
             regularAdmins.forEach((admin, i) => {
-                adminList += `\`\`\`${i + 1}. @${getParticipantJid(admin).split('@')[0]}\`\`\`\n`
+                adminList += `\`\`\`${i + 1}. @${admin.id.split('@')[0]}\`\`\`\n`
             })
         }
-        adminList += `\n\`Total Admin: ${admins.length}\``
+        
+        adminList += `\n> *Total Admins:* ${admins.length}\n`
+        adminList += `*KAORI MD — Gestión de Grupo*`
 
-        const mentions = admins.map(a => getParticipantJid(a))
+        const mentions = admins.map(a => a.id)
 
         await m.reply(adminList, { mentions })
 
     } catch (error) {
+        console.error(error)
         m.reply(te(m.prefix, m.command, m.pushName))
     }
 }
