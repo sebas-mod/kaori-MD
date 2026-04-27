@@ -54,7 +54,7 @@ async function handler(m, { sock }) {
         await sock.groupParticipantsUpdate(m.chat, [target], 'promote')
 
         await m.reply(
-            `✅ @${target.split('@')[0]} ¡ahora es administrador!\n\n*KAORI MD — Gestión*`,
+            `✅ @${target.split('@')[0]} ¡ahora es administrador!\n\n*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Gestión*`,
             { mentions: [target] }
         )
 
