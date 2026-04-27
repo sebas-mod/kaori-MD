@@ -1,10 +1,10 @@
 const pluginConfig = {
-    name: 'pin',
-    alias: ['pinmsg', 'pinpesan'],
+    name: 'fijar',
+    alias: ['pin', 'pinmsg', 'pinpesan', 'fijarmensaje'],
     category: 'group',
-    description: 'Pin pesan penting di grup',
-    usage: '.pin (reply pesan)',
-    example: '.pin',
+    description: 'Fija un mensaje importante en el grupo',
+    usage: '.fijar (respondiendo a un mensaje)',
+    example: '.fijar 24',
     isOwner: false,
     isPremium: false,
     isGroup: true,
@@ -19,15 +19,16 @@ const pluginConfig = {
 async function handler(m, { sock, args }) {
     if (!m.quoted || !m.quoted.key || !m.quoted.key.id) {
         await m.reply(
-            `⚠️ *ᴠᴀʟɪᴅᴀsɪ ɢᴀɢᴀʟ*\n\n` +
-            `> Reply pesan yang ingin di-pin!\n\n` +
-            `*Cara penggunaan:*\n` +
-            `> Reply pesan → ketik \`.pin\`\n` +
-            `> Optional: \`.pin 24\` (pin 24 jam)`
+            `⚠️ *ᴠᴀʟɪᴅᴀᴄɪᴏ́ɴ ꜰᴀʟʟɪᴅᴀ*\n\n` +
+            `> ¡Responde al mensaje que deseas fijar!\n\n` +
+            `*Modo de uso:*\n` +
+            `> Responde al mensaje → escribe \`${m.prefix}fijar\`\n` +
+            `> Opcional: \`${m.prefix}fijar 24\` (fijar por 24 horas)`
         );
         return;
     }
     
+    // Duración por defecto: 24 horas (86400 segundos)
     let duration = 86400;
     if (args && args.length > 0 && args[0]) {
         const hours = parseInt(args[0]);
@@ -46,22 +47,23 @@ async function handler(m, { sock, args }) {
         
         await sock.sendMessage(m.chat, {
             pin: pinKey,
-            type: 1,
+            type: 1, // 1 para fijar, 2 para desfijar
             time: duration
         });
         
         const durationText = duration >= 86400 
-            ? `${Math.floor(duration / 86400)} hari` 
-            : `${Math.floor(duration / 3600)} jam`;
+            ? `${Math.floor(duration / 86400)} día(s)` 
+            : `${Math.floor(duration / 3600)} hora(s)`;
         
-        const successMsg = `✅ Success pin pesan ini`;
-        await m.reply(successMsg, { mentions: [m.sender] })
+        const successMsg = `✅ *ᴍᴇɴsᴀᴊᴇ ғɪᴊᴀᴅᴏ*\n\n> El mensaje ha sido fijado con éxito.\n> Duración: *${durationText}*.\n\n*KAORI MD — Moderación*`;
+        
+        await m.reply(successMsg, { mentions: [m.sender] });
         
     } catch (error) {
         await m.reply(
             `❌ *ᴇʀʀᴏʀ*\n\n` +
-            `> Gagal mem-pin pesan.\n` +
-            `> _${error.message}_`
+            `> No se pudo fijar el mensaje.\n` +
+            `> _Detalle: ${error.message}_`
         );
     }
 }
