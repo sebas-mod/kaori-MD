@@ -1,9 +1,10 @@
 import { sendStoreBackup, SCHEMA_VERSION } from '../../src/lib/ourin-store-backup.js'
+
 const pluginConfig = {
     name: 'backupdb',
-    alias: ['dbbackup', 'backupstore', 'storebackup'],
+    alias: ['respaldodb', 'backupstore', 'storebackup'],
     category: 'owner',
-    description: 'Backup database/store dan kirim ke owner',
+    description: 'Realiza un respaldo de la base de datos y lo envía al owner',
     usage: '.backupdb',
     isOwner: true,
     isGroup: false,
@@ -12,17 +13,17 @@ const pluginConfig = {
 
 async function handler(m, { sock }) {
     const backupContents = [
-        '📁 database/*.json (semua file JSON)',
-        '📁 database/cpanel/* (data cPanel)',
-        '📄 storage/database.json (main database)',
-        '📄 db.json (root database)',
-        '📄 database/main/*.json (main database)',
-        '📋 backup_metadata.json (info schema)'
+        '📁 database/*.json (todos los archivos JSON)',
+        '📁 database/cpanel/* (datos de cPanel)',
+        '📄 storage/database.json (BD principal)',
+        '📄 db.json (BD raíz)',
+        '📄 database/main/*.json (BD principal)',
+        '📋 backup_metadata.json (info del esquema)'
     ]
     
     await m.reply(
-        `🕕 *Membuat backup database...*\n\n` +
-        `╭┈┈⬡「 📦 *ᴀᴘᴀ ʏᴀɴɢ ᴅɪ-ʙᴀᴄᴋᴜᴘ* 」\n` +
+        `🕕 *Creando respaldo de la base de datos...*\n\n` +
+        `╭┈┈⬡「 📦 *CONTENIDO DEL RESPALDO* 」\n` +
         backupContents.map(c => `┃ ${c}`).join('\n') +
         `\n╰┈┈┈┈┈┈┈┈⬡`
     )
@@ -31,15 +32,15 @@ async function handler(m, { sock }) {
     
     if (result.success) {
         await m.reply(
-            `✅ *Backup Berhasil!*\n\n` +
-            `📦 Size: ${result.size}\n` +
-            `📁 Files: ${result.files}\n` +
-            `🔖 Schema: v${SCHEMA_VERSION}\n\n` +
-            `> Type-safe backup, kompatibel dengan update mendatang.\n` +
-            `> Backup telah dikirim ke owner utama.`
+            `✅ *¡Respaldo Exitoso!*\n\n` +
+            `📦 Tamaño: ${result.size}\n` +
+            `📁 Archivos: ${result.files}\n` +
+            `🔖 Esquema: v${SCHEMA_VERSION}\n\n` +
+            `> Respaldo de tipo seguro, compatible con futuras actualizaciones.\n` +
+            `> El archivo ha sido enviado al owner principal.`
         )
     } else {
-        await m.reply(`❌ Backup gagal: ${result.error}`)
+        await m.reply(`❌ El respaldo falló: ${result.error}`)
     }
 }
 
