@@ -72,7 +72,7 @@ async function handler(m, { sock }) {
     });
 
     txt += `\n> Usa \`${m.prefix}listwarn @user\` para ver el detalle.`;
-    txt += `\n\n*KAORI MD — Sistema de Control*`;
+    txt += `\n\n*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Sistema de Control*`;
 
     await m.reply(txt, { mentions: usersWithWarnings });
   }
