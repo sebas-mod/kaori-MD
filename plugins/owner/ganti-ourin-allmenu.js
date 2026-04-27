@@ -1,13 +1,14 @@
 import fs from 'fs'
 import path from 'path'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: 'ganti-ourin-allmenu.jpg',
-    alias: ['gantiallemenu', 'setourinallmenu'],
+    name: 'cambiar-menu-img',
+    alias: ['setmenuimg', 'cambiarimagenmenu', 'setkeiimg'],
     category: 'owner',
-    description: 'Ganti gambar ourin-allmenu.jpg (thumbnail allmenu)',
-    usage: '.ganti-ourin-allmenu.jpg (reply/kirim gambar)',
-    example: '.ganti-ourin-allmenu.jpg',
+    description: 'Cambia la imagen de miniatura del menú principal de 𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃',
+    usage: '.cambiar-menu-img (responde o envía una imagen)',
+    example: '.cambiar-menu-img',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -21,7 +22,11 @@ async function handler(m, { sock }) {
     const isImage = m.isImage || (m.quoted && m.quoted.type === 'imageMessage')
     
     if (!isImage) {
-        return m.reply(`🖼️ *ɢᴀɴᴛɪ ᴏᴜʀɪɴ-ᴀʟʟᴍᴇɴᴜ.ᴊᴘɢ*\n\n> Kirim/reply gambar untuk mengganti\n> File: assets/images/ourin-allmenu.jpg`)
+        return m.reply(
+            `🖼️ *CAMBIAR IMAGEN DEL MENÚ*\n\n` +
+            `> Responde o envía una imagen para actualizar la miniatura.\n` +
+            `> Archivo: assets/images/ourin-allmenu.jpg`
+        )
     }
     
     try {
@@ -33,9 +38,10 @@ async function handler(m, { sock }) {
         }
         
         if (!buffer) {
-            return m.reply(`❌ Gagal mendownload gambar`)
+            return m.reply(`❌ No se pudo descargar la imagen.`)
         }
         
+        // Mantengo la ruta del archivo original para que el sistema la reconozca
         const targetPath = path.join(process.cwd(), 'assets', 'images', 'ourin-allmenu.jpg')
         
         const dir = path.dirname(targetPath)
@@ -45,7 +51,10 @@ async function handler(m, { sock }) {
         
         fs.writeFileSync(targetPath, buffer)
         
-        m.reply(`✅ *ʙᴇʀʜᴀsɪʟ*\n\n> Gambar ourin-allmenu.jpg telah diganti`)
+        m.reply(
+            `✅ *ÉXITO*\n\n` +
+            `> La imagen del menú para **𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃** ha sido actualizada correctamente.`
+        )
         
     } catch (error) {
         await m.reply(te(m.prefix, m.command, m.pushName))
