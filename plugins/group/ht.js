@@ -1,11 +1,13 @@
 import { getParticipantJids } from '../../src/lib/ourin-lid.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: ['ht', 'hidetag'],
+    name: 'hidetag',
+    alias: ['ht', 'notificar', 'tag'],
     category: 'group',
-    description: 'Hidetag dengan support reply pesan (teks/media)',
-    usage: '.ht [pesan] atau reply pesan',
-    example: '.ht atau reply pesan lalu .ht',
+    description: 'Notifica a todos los miembros (soporta responder a mensajes/media)',
+    usage: '.ht [mensaje] o respondiendo a un mensaje',
+    example: '.ht ¡Hola a todos! o responde a una imagen y usa .ht',
     isOwner: false,
     isPremium: false,
     isGroup: true,
@@ -26,12 +28,12 @@ async function handler(m, { sock }) {
         const quoted = m.quoted
         const text = m.fullArgs?.trim()
 
-        // ===== REPLY MODE =====
+        // ===== MODO RESPUESTA (REPLY) =====
         if (quoted) {
             const qMsg = quoted.message || {}
             const type = Object.keys(qMsg)[0]
 
-            // ===== IMAGE =====
+            // ===== IMAGEN =====
             if (type === 'imageMessage') {
                 const media = await quoted.download()
                 const caption = qMsg.imageMessage?.caption || text || ''
@@ -94,7 +96,7 @@ async function handler(m, { sock }) {
                 return
             }
 
-            // ===== DOCUMENT =====
+            // ===== DOCUMENTO =====
             if (type === 'documentMessage') {
                 const media = await quoted.download()
                 const docMsg = qMsg.documentMessage || {}
@@ -102,7 +104,7 @@ async function handler(m, { sock }) {
                 await sock.sendMessage(m.chat, {
                     document: media,
                     mimetype: docMsg.mimetype,
-                    fileName: docMsg.fileName || 'file',
+                    fileName: docMsg.fileName || 'archivo',
                     mentions
                 })
 
@@ -115,7 +117,7 @@ async function handler(m, { sock }) {
                 return
             }
 
-            // ===== TEXT / OTHER =====
+            // ===== TEXTO / OTROS =====
             const quotedText =
                 quoted.text ||
                 qMsg.conversation ||
@@ -125,7 +127,7 @@ async function handler(m, { sock }) {
             const finalText = text || quotedText
 
             if (!finalText) {
-                return m.reply('❌ *Pesan kosong*')
+                return m.reply('❌ *El mensaje está vacío*')
             }
 
             return sock.sendMessage(m.chat, {
@@ -133,21 +135,24 @@ async function handler(m, { sock }) {
                 mentions
             })
         }
+
+        // ===== MODO TEXTO DIRECTO =====
         if (!text) {
             return m.reply(
-                `📢 *HIDETAG*\n\n` +
-                `• Reply pesan lalu ketik \`${m.prefix}ht\`\n` +
-                `• Atau ketik \`${m.prefix}ht <pesan>\`\n\n` +
-                `Support: teks, gambar, video, sticker, audio, dokumen`
+                `📢 *ʜɪᴅᴇᴛᴀɢ*\n\n` +
+                `• Responde a un mensaje y usa \`${m.prefix}ht\`\n` +
+                `• O escribe \`${m.prefix}ht <mensaje>\`\n\n` +
+                `Soporta: texto, imágenes, videos, stickers, audios y documentos.`
             )
         }
 
         await sock.sendMessage(m.chat, {
             text,
             mentions
-        }, { quoted: m    })
+        }, { quoted: m })
 
     } catch (err) {
+        console.error(err)
         m.reply(te(m.prefix, m.command, m.pushName))
     }
 }
