@@ -47,7 +47,7 @@ async function handler(m) {
         `✅ *ɪɴᴛʀᴏ ɢᴜᴀʀᴅᴀᴅᴀ*\n\n` +
         `> El mensaje de introducción se ha actualizado con éxito.\n\n` +
         `Escribe *${m.prefix}intro* para ver el resultado.\n\n` +
-        `*KAORI MD — Ajustes*`
+        `*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Ajustes*`
     )
 }
 
