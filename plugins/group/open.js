@@ -1,10 +1,10 @@
 const pluginConfig = {
-    name: 'open',
-    alias: ['buka', 'opengroup', 'bukagroup'],
+    name: 'abrir',
+    alias: ['open', 'abrirgrupo', 'opengroup', 'buka'],
     category: 'group',
-    description: 'Membuka grup agar semua member bisa chat',
-    usage: '.open',
-    example: '.open',
+    description: 'Abre el grupo para que todos los miembros puedan enviar mensajes',
+    usage: '.abrir',
+    example: '.abrir',
     isOwner: false,
     isPremium: false,
     isGroup: true,
@@ -20,28 +20,30 @@ async function handler(m, { sock }) {
     try {
         const groupMeta = m.groupMetadata;
         
+        // Verificamos si el grupo ya está abierto (announce: false significa abierto)
         if (!groupMeta.announce) {
             await m.reply(
-                `⚠️ *ᴠᴀʟɪᴅᴀsɪ ɢᴀɢᴀʟ*\n\n` +
-                `> Grup sudah dalam keadaan \`terbuka\`.\n` +
-                `> Semua member sudah bisa mengirim pesan.`
+                `⚠️ *ᴠᴀʟɪᴅᴀᴄɪᴏ́ɴ ꜰᴀʟʟɪᴅᴀ*\n\n` +
+                `> El grupo ya se encuentra \`abierto\`.\n` +
+                `> Todos los miembros ya pueden enviar mensajes.`
             );
             return;
         }
         
+        // Actualizamos el ajuste del grupo a 'not_announcement' (abierto)
         await sock.groupSettingUpdate(m.chat, 'not_announcement');
         
         const senderNum = m.sender.split('@')[0];
         
-        const successMsg = `✅ @${senderNum} telah membuka grup ini\n_Sekarang kalian bisa mengirim pesan_`;
+        const successMsg = `✅ @${senderNum} ha abierto este grupo.\n\n_Ahora todos los miembros pueden participar._\n\n*KAORI MD — Gestión*`;
         
         await m.reply(successMsg, { mentions: [m.sender] });
         
     } catch (error) {
         await m.reply(
             `❌ *ᴇʀʀᴏʀ*\n\n` +
-            `> Gagal membuka grup.\n` +
-            `> _${error.message}_`
+            `> Hubo un fallo al intentar abrir el grupo.\n` +
+            `> _Detalle: ${error.message}_`
         );
     }
 }
