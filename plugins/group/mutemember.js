@@ -91,7 +91,7 @@ async function handler(m, { sock }) {
         `╰┈┈⬡\n\n` +
         `> Todo mensaje de este usuario será eliminado automáticamente.\n` +
         `> Usa \`${m.prefix}unmutemember\` para quitar la restricción.\n\n` +
-        `*KAORI MD — Seguridad*`,
+        `*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Seguridad*`,
         { mentions: [targetJid] }
     )
 }
