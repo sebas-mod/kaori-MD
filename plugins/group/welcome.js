@@ -243,7 +243,7 @@ async function handler(m, { sock }) {
       `> \`${m.prefix}welcome off\` → Desactivar\n` +
       `> \`${m.prefix}setwelcome\` → Personalizar mensaje\n` +
       `> \`${m.prefix}resetwelcome\` → Resetear mensaje\n\n` +
-      `*KAORI MD — Sistema de Ingreso*`
+      `*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Sistema de Ingreso*`
   );
 }
 
