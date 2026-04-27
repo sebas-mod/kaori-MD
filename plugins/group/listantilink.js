@@ -52,7 +52,7 @@ function handler(m) {
     txt += `> Propios: *${customList.length}* dominios\n\n`
     txt += `Usa \`${m.prefix}addantilink <link>\` para agregar\n`
     txt += `Usa \`${m.prefix}delantilink <link>\` para eliminar\n\n`
-    txt += `*KAORI MD — Seguridad*`
+    txt += `*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Seguridad*`
     
     m.reply(txt)
 }
