@@ -21,7 +21,7 @@ async function handler(m) {
     const prefix = m.prefix || '.'
 
     let txt = `🤝 *VENTAJAS DE SER PARTNER*\n\n`
-    txt += `Beneficios exclusivos por ser partner de ${config.bot?.name || 'KAORI MD'}:\n\n`
+    txt += `Beneficios exclusivos por ser partner de ${config.bot?.name || '𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃'}:\n\n`
 
     txt += `🔓 *Acceso Total*\n`
     txt += `├ Todas las funciones Premium desbloqueadas\n`
