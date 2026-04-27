@@ -1,8 +1,8 @@
 const pluginConfig = {
     name: 'notifpromote',
-    alias: [],
+    alias: ['avisopromote', 'notifdaradmin', 'notifascenso'],
     category: 'group',
-    description: 'Toggle notifikasi saat ada yang dijadikan admin',
+    description: 'Activa o desactiva la notificación cuando alguien es ascendido a administrador',
     usage: '.notifpromote on/off',
     example: '.notifpromote on',
     isOwner: false,
@@ -16,27 +16,34 @@ const pluginConfig = {
 
 function handler(m, { sock, db }) {
     if (!m.isAdmin && !m.isOwner) {
-        return m.reply(`❌ Hanya admin grup yang bisa menggunakan fitur ini`)
+        return m.reply(`❌ Solo los administradores del grupo pueden usar esta función.`)
     }
     
     const args = m.args[0]?.toLowerCase()
     const group = db.getGroup(m.chat) || {}
     
-    if (!['on', 'off'].includes(args)) {
-        const status = group.notifPromote === true ? '✅ Aktif' : '❌ Nonaktif'
-        return m.reply(`👑 *ɴᴏᴛɪꜰ ᴘʀᴏᴍᴏᴛᴇ*\n\n> Status: ${status}\n\n*Penggunaan:*\n\`${m.prefix}notifpromote on\` - Aktifkan\n\`${m.prefix}notifpromote off\` - Nonaktifkan`)
+    if (!['on', 'off', 'activar', 'desactivar'].includes(args)) {
+        const status = group.notifPromote === true ? '✅ Activado' : '❌ Desactivado'
+        return m.reply(
+            `👑 *ɴᴏᴛɪꜰɪᴄᴀᴄɪᴏ́ɴ ᴅᴇ ᴘʀᴏᴍᴏᴛᴇ*\n\n` +
+            `> Estado actual: ${status}\n\n` +
+            `*Uso:*\n` +
+            `\`${m.prefix}notifpromote on\` - Para activar\n` +
+            `\`${m.prefix}notifpromote off\` - Para desactivar\n\n` +
+            `*KAORI MD — Ajustes*`
+        )
     }
     
-    if (args === 'on') {
+    if (args === 'on' || args === 'activar') {
         group.notifPromote = true
         db.setGroup(m.chat, group)
-        return m.reply(`✅ *ɴᴏᴛɪꜰ ᴘʀᴏᴍᴏᴛᴇ ᴅɪᴀᴋᴛɪꜰᴋᴀɴ*`)
+        return m.reply(`✅ *ɴᴏᴛɪꜰɪᴄᴀᴄɪᴏ́ɴ ᴅᴇ ᴘʀᴏᴍᴏᴛᴇ ᴀᴄᴛɪᴠᴀᴅᴀ*\n\n> El bot avisará cuando un miembro sea ascendido a administrador.`)
     }
     
-    if (args === 'off') {
+    if (args === 'off' || args === 'desactivar') {
         group.notifPromote = false
         db.setGroup(m.chat, group)
-        return m.reply(`❌ *ɴᴏᴛɪꜰ ᴘʀᴏᴍᴏᴛᴇ ᴅɪɴᴏɴᴀᴋᴛɪꜰᴋᴀɴ*`)
+        return m.reply(`❌ *ɴᴏᴛɪꜰɪᴄᴀᴄɪᴏ́ɴ ᴅᴇ ᴘʀᴏᴍᴏᴛᴇ ᴅᴇsᴀᴄᴛɪᴠᴀᴅᴀ*\n\n> El bot ya no enviará avisos cuando alguien sea nombrado admin.`)
     }
 }
 
