@@ -188,7 +188,7 @@ Puedes pedirme lo que quieras, estaré encantada de responderte 💫
   txt += `_© ${botConfig.bot?.name || "𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃"} | ${new Date().getFullYear()}_\n`;
   txt += `_ᴅᴇsᴀʀʀᴏʟʟᴀᴅᴏʀ: sebas MD_`;
 
-  const imagePath = path.join(process.cwd(), "assets", "images", "ourin.jpg");
+  const imagePath = path.join(process.cwd(), "assets", "images", "ourin-allmenu.jpg");
   const thumbPath = path.join(process.cwd(), "assets", "images", "ourin2.jpg");
 
   let imageBuffer = fs.existsSync(imagePath) ? fs.readFileSync(imagePath) : null;
