@@ -1,10 +1,11 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
     name: 'delkoin',
-    alias: ['kurangkoin', 'removekoin', 'delcoin', 'delmoney'],
+    alias: ['quitarmonedas', 'removekoin', 'delcoin', 'delmoney', 'restarmonedas'],
     category: 'owner',
-    description: 'Kurangi koin user',
-    usage: '.delkoin <jumlah> @user',
+    description: 'Resta monedas a un usuario específico',
+    usage: '.delkoin <cantidad> @user',
     example: '.delkoin 50000 @user',
     isOwner: true,
     isPremium: false,
@@ -33,32 +34,34 @@ async function handler(m, { sock }) {
     const db = getDatabase()
     const args = m.args
     
+    // Buscar argumento numérico que no sea una mención
     const numArg = args.find(a => !isNaN(a) && !a.startsWith('@'))
     const amount = parseInt(numArg) || 0
     
     let targetJid = await extractTarget(m)
     
+    // Si no hay mención, se aplica al remitente si hay una cantidad
     if (!targetJid && amount > 0) {
         targetJid = m.sender
     }
     
     if (!targetJid || amount <= 0) {
         return m.reply(
-            `💰 *ᴅᴇʟ ᴋᴏɪɴ*\n\n` +
-            `> \`.delkoin <jumlah>\` - dari diri sendiri\n` +
-            `> \`.delkoin <jumlah> @user\` - dari user\n\n` +
-            `\`Contoh: ${m.prefix}delkoin 50000\``
+            `💰 *QUITAR MONEDAS*\n\n` +
+            `> \`${m.prefix}delkoin <cantidad>\` - de ti mismo\n` +
+            `> \`${m.prefix}delkoin <cantidad> @user\` - de un usuario\n\n` +
+            `\`Ejemplo: ${m.prefix}delkoin 50000\``
         )
     }
     
     if (amount <= 0) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Jumlah harus lebih dari 0`)
+        return m.reply(`❌ *ERROR*\n\n> La cantidad debe ser mayor a 0`)
     }
     
     const user = db.getUser(targetJid)
     
     if (!user) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> User tidak ditemukan di database`)
+        return m.reply(`❌ *ERROR*\n\n> Usuario no encontrado en la base de datos`)
     }
     
     const newKoin = db.updateKoin(targetJid, -amount)
@@ -66,11 +69,11 @@ async function handler(m, { sock }) {
     await m.react('✅')
     
     await m.reply(
-        `✅ *ᴋᴏɪɴ ᴅɪᴋᴜʀᴀɴɢɪ*\n\n` +
-        `╭┈┈⬡「 📋 *ᴅᴇᴛᴀɪʟ* 」\n` +
-        `┃ 👤 ᴜsᴇʀ: @${targetJid.split('@')[0]}\n` +
-        `┃ ➖ ᴋᴜʀᴀɴɢ: *-${formatKoin(amount)}*\n` +
-        `┃ 💰 sɪsᴀ: *${formatKoin(newKoin)}*\n` +
+        `✅ *MONEDAS RESTADAS*\n\n` +
+        `╭┈┈⬡「 📋 *DETALLES* 」\n` +
+        `┃ 👤 Usuario: @${targetJid.split('@')[0]}\n` +
+        `┃ ➖ Restado: *-${formatKoin(amount)}*\n` +
+        `┃ 💰 Restante: *${formatKoin(newKoin)}*\n` +
         `╰┈┈⬡`,
         { mentions: [targetJid] }
     )
