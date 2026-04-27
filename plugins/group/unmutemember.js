@@ -93,7 +93,7 @@ async function handler(m, { sock }) {
         `┃ 👤 ᴍɪᴇᴍʙʀᴏ: @${targetNumber}\n` +
         `┃ 🔊 ᴇsᴛᴀᴅᴏ: \`Habilitado\`\n` +
         `┃ 📊 sɪʟᴇɴᴄɪᴀᴅᴏs: \`${mutedMembers.length}\` restantes\n` +
-        `╰┈┈⬡\n\n*KAORI MD — Moderación*`,
+        `╰┈┈⬡\n\n*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Moderación*`,
         { mentions: [targetJid] }
     )
 }
