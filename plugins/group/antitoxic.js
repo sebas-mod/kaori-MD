@@ -1,11 +1,12 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import config from '../../config.js'
+
 const pluginConfig = {
     name: 'antitoxic',
-    alias: ['toxic', 'antitoxik'],
+    alias: ['toxic', 'antitoxico', 'antigroserias'],
     category: 'group',
-    description: 'Mengatur antitoxic di grup',
-    usage: '.antitoxic <on/off/warn/metode>',
+    description: 'Configura el sistema anti-toxicidad en el grupo',
+    usage: '.antitoxic <on/off/warn/metodo>',
     example: '.antitoxic on',
     isOwner: false,
     isPremium: false,
@@ -17,10 +18,11 @@ const pluginConfig = {
     isEnabled: true
 }
 
+// Lista predeterminada de palabras ofensivas en español
 const DEFAULT_TOXIC_WORDS = [
-    'anjing', 'bangsat', 'kontol', 'memek', 'ngentot', 'babi', 'tolol',
-    'goblok', 'idiot', 'bodoh', 'kampret', 'asu', 'jancok', 'bajingan',
-    'keparat', 'setan', 'iblis', 'tai', 'brengsek', 'sialan'
+    'pendejo', 'estupido', 'mierda', 'carajo', 'puto', 'puta', 'malparido',
+    'gonorrea', 'hijo de puta', 'idiota', 'imbecil', 'maricon', 'culero',
+    'pendeja', 'zorra', 'basura', 'maldito', 'maldita', 'cabron', 'chinga'
 ]
 
 function isToxic(text, toxicList) {
@@ -49,8 +51,8 @@ function isToxic(text, toxicList) {
 
 function gpMsg(key, replacements = {}) {
     const defaults = {
-        antitoxicWarn: '⚠ @%user% berkata kasar.\nPeringatan ke %warn% dari %max%, pelanggaran berikutnya bisa di-%method%.',
-        antitoxicAction: '🚫 @%user% di-%method% karena toxic. (%warn%/%max%)',
+        antitoxicWarn: '⚠ @%user% no uses lenguaje ofensivo.\nAdvertencia %warn% de %max%, la próxima infracción resultará en: *%method%*.',
+        antitoxicAction: '🚫 @%user% ha sido %method% por toxicidad. (%warn%/%max%)',
     }
     let text = config.groupProtection?.[key] || defaults[key] || ''
     for (const [k, v] of Object.entries(replacements)) {
@@ -90,7 +92,7 @@ async function handleToxicMessage(m, sock, db, toxicWord) {
                 user: senderTag,
                 warn: String(warnCount),
                 max: String(maxWarn),
-                method
+                method: method === 'kick' ? 'eliminado' : 'sancionado'
             }),
             mentions: [m.sender],
         })
@@ -100,7 +102,7 @@ async function handleToxicMessage(m, sock, db, toxicWord) {
                 user: senderTag,
                 warn: String(warnCount),
                 max: String(maxWarn),
-                method
+                method: method === 'kick' ? 'EXPULSIÓN' : 'ELIMINAR MENSAJE'
             }),
             mentions: [m.sender],
         })
@@ -117,22 +119,22 @@ async function handler(m, { sock }) {
     const groupData = db.getGroup(m.chat) || {}
 
     if (!subCommand) {
-        const status = groupData.antitoxic ? '✅ ON' : '❌ OFF'
+        const status = groupData.antitoxic ? '✅ ACTIVADO' : '❌ DESACTIVADO'
         const toxicCount = groupData.toxicWords?.length || DEFAULT_TOXIC_WORDS.length
         const maxWarn = groupData.toxicMaxWarn || 3
         const method = groupData.toxicMethod || 'kick'
 
-        let txt = `🛡️ *ᴀɴᴛɪᴛᴏxɪᴄ*\n\n`
-        txt += `> Status: *${status}*\n`
-        txt += `> Kata: *${toxicCount}*\n`
-        txt += `> Max Warn: *${maxWarn}*\n`
-        txt += `> Metode: *${method}*\n\n`
-        txt += `*Command:*\n`
+        let txt = `🛡️ *ᴀɴᴛɪᴛᴏxɪᴄ | ᴋᴀᴏʀɪ ᴍᴅ*\n\n`
+        txt += `> Estado: *${status}*\n`
+        txt += `> Palabras en lista: *${toxicCount}*\n`
+        txt += `> Max Advertencias: *${maxWarn}*\n`
+        txt += `> Método: *${method === 'kick' ? 'Expulsar' : 'Solo borrar'}*\n\n`
+        txt += `*Comandos disponibles:*\n`
         txt += `> \`.antitoxic on/off\`\n`
         txt += `> \`.antitoxic warn <1-10>\`\n`
-        txt += `> \`.antitoxic metode kick/delete\`\n`
-        txt += `> \`.addtoxic <kata>\`\n`
-        txt += `> \`.deltoxic <kata>\`\n`
+        txt += `> \`.antitoxic metodo kick/delete\`\n`
+        txt += `> \`.addtoxic <palabra>\`\n`
+        txt += `> \`.deltoxic <palabra>\`\n`
         txt += `> \`.listtoxic\``
 
         await m.reply(txt)
@@ -140,42 +142,42 @@ async function handler(m, { sock }) {
     }
 
     if (subCommand === 'on') {
-        db.setGroup(m.chat, { antitoxic: true })
+        db.setGroup(m.chat, { ...groupData, antitoxic: true })
         m.react('✅')
-        await m.reply(`✅ *Antitoxic diaktifkan*`)
+        await m.reply(`✅ *AntiToxic activado*`)
         return
     }
 
     if (subCommand === 'off') {
-        db.setGroup(m.chat, { antitoxic: false })
+        db.setGroup(m.chat, { ...groupData, antitoxic: false })
         m.react('❌')
-        await m.reply(`❌ *Antitoxic dinonaktifkan*`)
+        await m.reply(`❌ *AntiToxic desactivado*`)
         return
     }
 
-    if (subCommand === 'warn') {
+    if (subCommand === 'warn' || subCommand === 'advertencia') {
         const count = parseInt(args[1])
         if (!count || count < 1 || count > 10) {
-            return m.reply(`❌ Masukkan angka 1-10\n> Contoh: \`.antitoxic warn 5\``)
+            return m.reply(`❌ Ingresa un número del 1 al 10\n> Ejemplo: \`.antitoxic warn 5\``)
         }
-        db.setGroup(m.chat, { toxicMaxWarn: count })
+        db.setGroup(m.chat, { ...groupData, toxicMaxWarn: count })
         m.react('✅')
-        await m.reply(`✅ Max peringatan diubah ke *${count}*`)
+        await m.reply(`✅ Límite de advertencias cambiado a *${count}*`)
         return
     }
 
-    if (subCommand === 'metode' || subCommand === 'method' || subCommand === 'mode') {
+    if (subCommand === 'metode' || subCommand === 'metodo' || subCommand === 'mode') {
         const method = args[1]?.toLowerCase()
         if (!method || !['kick', 'delete'].includes(method)) {
-            return m.reply(`❌ Pilih metode: *kick* atau *delete*\n> Contoh: \`.antitoxic metode kick\``)
+            return m.reply(`❌ Elige un método: *kick* (expulsar) o *delete* (solo borrar)\n> Ejemplo: \`.antitoxic metodo kick\``)
         }
-        db.setGroup(m.chat, { toxicMethod: method })
+        db.setGroup(m.chat, { ...groupData, toxicMethod: method })
         m.react('✅')
-        await m.reply(`✅ Metode diubah ke *${method}*`)
+        await m.reply(`✅ Método cambiado a *${method === 'kick' ? 'Expulsar' : 'Borrar mensaje'}*`)
         return
     }
 
-    await m.reply(`❌ Sub-command tidak dikenal.\n> Ketik \`.antitoxic\` untuk melihat daftar command.`)
+    await m.reply(`❌ Sub-comando no reconocido.\n> Escribe \`.antitoxic\` para ver la lista de opciones.`)
 }
 
 export { pluginConfig as config, handler, isToxic, handleToxicMessage, DEFAULT_TOXIC_WORDS }
