@@ -1,10 +1,11 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
     name: 'delexp',
-    alias: ['kurangexp', 'removeexp', 'delxp'],
+    alias: ['quitarexp', 'removeexp', 'delxp', 'restarexp'],
     category: 'owner',
-    description: 'Kurangi exp user',
-    usage: '.delexp <jumlah> @user',
+    description: 'Resta puntos de experiencia (EXP) a un usuario',
+    usage: '.delexp <cantidad> @user',
     example: '.delexp 5000 @user',
     isOwner: true,
     isPremium: false,
@@ -32,32 +33,34 @@ async function handler(m, { sock }) {
     const db = getDatabase()
     const args = m.args
     
+    // Buscar argumento numérico que no sea una mención
     const numArg = args.find(a => !isNaN(a) && !a.startsWith('@'))
     const amount = parseInt(numArg) || 0
     
     let targetJid = await extractTarget(m)
     
+    // Si no hay mención, aplicar al remitente si hay una cantidad
     if (!targetJid && amount > 0) {
         targetJid = m.sender
     }
     
     if (!targetJid || amount <= 0) {
         return m.reply(
-            `⭐ *ᴅᴇʟ ᴇxᴘ*\n\n` +
-            `> \`.delexp <jumlah>\` - dari diri sendiri\n` +
-            `> \`.delexp <jumlah> @user\` - dari user\n\n` +
-            `\`Contoh: ${m.prefix}delexp 5000\``
+            `⭐ *QUITAR EXP*\n\n` +
+            `> \`${m.prefix}delexp <cantidad>\` - de ti mismo\n` +
+            `> \`${m.prefix}delexp <cantidad> @user\` - de un usuario\n\n` +
+            `\`Ejemplo: ${m.prefix}delexp 5000\``
         )
     }
     
     if (amount <= 0) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Jumlah harus lebih dari 0`)
+        return m.reply(`❌ *ERROR*\n\n> La cantidad debe ser mayor a 0`)
     }
     
     const user = db.getUser(targetJid)
     
     if (!user) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> User tidak ditemukan di database`)
+        return m.reply(`❌ *ERROR*\n\n> Usuario no encontrado en la base de datos`)
     }
     
     const newExp = db.updateExp(targetJid, -amount)
@@ -65,11 +68,11 @@ async function handler(m, { sock }) {
     await m.react('✅')
     
     await m.reply(
-        `✅ *ᴇxᴘ ᴅɪᴋᴜʀᴀɴɢɪ*\n\n` +
-        `╭┈┈⬡「 📋 *ᴅᴇᴛᴀɪʟ* 」\n` +
-        `┃ 👤 ᴜsᴇʀ: @${targetJid.split('@')[0]}\n` +
-        `┃ ➖ ᴋᴜʀᴀɴɢ: *-${formatNumber(amount)}*\n` +
-        `┃ ⭐ sɪsᴀ: *${formatNumber(newExp)}*\n` +
+        `✅ *EXP RESTADA*\n\n` +
+        `╭┈┈⬡「 📋 *DETALLES* 」\n` +
+        `┃ 👤 Usuario: @${targetJid.split('@')[0]}\n` +
+        `┃ ➖ Restado: *-${formatNumber(amount)}*\n` +
+        `┃ ⭐ Restante: *${formatNumber(newExp)}*\n` +
         `╰┈┈⬡`,
         { mentions: [targetJid] }
     )
