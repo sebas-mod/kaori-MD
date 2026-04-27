@@ -19,7 +19,7 @@ const pluginConfig = {
     isEnabled: true
 }
 
-const NEOXR_APIKEY = config.APIkey?.neoxr || 'Milik-Bot-OurinMD'
+const NEOXR_APIKEY = config.APIkey?.neoxr || '𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃'
 
 const LEAGUE_EMOJI = {
     'liga inggris': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
