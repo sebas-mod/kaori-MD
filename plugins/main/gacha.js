@@ -1,9 +1,10 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
     name: 'gacha',
-    alias: ['spin', 'pull', 'lucky'],
+    alias: ['suerte', 'girar', 'pull', 'lucky'],
     category: 'rpg',
-    description: 'Gacha untuk dapat hadiah random',
+    description: 'Sistema de Gacha para obtener recompensas aleatorias',
     usage: '.gacha',
     example: '.gacha',
     isOwner: false,
@@ -16,31 +17,31 @@ const pluginConfig = {
 };
 
 const rewards = [
-    { type: 'balance', min: 100, max: 500, rarity: 'common', emoji: '⚪', chance: 35 },
-    { type: 'balance', min: 500, max: 1500, rarity: 'uncommon', emoji: '🟢', chance: 25 },
-    { type: 'balance', min: 1500, max: 5000, rarity: 'rare', emoji: '🔵', chance: 15 },
-    { type: 'balance', min: 5000, max: 15000, rarity: 'epic', emoji: '🟣', chance: 5 },
-    { type: 'balance', min: 15000, max: 50000, rarity: 'legendary', emoji: '🟡', chance: 1 },
-    { type: 'exp', min: 50, max: 200, rarity: 'common', emoji: '⚪', chance: 30 },
-    { type: 'exp', min: 200, max: 800, rarity: 'uncommon', emoji: '🟢', chance: 20 },
-    { type: 'exp', min: 800, max: 2000, rarity: 'rare', emoji: '🔵', chance: 10 },
-    { type: 'exp', min: 2000, max: 5000, rarity: 'epic', emoji: '🟣', chance: 3 },
-    { type: 'exp', min: 5000, max: 10000, rarity: 'legendary', emoji: '🟡', chance: 0.5 },
-    { type: 'limit', min: 1, max: 3, rarity: 'common', emoji: '⚪', chance: 25 },
-    { type: 'limit', min: 3, max: 7, rarity: 'uncommon', emoji: '🟢', chance: 15 },
-    { type: 'limit', min: 7, max: 15, rarity: 'rare', emoji: '🔵', chance: 8 },
-    { type: 'limit', min: 15, max: 30, rarity: 'epic', emoji: '🟣', chance: 2 },
+    { type: 'balance', min: 100, max: 500, rarity: 'comun', emoji: '⚪', chance: 35 },
+    { type: 'balance', min: 500, max: 1500, rarity: 'poco_comun', emoji: '🟢', chance: 25 },
+    { type: 'balance', min: 1500, max: 5000, rarity: 'raro', emoji: '🔵', chance: 15 },
+    { type: 'balance', min: 5000, max: 15000, rarity: 'epico', emoji: '🟣', chance: 5 },
+    { type: 'balance', min: 15000, max: 50000, rarity: 'legendario', emoji: '🟡', chance: 1 },
+    { type: 'exp', min: 50, max: 200, rarity: 'comun', emoji: '⚪', chance: 30 },
+    { type: 'exp', min: 200, max: 800, rarity: 'poco_comun', emoji: '🟢', chance: 20 },
+    { type: 'exp', min: 800, max: 2000, rarity: 'raro', emoji: '🔵', chance: 10 },
+    { type: 'exp', min: 2000, max: 5000, rarity: 'epico', emoji: '🟣', chance: 3 },
+    { type: 'exp', min: 5000, max: 10000, rarity: 'legendario', emoji: '🟡', chance: 0.5 },
+    { type: 'limit', min: 1, max: 3, rarity: 'comun', emoji: '⚪', chance: 25 },
+    { type: 'limit', min: 3, max: 7, rarity: 'poco_comun', emoji: '🟢', chance: 15 },
+    { type: 'limit', min: 7, max: 15, rarity: 'raro', emoji: '🔵', chance: 8 },
+    { type: 'limit', min: 15, max: 30, rarity: 'epico', emoji: '🟣', chance: 2 },
     { type: 'limit', min: 30, max: 50, rarity: 'legendary', emoji: '🟡', chance: 0.5 },
-    { type: 'jackpot', min: 100000, max: 500000, rarity: 'mythic', emoji: '🌟', chance: 0.1 }
+    { type: 'jackpot', min: 100000, max: 500000, rarity: 'mitico', emoji: '🌟', chance: 0.1 }
 ];
 
 const rarityColors = {
-    common: '⚪ Common',
-    uncommon: '🟢 Uncommon', 
-    rare: '🔵 Rare',
-    epic: '🟣 Epic',
-    legendary: '🟡 Legendary',
-    mythic: '🌟 MYTHIC'
+    comun: '⚪ Común',
+    poco_comun: '🟢 Poco Común', 
+    raro: '🔵 Raro',
+    epico: '🟣 Épico',
+    legendario: '🟡 Legendario',
+    mitico: '🌟 MÍTICO'
 };
 
 function getRandomReward() {
@@ -76,7 +77,7 @@ async function handler(m, { sock }) {
         case 'balance':
             db.updateKoin(m.sender, reward.amount);
             typeEmoji = '💰';
-            rewardText = `+${reward.amount.toLocaleString()} Koin`;
+            rewardText = `+${reward.amount.toLocaleString()} Monedas`;
             break;
         case 'exp':
             if (!user.rpg) user.rpg = {};
@@ -85,36 +86,37 @@ async function handler(m, { sock }) {
             typeEmoji = '⭐';
             rewardText = `+${reward.amount.toLocaleString()} EXP`;
             break;
-        case 'energi':
-            db.updateEnergi(m.sender, reward.amount);
-            typeEmoji = '⚡';
-            rewardText = `+${reward.amount} Energi`;
+        case 'limit':
+            // Asumiendo que 'limit' se maneja como energía o similar en tu DB
+            db.updateLimit ? db.updateLimit(m.sender, reward.amount) : null; 
+            typeEmoji = '🎫';
+            rewardText = `+${reward.amount} Límite`;
             break;
         case 'jackpot':
             db.updateKoin(m.sender, reward.amount);
             typeEmoji = '💎';
-            rewardText = `+${reward.amount.toLocaleString()} Koin`;
+            rewardText = `+${reward.amount.toLocaleString()} Monedas`;
             break;
     }
     
     db.save();
     
-    let text = `${createGachaAnimation()} *ɢᴀᴄʜᴀ ʀᴇsᴜʟᴛ*\n\n`;
+    let text = `${createGachaAnimation()} *ɢᴀᴄʜᴀ ʀᴇsᴜʟᴛ (ᴋᴀᴏʀɪ ᴍᴅ)*\n\n`;
     text += `╭─────────────╮\n`;
     text += `│  ${reward.emoji} ${reward.emoji} ${reward.emoji}  │\n`;
     text += `╰─────────────╯\n\n`;
     
-    if (reward.rarity === 'mythic') {
-        text += `🎊🎊🎊 *JACKPOT!* 🎊🎊🎊\n\n`;
-    } else if (reward.rarity === 'legendary') {
-        text += `✨ *LEGENDARY PULL!* ✨\n\n`;
-    } else if (reward.rarity === 'epic') {
-        text += `💜 *EPIC PULL!* 💜\n\n`;
+    if (reward.rarity === 'mitico') {
+        text += `🎊🎊🎊 *¡JACKPOT!* 🎊🎊🎊\n\n`;
+    } else if (reward.rarity === 'legendario') {
+        text += `✨ *¡OBTENCIÓN LEGENDARIA!* ✨\n\n`;
+    } else if (reward.rarity === 'epico') {
+        text += `💜 *¡OBTENCIÓN ÉPICA!* 💜\n\n`;
     }
     
-    text += `*Rarity:* ${rarityColors[reward.rarity]}\n`;
-    text += `*Hadiah:* ${typeEmoji} ${rewardText}\n\n`;
-    text += `_Cooldown: 5 menit_`;
+    text += `*Rareza:* ${rarityColors[reward.rarity]}\n`;
+    text += `*Recompensa:* ${typeEmoji} ${rewardText}\n\n`;
+    text += `_Espera 5 minutos para volver a girar._`;
     
     await m.reply(text);
 }
