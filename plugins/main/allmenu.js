@@ -74,7 +74,7 @@ function toSmallCaps(text) {
 }
 
 function getContextInfo(botConfig, m, thumbBuffer) {
-  const saluranId = botConfig.saluran?.id || "120363208449943317@newsletter";
+  const saluranId = botConfig.saluran?.id || "";
   const saluranName =
     botConfig.saluran?.name || botConfig.bot?.name || "ᴋᴀᴏʀɪ ᴍᴅ";
   return {
@@ -200,13 +200,13 @@ Puedes usarme para buscar información, obtener datos o ayudarte con tareas simp
     mentionedJid: [m.sender],
     forwardingScore: 9999,
     isForwarded: true,
-    externalAdReply: {
+  /*  externalAdReply: {
       title: botConfig.bot?.name || "ᴋᴀᴏʀɪ ᴍᴅ",
       body: `Owner: sebas MD`,
       mediaType: 1,
       thumbnail: imageBuffer,
       renderLargerThumbnail: true,
-    },
+    },*/
   };
 
   try {
