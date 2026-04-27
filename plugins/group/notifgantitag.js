@@ -185,7 +185,7 @@ async function handleLabelChange(msg, sock) {
                     mediaUrl: null,
                     sourceUrl: null,
                     title: "AVISO DE ETIQUETA",
-                    body: "KAORI MD - GESTIÓN DE GRUPO",
+                    body: "𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 - GESTIÓN DE GRUPO",
                     thumbnail: fs.readFileSync('./assets/images/ourin.jpg'),
                     renderLargerThumbnail: true,
                 }
