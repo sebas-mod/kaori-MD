@@ -4,8 +4,8 @@ const pluginConfig = {
     name: 'addexp',
     alias: ['tambahexp', 'giveexp', 'addxp'],
     category: 'owner',
-    description: 'Tambah exp user (max 9 Miliar)',
-    usage: '.addexp <jumlah> @user',
+    description: 'Añadir EXP a un usuario (máx. 9 mil millones)',
+    usage: '.addexp <cantidad> @user',
     example: '.addexp 10000 @user',
     isOwner: true,
     isPremium: false,
@@ -46,16 +46,16 @@ async function handler(m, { sock }) {
     
     if (!targetJid || amount <= 0) {
         return m.reply(
-            `⭐ *ᴀᴅᴅ ᴇxᴘ*\n\n` +
-            `> \`.addexp <jumlah>\` - ke diri sendiri\n` +
-            `> \`.addexp <jumlah> @user\` - ke user\n` +
-            `> Max: 9.000.000.000 (9B)\n\n` +
-            `\`Contoh: ${m.prefix}addexp 10000\``
+            `⭐ *AÑADIR EXP*\n\n` +
+            `> \`.addexp <cantidad>\` - a ti mismo\n` +
+            `> \`.addexp <cantidad> @user\` - a un usuario\n` +
+            `> Máx: 9.000.000.000 (9B)\n\n` +
+            `\`Ejemplo: ${m.prefix}addexp 10000\``
         )
     }
     
     if (amount <= 0) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Jumlah exp harus lebih dari 0`)
+        return m.reply(`❌ *ERROR*\n\n> La cantidad de EXP debe ser mayor a 0`)
     }
     
     if (amount > MAX_EXP) {
@@ -69,7 +69,7 @@ async function handler(m, { sock }) {
     await m.react('✅')
     
     await m.reply(
-        `✅ Berhasil menambahkan exp *${formatNumber(amount)}* ke *@${targetJid.split('@')[0]}*`,
+        `✅ Se han añadido *${formatNumber(amount)}* de EXP a *@${targetJid.split('@')[0]}*`,
         { mentions: [targetJid] }
     )
 }
