@@ -1,12 +1,13 @@
 import fs from "fs";
 import path from "path";
 import te from "../../src/lib/ourin-error.js";
+
 const pluginConfig = {
   name: "disableplugin",
-  alias: ["dplugin", "plugindisable", "offplugin"],
+  alias: ["dplugin", "desactivarplugin", "offplugin"],
   category: "owner",
-  description: "Menonaktifkan plugin tertentu",
-  usage: ".disableplugin <nama_plugin>",
+  description: "Desactiva un plugin específico cambiando su configuración",
+  usage: ".disableplugin <nombre_plugin>",
   example: ".disableplugin sticker",
   isOwner: true,
   isPremium: false,
@@ -56,9 +57,9 @@ async function handler(m, { sock }) {
 
   if (!pluginName) {
     return m.reply(
-      `🔌 *ᴅɪsᴀʙʟᴇ ᴘʟᴜɢɪɴ*\n\n` +
-        `> Masukkan nama plugin yang ingin dinonaktifkan\n\n` +
-        `*Contoh:*\n` +
+      `🔌 *DESACTIVAR PLUGIN*\n\n` +
+        `> Ingresa el nombre del plugin que deseas desactivar\n\n` +
+        `*Ejemplo:*\n` +
         `> \`${m.prefix}disableplugin sticker\`\n` +
         `> \`${m.prefix}disableplugin tiktok\``,
     );
@@ -67,31 +68,32 @@ async function handler(m, { sock }) {
   const found = await findPluginFile(pluginName);
 
   if (!found) {
-    return m.reply(`❌ Plugin *${pluginName}* tidak ditemukan!`);
+    return m.reply(`❌ ¡El plugin *${pluginName}* no fue encontrado!`);
   }
 
   const { filePath, plugin, category, file } = found;
 
   if (plugin.config.isEnabled === false) {
-    return m.reply(`⚠️ Plugin *${pluginName}* sudah dinonaktifkan!`);
+    return m.reply(`⚠️ ¡El plugin *${pluginName}* ya se encuentra desactivado!`);
   }
 
   try {
     let content = fs.readFileSync(filePath, "utf-8");
 
+    // Reemplaza isEnabled: true por isEnabled: false en el archivo físico
     content = content.replace(/isEnabled:\s*true/i, "isEnabled: false");
 
     fs.writeFileSync(filePath, content);
 
     await m.reply(
-      `✅ *ᴘʟᴜɢɪɴ ᴅɪsᴀʙʟᴇᴅ*\n\n` +
-        `╭┈┈⬡「 📋 *ᴅᴇᴛᴀɪʟ* 」\n` +
+      `✅ *PLUGIN DESACTIVADO*\n\n` +
+        `╭┈┈⬡「 📋 *DETALLES* 」\n` +
         `┃ 📦 Plugin: *${plugin.config.name}*\n` +
-        `┃ 📁 Category: *${category}*\n` +
-        `┃ 📄 File: *${file}*\n` +
-        `┃ 🔴 Status: *Disabled*\n` +
+        `┃ 📁 Categoría: *${category}*\n` +
+        `┃ 📄 Archivo: *${file}*\n` +
+        `┃ 🔴 Estado: *Desactivado*\n` +
         `╰┈┈⬡\n\n` +
-        `> Restart bot atau gunakan hot reload untuk apply.`,
+        `> Reinicia el bot o usa hot reload para aplicar los cambios.`,
     );
   } catch (error) {
     await m.reply(te(m.prefix, m.command, m.pushName));
