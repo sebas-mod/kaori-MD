@@ -1,13 +1,14 @@
 import fs from 'fs'
 import path from 'path'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: 'ganti-namaowner',
-    alias: ['setnamaowner', 'setnameowner'],
+    name: 'cambiar-nombreowner',
+    alias: ['setnamaowner', 'setnameowner', 'nombreowner', 'cambiarowner'],
     category: 'owner',
-    description: 'Ganti nama owner di config.js',
-    usage: '.ganti-namaowner <nama baru>',
-    example: '.ganti-namaowner Zann',
+    description: 'Cambia el nombre del propietario en config.js',
+    usage: '.cambiar-nombreowner <nuevo nombre>',
+    example: '.cambiar-nombreowner Zann',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -21,13 +22,19 @@ async function handler(m, { sock, config }) {
     const newName = m.args.join(' ')
     
     if (!newName) {
-        return m.reply(`👤 *ɢᴀɴᴛɪ ɴᴀᴍᴀ ᴏᴡɴᴇʀ*\n\n> Nama saat ini: *${config.owner?.name || '-'}*\n\n*Penggunaan:*\n\`${m.prefix}ganti-namaowner <nama baru>\``)
+        return m.reply(
+            `👤 *CAMBIAR NOMBRE DEL OWNER*\n\n` +
+            `> Nombre actual: *${config.owner?.name || '-'}*\n\n` +
+            `*Uso:*\n` +
+            `\`${m.prefix}cambiar-nombreowner <nuevo nombre>\``
+        )
     }
     
     try {
         const configPath = path.join(process.cwd(), 'config.js')
         let configContent = fs.readFileSync(configPath, 'utf8')
         
+        // Busca el objeto owner: { ... name: '...' } y actualiza el valor del nombre
         configContent = configContent.replace(
             /owner:\s*\{[\s\S]*?name:\s*['"]([^'"]*)['"]/,
             (match, oldName) => match.replace(`'${oldName}'`, `'${newName}'`).replace(`"${oldName}"`, `'${newName}'`)
@@ -35,9 +42,12 @@ async function handler(m, { sock, config }) {
         
         fs.writeFileSync(configPath, configContent)
         
-        config.owner.name = newName
+        // Actualiza el objeto en memoria para KAORI MD
+        if (config.owner) {
+            config.owner.name = newName
+        }
         
-        m.reply(`✅ *ʙᴇʀʜᴀsɪʟ*\n\n> Nama owner diganti ke: *${newName}*`)
+        m.reply(`✅ *ÉXITO*\n\n> El nombre del owner se ha cambiado a: *${newName}*`)
         
     } catch (error) {
         await m.reply(te(m.prefix, m.command, m.pushName))
