@@ -49,7 +49,7 @@ async function handler(m, { sock }) {
   m.react("✅");
 
   await m.reply(
-    `✅ La bienvenida se ha configurado como:\n\n> *${text}*\n\n¿Quieres restablecerla? Usa: *${m.prefix}resetwelcome*\n\n*KAORI MD — Ajustes*`,
+    `✅ La bienvenida se ha configurado como:\n\n> *${text}*\n\n¿Quieres restablecerla? Usa: *${m.prefix}resetwelcome*\n\n*𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃 — Ajustes*`,
   );
 }
 
