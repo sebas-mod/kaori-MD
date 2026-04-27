@@ -1,9 +1,10 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
     name: 'cmdvn',
-    alias: ['voicecommand', 'vncmd'],
+    alias: ['voicecommand', 'vncmd', 'comandovoz'],
     category: 'owner',
-    description: 'Aktifkan command via voice note',
+    description: 'Activa o desactiva la ejecución de comandos mediante notas de voz (Voice Note)',
     usage: '.cmdvn <on/off>',
     example: '.cmdvn on',
     isOwner: true,
@@ -23,33 +24,33 @@ function handler(m) {
     const current = db.setting('cmdVn') || false
 
     if (!subCmd || subCmd === 'status') {
-        const status = current ? '✅ ON' : '❌ OFF'
+        const status = current ? '✅ ACTIVADO' : '❌ DESACTIVADO'
         return m.reply(
-            `🎤 *ᴄᴍᴅ ᴠᴏɪᴄᴇ ɴᴏᴛᴇ*\n\n` +
-            `> Status: *${status}*\n\n` +
-            `> \`${m.prefix}cmdvn on\` — Command via VN\n` +
-            `> \`${m.prefix}cmdvn off\` — Command via text (default)\n\n` +
-            `> Saat ON, kirim VN berisi nama command\n` +
-            `> Contoh: VN "menu" → trigger .menu`
+            `🎤 *COMANDO POR VOZ (VN)*\n\n` +
+            `> Estado actual: *${status}*\n\n` +
+            `> \`${m.prefix}cmdvn on\` — Activar comandos vía VN\n` +
+            `> \`${m.prefix}cmdvn off\` — Solo comandos vía texto (predeterminado)\n\n` +
+            `> Cuando esté ON, envía una nota de voz con el nombre del comando\n` +
+            `> Ejemplo: Audio diciendo "menu" → activará .menu`
         )
     }
 
     if (subCmd === 'on') {
         db.setting('cmdVn', true)
         return m.reply(
-            `✅ *ᴄᴍᴅ ᴠɴ ᴀᴋᴛɪꜰ*\n\n` +
-            `> Kirim voice note berisi nama command\n` +
-            `> Bot akan transkrip dan jalankan otomatis\n` +
-            `> Contoh: VN "menu" → trigger .menu`
+            `✅ *COMANDO POR VOZ ACTIVADO*\n\n` +
+            `> Envía una nota de voz con el nombre del comando.\n` +
+            `> El bot transcribirá y ejecutará la orden automáticamente.\n` +
+            `> Ejemplo: Audio diciendo "menu" → activará .menu`
         )
     }
 
     if (subCmd === 'off') {
         db.setting('cmdVn', false)
-        return m.reply(`❌ CMD VN *dinonaktifkan*. Command via text normal.`)
+        return m.reply(`❌ *COMANDO POR VOZ DESACTIVADO*. Ahora solo responderé a comandos de texto normales.`)
     }
 
-    return m.reply(`❌ Gunakan \`${m.prefix}cmdvn on\` atau \`${m.prefix}cmdvn off\``)
+    return m.reply(`❌ Uso incorrecto. Utiliza \`${m.prefix}cmdvn on\` o \`${m.prefix}cmdvn off\``)
 }
 
 export { pluginConfig as config, handler }
