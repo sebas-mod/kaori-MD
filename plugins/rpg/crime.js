@@ -1,14 +1,14 @@
-
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { addExpWithLevelCheck } from '../../src/lib/ourin-level.js'
 import { getRpgContextInfo } from '../../src/lib/ourin-context.js'
+
 const pluginConfig = {
-    name: 'crime',
-    alias: ['steal', 'curi'],
+    name: 'crimen',
+    alias: ['steal', 'curi', 'chorear', 'robar'],
     category: 'rpg',
-    description: 'Mencuri uang (berisiko tertangkap + denda)',
-    usage: '.crime',
-    example: '.crime',
+    description: 'Intentá robar algo de guita (ojo que te pueden agarrar)',
+    usage: '.crimen',
+    example: '.crimen',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -24,7 +24,7 @@ async function handler(m, { sock }) {
     
     if (!user.rpg) user.rpg = {}
     
-    await m.reply('🦹 *sᴇᴅᴀɴɢ ᴍᴇɴᴄᴜʀɪ...*')
+    await m.reply('🦹 *CHOREANDO ALGO POR AHÍ...*')
     await new Promise(r => setTimeout(r, 2000))
     
     const successRate = 0.5
@@ -39,10 +39,10 @@ async function handler(m, { sock }) {
         
         db.save()
         
-        let txt = `✅ *ᴄʀɪᴍᴇ sᴜᴋsᴇs*\n\n`
-        txt += `> 🦹 Kamu berhasil mencuri!\n`
-        txt += `> 💰 Hasil: *+Rp ${stolen.toLocaleString('id-ID')}*\n`
-        txt += `> 🚄 Exp: *+${expGain}*`
+        let txt = `✅ *¡AFANO EXITOSO!* - 𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃\n\n`
+        txt += `> 🦹 ¡Te saliste con la tuya, chorro!\n`
+        txt += `> 💰 Botín: *+$${stolen.toLocaleString('es-AR')}*\n`
+        txt += `> ✨ EXP: *+${expGain}*`
         
         await m.reply(txt)
     } else {
@@ -54,10 +54,10 @@ async function handler(m, { sock }) {
         
         db.save()
         
-        let txt = `❌ *ᴄʀɪᴍᴇ ɢᴀɢᴀʟ*\n\n`
-        txt += `> 🚔 Kamu tertangkap polisi!\n`
-        txt += `> 💸 Denda: *-Rp ${actualFine.toLocaleString('id-ID')}*\n`
-        txt += `> ❤️ Health: *-15* (dipukuli)`
+        let txt = `❌ *¡TE AGARRÓ LA CANA!*\n\n`
+        txt += `> 🚔 Fuiste para atrás y terminaste en la comisaría.\n`
+        txt += `> 💸 Multa: *-$${actualFine.toLocaleString('es-AR')}*\n`
+        txt += `> ❤️ Salud: *-15* (Te acomodaron un poco)`
         
         await m.reply(txt)
     }
