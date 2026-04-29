@@ -4,12 +4,12 @@ import { hotReloadPlugin } from '../../src/lib/ourin-plugins.js'
 import te from '../../src/lib/ourin-error.js'
 
 const pluginConfig = {
-    name: 'ganticode',
-    alias: ['replaceplugin', 'updateplugin', 'gantiplugin'],
+    name: 'cambiarcode',
+    alias: ['replaceplugin', 'updateplugin', 'cambiarplugin'],
     category: 'owner',
-    description: 'Ganti code plugin yang sudah ada',
-    usage: '.ganticode [namafile] [folder]',
-    example: '.ganticode ping main',
+    description: 'Cambiar el código de un plugin existente',
+    usage: '.cambiarcode [nombrearchivo] [carpeta]',
+    example: '.cambiarcode ping main',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -53,12 +53,12 @@ async function handler(m, { sock }) {
 
     if (!quoted) {
         return m.reply(
-            `🔄 *GANTI CODE*\n\n` +
-            `Reply code plugin baru dengan caption:\n` +
-            `\`${m.prefix}ganticode\` - Auto detect\n` +
-            `\`${m.prefix}ganticode namafile\` - Custom nama\n` +
-            `\`${m.prefix}ganticode namafile folder\` - Custom nama + folder\n\n` +
-            `⚠️ *PERINGATAN:*\nCode lama akan di-backup sebelum diganti`
+            `🔄 *CAMBIAR CÓDIGO*\n\n` +
+            `Responde al código del nuevo plugin con el prefijo:\n` +
+            `> \`${m.prefix}cambiarcode\` - Auto detectar\n` +
+            `> \`${m.prefix}cambiarcode nombrearchivo\` - Nombre personalizado\n` +
+            `> \`${m.prefix}cambiarcode nombrearchivo carpeta\` - Nombre + carpeta personalizada\n\n` +
+            `⚠️ *ADVERTENCIA:*\nEl código antiguo se respaldará antes de ser reemplazado.`
         )
     }
 
@@ -68,18 +68,18 @@ async function handler(m, { sock }) {
         try {
             code = (await quoted.download()).toString()
         } catch (e) {
-            return m.reply(`❌ *GAGAL*\n\nGagal download file`)
+            return m.reply(`❌ *ERROR*\n\nNo se pudo descargar el archivo`)
         }
     }
 
     if (!code || code.length < 50) {
-        return m.reply(`❌ *GAGAL*\n\nCode terlalu pendek atau tidak valid`)
+        return m.reply(`❌ *ERROR*\n\nEl código es demasiado corto o inválido`)
     }
 
     const hasExport = code.includes('module.exports') || code.includes('export ')
     const hasConfig = code.includes('pluginConfig') || code.includes('config')
     if (!hasExport || !hasConfig) {
-        return m.reply(`❌ *GAGAL*\n\nCode bukan format plugin yang valid\nHarus ada export dan config`)
+        return m.reply(`❌ *ERROR*\n\nEl código no tiene un formato de plugin válido\nDebe contener export y config`)
     }
 
     const extracted = extractPluginInfo(code)
@@ -89,13 +89,13 @@ async function handler(m, { sock }) {
     let folderName = args[1] || extracted.category
 
     if (!fileName) {
-        return m.reply(`❌ *GAGAL*\n\nTidak bisa mendeteksi nama plugin\nGunakan \`${m.prefix}ganticode <namafile>\``)
+        return m.reply(`❌ *ERROR*\n\nNo se pudo detectar el nombre del plugin\nUsa \`${m.prefix}cambiarcode <nombrearchivo>\``)
     }
 
     fileName = fileName.toLowerCase().replace(/[^a-z0-9\-_]/g, '')
 
     if (!fileName) {
-        return m.reply(`❌ *GAGAL*\n\nNama file tidak valid`)
+        return m.reply(`❌ *ERROR*\n\nNombre de archivo no válido`)
     }
 
     await m.react('🕕')
@@ -124,7 +124,7 @@ async function handler(m, { sock }) {
             backupPath = path.join(backupDir, `${fileName}_${timestamp}.js`)
             fs.copyFileSync(filePath, backupPath)
         } else {
-            if (!folderName) folderName = 'other'
+            if (!folderName) folderName = 'otros'
             folderName = folderName.toLowerCase().replace(/[^a-z0-9\-_]/g, '')
 
             targetFolder = folderName
@@ -145,25 +145,25 @@ async function handler(m, { sock }) {
 
         await m.react('✅')
 
-        let replyText = `✅ *CODE ${isNewFile ? 'DITAMBAH' : 'DIGANTI'}*\n\n` +
-            `╭─〔 *DETAIL* 〕───⬣\n` +
-            `│ File: \`${fileName}.js\`\n` +
-            `│ Folder: \`${targetFolder}\`\n` +
-            `│ Size: \`${code.length} bytes\`\n`
+        let replyText = `✅ *CÓDIGO ${isNewFile ? 'AÑADIDO' : 'REEMPLAZADO'}*\n\n` +
+            `╭─〔 *DETALLES* 〕───⬣\n` +
+            `│ Archivo: \`${fileName}.js\`\n` +
+            `│ Carpeta: \`${targetFolder}\`\n` +
+            `│ Tamaño: \`${code.length} bytes\`\n`
 
         if (!isNewFile) {
-            replyText += `│ Old Size: \`${oldSize} bytes\`\n`
+            replyText += `│ Tamaño anterior: \`${oldSize} bytes\`\n`
         }
 
-        replyText += ` │ 🔄 Hot Reload: ${reloadResult.success ? '✅ Sukses' : '⚠️ Pending'}\n` +
+        replyText += ` │ 🔄 Hot Reload: ${reloadResult.success ? '✅ Éxito' : '⚠️ Pendiente'}\n` +
             `╰───────⬣\n\n`
 
         if (backupPath) {
             const relBackup = path.relative(process.cwd(), backupPath)
-            replyText += `💾 *Backup:*\n\`${relBackup}\`\n\n`
+            replyText += `💾 *Respaldo:*\n\`${relBackup}\`\n\n`
         }
 
-        replyText += `Plugin sudah aktif dan siap digunakan!`
+        replyText += `¡El plugin ya está activo y listo para usar!`
 
         return m.reply(replyText)
 
