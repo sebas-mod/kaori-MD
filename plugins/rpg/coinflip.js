@@ -1,12 +1,13 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { getRpgContextInfo } from '../../src/lib/ourin-context.js'
+
 const pluginConfig = {
-    name: 'coinflip',
-    alias: ['cf', 'flip', 'toss'],
+    name: 'caraoseca',
+    alias: ['cf', 'flip', 'toss', 'coinflip', 'suerte'],
     category: 'rpg',
-    description: 'Gambling coin flip',
-    usage: '.coinflip <heads/tails> <bet>',
-    example: '.coinflip heads 5000',
+    description: 'Apostá tus monedas al cara o seca',
+    usage: '.caraoseca <cara/seca> <apuesta>',
+    example: '.caraoseca cara 5000',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -24,59 +25,68 @@ async function handler(m, { sock }) {
     const choice = args[0]?.toLowerCase()
     const bet = parseInt(args[1])
     
-    if (!choice || (choice !== 'heads' && choice !== 'tails' && choice !== 'h' && choice !== 't')) {
+    // Adaptación a términos locales: Cara o Seca
+    if (!choice || (choice !== 'cara' && choice !== 'seca' && choice !== 'c' && choice !== 's')) {
         return m.reply(
-            `🪙 *ᴄᴏɪɴ ꜰʟɪᴘ*\n\n` +
-            `╭┈┈⬡「 📋 *ᴜsᴀɢᴇ* 」\n` +
-            `┃ > Pilih heads (h) atau tails (t)\n` +
-            `┃ > \`.coinflip heads 5000\`\n` +
+            `🪙 *CARA O SECA - 𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃*\n\n` +
+            `╭┈┈⬡「 📋 *MODO DE USO* 」\n` +
+            `┃ > Elegí cara (c) o seca (s)\n` +
+            `┃ > \`${m.prefix}caraoseca cara 5000\`\n` +
             `╰┈┈┈┈┈┈┈┈⬡`
         )
     }
     
     if (!bet || bet < 1000) {
         return m.reply(
-            `❌ *ɪɴᴠᴀʟɪᴅ ʙᴇᴛ*\n\n` +
-            `> Minimal bet Rp 1.000!\n` +
-            `> Contoh: \`.coinflip heads 5000\``
+            `❌ *APUESTA INVÁLIDA*\n\n` +
+            `> ¡El mínimo para timbear son $1.000 monedas!\n` +
+            `> Ejemplo: \`.caraoseca seca 5000\``
         )
     }
     
     if ((user.koin || 0) < bet) {
         return m.reply(
-            `❌ *sᴀʟᴅᴏ ᴛɪᴅᴀᴋ ᴄᴜᴋᴜᴘ*\n\n` +
-            `> Koin kamu: Rp ${(user.koin || 0).toLocaleString('id-ID')}\n` +
-            `> Butuh: Rp ${bet.toLocaleString('id-ID')}`
+            `❌ *NO TENÉS UN MANGO*\n\n` +
+            `> Tus monedas: $${(user.koin || 0).toLocaleString('es-AR')}\n` +
+            `> Te faltan: $${(bet - (user.koin || 0)).toLocaleString('es-AR')}`
         )
     }
     
+    // Restamos la apuesta antes de tirar
     user.koin -= bet
     
-    const userChoice = (choice === 'heads' || choice === 'h') ? 'heads' : 'tails'
-    const result = Math.random() < 0.5 ? 'heads' : 'tails'
-    const emoji = result === 'heads' ? '🪙' : '⭕'
+    const userChoice = (choice === 'cara' || choice === 'c') ? 'cara' : 'seca'
+    const result = Math.random() < 0.5 ? 'cara' : 'seca'
+    const emoji = result === 'cara' ? '🪙' : '⚖️'
     
-    await sock.sendMessage(m.chat, { text: `🪙 *ꜰʟɪᴘᴘɪɴɢ...*`, contextInfo: getRpgContextInfo('🪙 COINFLIP', 'Flipping!') }, { quoted: m })
+    await sock.sendMessage(m.chat, { 
+        text: `🪙 *VOLEANDO LA MONEDA...*`, 
+        contextInfo: getRpgContextInfo('🪙 CARA O SECA', '¡Mucha suerte!') 
+    }, { quoted: m })
+    
     await new Promise(r => setTimeout(r, 1500))
     
     const isWin = userChoice === result
     
-    let txt = `🪙 *ᴄᴏɪɴ ꜰʟɪᴘ*\n\n`
-    txt += `> ${emoji} Hasil: *${result.toUpperCase()}*\n`
-    txt += `> 🎯 Pilihanmu: *${userChoice.toUpperCase()}*\n\n`
+    let txt = `🪙 *RESULTADO DEL TIRO*\n\n`
+    txt += `> ${emoji} Salió: *${result.toUpperCase()}*\n`
+    txt += `> 🎯 Vos elegiste: *${userChoice.toUpperCase()}*\n\n`
     
     if (isWin) {
         const winnings = bet * 2
         user.koin = (user.koin || 0) + winnings
-        txt += `✅ *ᴋᴀᴍᴜ ᴍᴇɴᴀɴɢ!*\n`
-        txt += `> 💰 Win: *+Rp ${winnings.toLocaleString('id-ID')}*`
+        txt += `✅ *¡GANASTE, CAPO!*\n`
+        txt += `> 💰 Te llevás: *+$${winnings.toLocaleString('es-AR')}*`
     } else {
-        txt += `❌ *ᴋᴀᴍᴜ ᴋᴀʟᴀʜ!*\n`
-        txt += `> 💸 Lost: *-Rp ${bet.toLocaleString('id-ID')}*`
+        txt += `❌ *¡PERDISTE POR GIL!*\n`
+        txt += `> 💸 Perdiste: *-$${bet.toLocaleString('es-AR')}*`
     }
     
     db.save()
-    await sock.sendMessage(m.chat, { text: txt, contextInfo: getRpgContextInfo('🪙 COINFLIP', 'Result!') }, { quoted: m })
+    await sock.sendMessage(m.chat, { 
+        text: txt, 
+        contextInfo: getRpgContextInfo('🪙 CARA O SECA', isWin ? '¡Ganador!' : 'Seguí participando') 
+    }, { quoted: m })
 }
 
 export { pluginConfig as config, handler }
