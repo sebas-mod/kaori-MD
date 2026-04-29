@@ -4,11 +4,11 @@ import { isLid, lidToJid } from '../../src/lib/ourin-lid.js'
 
 const pluginConfig = {
     name: 'unban',
-    alias: ['delban', 'unblock'],
+    alias: ['desbanear', 'quitarban', 'desbloquear'],
     category: 'owner',
-    description: 'Menghapus user dari daftar banned',
-    usage: '.unban <nomor/@tag>',
-    example: '.unban 6281234567890',
+    description: 'Elimina a un usuario de la lista de baneados',
+    usage: '.unban <número/@tag>',
+    example: '.unban 34612345678',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -33,20 +33,20 @@ function resolveTarget(m) {
 
     if (isLid(raw)) raw = lidToJid(raw)
     let num = raw.replace(/[^0-9]/g, '')
-    if (num.startsWith('08')) num = '62' + num.slice(1)
-    if (num.startsWith('0')) num = '62' + num.slice(1)
-
+    
+    // Adaptación opcional: Si el número empieza con 0, podrías añadir el prefijo de tu país
+    // Por defecto mantendremos la limpieza de caracteres no numéricos
     return num
 }
 
 async function handler(m, { sock }) {
     const targetNumber = resolveTarget(m)
 
-    if (!targetNumber || targetNumber.length < 10 || targetNumber.length > 15) {
+    if (!targetNumber || targetNumber.length < 8 || targetNumber.length > 15) {
         return m.reply(
-            `✅ *ᴜɴʙᴀɴ ᴜsᴇʀ*\n\n` +
-            `> Masukkan nomor atau tag user\n\n` +
-            `\`Contoh: ${m.prefix}unban 6281234567890\``
+            `✅ *ᴜɴʙᴀɴ ᴜsᴜᴀʀɪᴏ*\n\n` +
+            `> Por favor, ingresa el número o etiqueta al usuario\n\n` +
+            `\`Ejemplo: ${m.prefix}unban 34612345678\``
         )
     }
 
@@ -59,7 +59,7 @@ async function handler(m, { sock }) {
     })
 
     if (index === -1) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Nomor \`${targetNumber}\` tidak dalam daftar banned`)
+        return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> El número \`${targetNumber}\` no se encuentra en la lista de baneados.`)
     }
 
     bannedList.splice(index, 1)
@@ -69,11 +69,11 @@ async function handler(m, { sock }) {
     await m.react('✅')
 
     await m.reply(
-        `✅ *ᴜsᴇʀ ᴅɪᴜɴʙᴀɴ*\n\n` +
-        `╭┈┈⬡「 📋 *ᴅᴇᴛᴀɪʟ* 」\n` +
-        `┃ 📱 ɴᴏᴍᴏʀ: \`${targetNumber}\`\n` +
-        `┃ ✅ sᴛᴀᴛᴜs: \`Unbanned\`\n` +
-        `┃ 📊 ᴛᴏᴛᴀʟ: \`${bannedList.length}\` ᴜsᴇʀ\n` +
+        `✅ *ᴜsᴜᴀʀɪᴏ ᴅᴇsʙᴀɴᴇᴀᴅᴏ*\n\n` +
+        `╭┈┈⬡「 📋 *ᴅᴇᴛᴀʟʟᴇs* 」\n` +
+        `┃ 📱 ɴᴜ́ᴍᴇʀᴏ: \`${targetNumber}\`\n` +
+        `┃ ✅ ᴇsᴛᴀᴅᴏ: \`Desbaneado\`\n` +
+        `┃ 📊 ʀᴇsᴛᴀɴᴛᴇs: \`${bannedList.length}\` ᴜsᴜᴀʀɪᴏs\n` +
         `╰┈┈⬡`
     )
 }
