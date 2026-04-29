@@ -1,9 +1,10 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
     name: 'resetrules',
-    alias: ['resetbotrules'],
+    alias: ['resetreglas', 'resetbotrules'],
     category: 'owner',
-    description: 'Reset rules bot ke default',
+    description: 'Restablece las reglas del bot a los valores predeterminados',
     usage: '.resetrules',
     example: '.resetrules',
     isOwner: true,
@@ -18,12 +19,13 @@ const pluginConfig = {
 function handler(m) {
     const db = getDatabase()
     
+    // Restablece el valor en la configuración de la base de datos a null (por defecto)
     db.setting('botRules', null)
     
     m.reply(
-        `✅ *ʙᴏᴛ ʀᴜʟᴇs ᴅɪʀᴇsᴇᴛ*\n\n` +
-        `> Rules bot berhasil direset ke default!\n` +
-        `> Ketik \`${m.prefix}rules\` untuk melihat.`
+        `✅ *ʀᴇɢʟᴀs ʀᴇsᴛᴀʙʟᴇᴄɪᴅᴀs*\n\n` +
+        `> ¡Las reglas del bot se han restablecido correctamente!\n` +
+        `> Escribe \`${m.prefix}rules\` para ver las reglas actuales.`
     )
 }
 
