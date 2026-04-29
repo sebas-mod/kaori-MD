@@ -2,12 +2,13 @@ import config from "../../config.js";
 import { getDatabase } from "../../src/lib/ourin-database.js";
 import pkg from "ourin";
 const { generateWAMessageFromContent, proto } = pkg;
+
 const pluginConfig = {
   name: "setmenu",
-  alias: ["menuvariant", "menustyle"],
+  alias: ["variantemenu", "estilomenu", "configmenu"],
   category: "owner",
-  description: "Mengatur variant tampilan menu",
-  usage: ".setmenu <v1-v13>",
+  description: "Configura el estilo visual del menú",
+  usage: ".setmenu <v1-v15>",
   example: ".setmenu v8",
   isOwner: true,
   isPremium: false,
@@ -19,53 +20,53 @@ const pluginConfig = {
 };
 
 const VARIANTS = {
-  v1: { id: 1, name: "Simple", desc: "Image biasa tanpa contextInfo" },
-  v2: { id: 2, name: "Standard", desc: "Image + full contextInfo (default)" },
+  v1: { id: 1, name: "Simple", desc: "Imagen normal sin información de contexto" },
+  v2: { id: 2, name: "Estándar", desc: "Imagen + contextInfo completo (por defecto)" },
   v3: {
     id: 3,
-    name: "Document",
-    desc: "Document + jpegThumbnail + verified quoted",
+    name: "Documento",
+    desc: "Documento + miniatura JPEG + citado verificado",
   },
-  v4: { id: 4, name: "Video", desc: "Video + contextInfo + verified quoted" },
+  v4: { id: 4, name: "Video", desc: "Video + contextInfo + citado verificado" },
   v5: {
     id: 5,
-    name: "Button",
-    desc: "Image + buttons (single_select & quick_reply)",
+    name: "Botón",
+    desc: "Imagen + botones (selección única y respuesta rápida)",
   },
   v6: {
     id: 6,
-    name: "Document Premium",
-    desc: "Document + jpegThumbnail 1280x450 + full contextInfo",
+    name: "Documento Premium",
+    desc: "Documento + miniatura 1280x450 + contextInfo completo",
   },
   v7: {
     id: 7,
-    name: "Carousel",
-    desc: "Swipeable cards per kategori (modern)",
+    name: "Carrusel",
+    desc: "Tarjetas deslizables por categoría (estilo moderno)",
   },
   v8: {
     id: 8,
-    name: "Minimalist",
-    desc: "Image + ftroli quoted + fresh design",
+    name: "Minimalista",
+    desc: "Imagen + citado estilo carrito + diseño fresco",
   },
   v9: {
     id: 9,
-    name: "NativeFlow",
-    desc: "Interactive + limited_time_offer + bottom_sheet + single_select",
+    name: "Flujo Nativo",
+    desc: "Interactivo + oferta limitada + hoja inferior + selección única",
   },
-  v10: { id: 10, name: "NativeFlow", desc: "OURINNNNNNNNNN" },
+  v10: { id: 10, name: "Flujo Nativo", desc: "ESTILO OURINNN" },
   v11: {
     id: 11,
-    name: "Document Interactive",
-    desc: "Document + nativeFlowMessage + limited_time_offer + cta buttons",
+    name: "Documento Interactivo",
+    desc: "Documento + mensaje de flujo nativo + oferta limitada + botones CTA",
   },
-  v12: { id: 12, name: "MENU VERSI 12", desc: "XXXXXX" },
+  v12: { id: 12, name: "MENÚ VERSIÓN 12", desc: "Diseño experimental X" },
   v13: {
     id: 13,
-    name: "Canvas Thumbnail",
-    desc: "Document style V6 + Canvas Banner Thumbnail",
+    name: "Miniatura Canvas",
+    desc: "Estilo Documento V6 + Banner de miniatura Canvas",
   },
-  v14: { id: 14, name: "MENU VERSI 14", desc: "XXXXXX" },
-  v15: { id: 15, name: "MENU VERSI 15", desc: "XXXXXX" },
+  v14: { id: 14, name: "MENÚ VERSIÓN 14", desc: "Diseño experimental Y" },
+  v15: { id: 15, name: "MENÚ VERSIÓN 15", desc: "Diseño experimental Z" },
 };
 
 async function handler(m, { sock, db }) {
@@ -75,7 +76,7 @@ async function handler(m, { sock, db }) {
   if (variant) {
     const selected = VARIANTS[variant];
     if (!selected) {
-      await m.reply(`❌ Variant tidak valid!\n\nGunakan: v1 s/d v15`);
+      await m.reply(`❌ ¡Variante no válida!\n\nUsa: v1 hasta v15`);
       return;
     }
 
@@ -83,7 +84,7 @@ async function handler(m, { sock, db }) {
     await db.save();
 
     await m.reply(
-      `✅ Menu variant diubah ke *V${selected.id}*\n\n` +
+      `✅ Variante de menú cambiada a *V${selected.id}*\n\n` +
         `> *${selected.name}*\n` +
         `> _${selected.desc}_`,
     );
@@ -99,20 +100,20 @@ async function handler(m, { sock, db }) {
   }));
 
   const bodyText =
-    `🎨 *sᴇᴛ ᴍᴇɴᴜ ᴠᴀʀɪᴀɴᴛ*\n\n` +
-    `> Variant aktif: *V${current}*\n` +
-    `> _${VARIANTS[`v${current}`]?.name || "Unknown"}_\n\n` +
-    `> Pilih variant dari daftar di bawah`;
+    `🎨 *ᴄᴏɴғɪɢᴜʀᴀʀ ᴠᴀʀɪᴀɴᴛᴇ ᴅᴇ ᴍᴇɴᴜ́*\n\n` +
+    `> Variante activa: *V${current}*\n` +
+    `> _${VARIANTS[`v${current}`]?.name || "Desconocido"}_\n\n` +
+    `> Elige una variante de la lista de abajo:`;
 
   try {
     const interactiveButtons = [
       {
         name: "single_select",
         buttonParamsJson: JSON.stringify({
-          title: "🎨 ᴘɪʟɪʜ ᴠᴀʀɪᴀɴᴛ",
+          title: "🎨 ᴇʟᴇɢɪʀ ᴠᴀʀɪᴀɴᴛᴇ",
           sections: [
             {
-              title: "ᴅᴀꜰᴛᴀʀ ᴠᴀʀɪᴀɴᴛ ᴍᴇɴᴜ",
+              title: "ʟɪsᴛᴀ ᴅᴇ ᴠᴀʀɪᴀɴᴛᴇs ᴅɪsᴘᴏɴɪʙʟᴇs",
               rows,
             },
           ],
@@ -137,8 +138,8 @@ async function handler(m, { sock, db }) {
                 text: config.bot?.name || "Ourin-AI",
               }),
               header: proto.Message.InteractiveMessage.Header.fromObject({
-                title: "🎨 Menu Variant",
-                subtitle: `${Object.keys(VARIANTS).length} variant tersedia`,
+                title: "🎨 Variante de Menú",
+                subtitle: `${Object.keys(VARIANTS).length} variantes disponibles`,
                 hasMediaAttachment: false,
               }),
               nativeFlowMessage:
@@ -166,13 +167,13 @@ async function handler(m, { sock, db }) {
 
     await sock.relayMessage(m.chat, msg.message, { messageId: msg.key.id });
   } catch {
-    let txt = `🎨 *sᴇᴛ ᴍᴇɴᴜ ᴠᴀʀɪᴀɴᴛ*\n\n`;
-    txt += `> Variant saat ini: *V${current}*\n\n`;
+    let txt = `🎨 *ᴄᴏɴғɪɢᴜʀᴀʀ ᴠᴀʀɪᴀɴᴛᴇ ᴅᴇ ᴍᴇɴᴜ́*\n\n`;
+    txt += `> Variante actual: *V${current}*\n\n`;
     for (const [key, val] of Object.entries(VARIANTS)) {
       const mark = val.id === current ? " ✓" : "";
       txt += `> *${key.toUpperCase()}*${mark} — _${val.desc}_\n`;
     }
-    txt += `\n_Gunakan: \`.setmenu v1\` dst._`;
+    txt += `\n_Usa: \`.setmenu v1\`, etc._`;
     await m.reply(txt);
   }
 }
