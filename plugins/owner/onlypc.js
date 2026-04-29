@@ -1,11 +1,12 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
-    name: 'onlypc',
-    alias: ['onlyprivate', 'privateonly'],
+    name: 'soloprivado',
+    alias: ['onlypc', 'onlyprivate', 'privateonly'],
     category: 'owner',
-    description: 'Toggle mode bot hanya di private chat',
-    usage: '.onlypc',
-    example: '.onlypc',
+    description: 'Alternar el modo para que el bot solo responda en chats privados',
+    usage: '.soloprivado',
+    example: '.soloprivado',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -22,12 +23,12 @@ async function handler(m, { sock }) {
     if (currentMode) {
         db.setting('onlyPc', false)
         await m.react('❌')
-        return m.reply(`❌ *ᴏɴʟʏ ᴘʀɪᴠᴀᴛᴇ ᴍᴏᴅᴇ ɴᴏɴᴀᴋᴛɪꜰ*\n\n> Bot bisa diakses di mana saja`)
+        return m.reply(`❌ *ᴍᴏᴅᴏ sᴏʟᴏ ᴘʀɪᴠᴀᴅᴏ ᴅᴇsᴀᴄᴛɪᴠᴀᴅᴏ*\n\n> El bot ahora puede ser usado en cualquier lugar (Grupos y Privado)`)
     } else {
         db.setting('onlyPc', true)
         db.setting('onlyGc', false)
         await m.react('✅')
-        return m.reply(`✅ *ᴏɴʟʏ ᴘʀɪᴠᴀᴛᴇ ᴍᴏᴅᴇ ᴀᴋᴛɪꜰ*\n\n> Bot hanya bisa diakses di private chat!`)
+        return m.reply(`✅ *ᴍᴏᴅᴏ sᴏʟᴏ ᴘʀɪᴠᴀᴅᴏ ᴀᴄᴛɪᴠᴀᴅᴏ*\n\n> ¡El bot ahora solo podrá ser utilizado en chats privados!`)
     }
 }
 
