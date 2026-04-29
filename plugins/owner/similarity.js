@@ -1,9 +1,10 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
     name: 'similarity',
-    alias: ['setsimilarity', 'sim'],
+    alias: ['setsimilarity', 'sim', 'similitud'],
     category: 'owner',
-    description: 'Mengaktifkan/menonaktifkan fitur similarity (saran typo)',
+    description: 'Activa o desactiva la función de similitud (sugerencias por errores de escritura)',
     usage: '.similarity <on/off>',
     example: '.similarity on',
     isOwner: true,
@@ -20,7 +21,7 @@ async function handler(m, { sock }) {
     const args = m.args
     
     if (!args[0]) {
-        return m.reply(`⚠️ *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ*\n\n> \`.similarity on\` - Aktifkan\n> \`.similarity off\` - Matikan`)
+        return m.reply(`⚠️ *ᴍᴏᴅᴏ ᴅᴇ ᴜsᴏ*\n\n> \`.similarity on\` - Activar\n> \`.similarity off\` - Desactivar`)
     }
     
     const mode = args[0].toLowerCase()
@@ -28,13 +29,13 @@ async function handler(m, { sock }) {
     if (mode === 'on') {
         db.setting('similarity', true)
         await m.react('✅')
-        await m.reply(`✅ *sᴜᴋsᴇs*\n\n> Fitur similarity command *DIAKTIFKAN*`)
+        await m.reply(`✅ *ᴇ́xɪᴛᴏ*\n\n> La función de comandos por similitud ha sido *ACTIVADA*`)
     } else if (mode === 'off') {
         db.setting('similarity', false)
         await m.react('✅')
-        await m.reply(`✅ *sᴜᴋsᴇs*\n\n> Fitur similarity command *DIMATIKAN*`)
+        await m.reply(`✅ *ᴇ́xɪᴛᴏ*\n\n> La función de comandos por similitud ha sido *DESACTIVADA*`)
     } else {
-        return m.reply(`⚠️ *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ*\n\n> \`.similarity on\` - Aktifkan\n> \`.similarity off\` - Matikan`)
+        return m.reply(`⚠️ *ᴍᴏᴅᴏ ᴅᴇ ᴜsᴏ*\n\n> \`.similarity on\` - Activar\n> \`.similarity off\` - Desactivar`)
     }
     
     await db.save()
