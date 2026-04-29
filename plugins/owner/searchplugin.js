@@ -2,12 +2,13 @@ import fs from "fs";
 import path from "path";
 import { getAllPlugins } from "../../src/lib/ourin-plugins.js";
 import te from "../../src/lib/ourin-error.js";
+
 const pluginConfig = {
   name: "searchplugin",
-  alias: ["splugin", "findplugin", "infoplugin"],
+  alias: ["splugin", "buscarplugin", "infoplugin"],
   category: "owner",
-  description: "Cari dan tampilkan info plugin",
-  usage: ".splugin <nama>",
+  description: "Busca y muestra información detallada de un plugin",
+  usage: ".splugin <nombre>",
   example: ".splugin sticker",
   isOwner: true,
   isPremium: false,
@@ -81,9 +82,9 @@ async function handler(m, { sock }) {
 
   if (!name) {
     return m.reply(
-      `🔍 *sᴇᴀʀᴄʜ ᴘʟᴜɢɪɴ*\n\n` +
-        `> Cari dan tampilkan info plugin\n\n` +
-        `*ᴄᴏɴᴛᴏʜ:*\n` +
+      `🔍 *ʙᴜsᴄᴀʀ ᴘʟᴜɢɪɴ*\n\n` +
+        `> Busca y muestra la información de un plugin\n\n` +
+        `*ᴇᴊᴇᴍᴘʟᴏ:*\n` +
         `> \`${m.prefix}splugin sticker\`\n` +
         `> \`${m.prefix}splugin menu\``,
     );
@@ -102,46 +103,46 @@ async function handler(m, { sock }) {
     if (!info) {
       await m.react("❌");
       return m.reply(
-        `❌ *ᴛɪᴅᴀᴋ ᴅɪᴛᴇᴍᴜᴋᴀɴ*\n\n> Plugin \`${name}\` tidak ditemukan`,
+        `❌ *ɴᴏ ᴇɴᴄᴏɴᴛʀᴀᴅᴏ*\n\n> El plugin \`${name}\` no existe en el sistema`,
       );
     }
 
     if (info.error) {
       await m.react("⚠️");
       return m.reply(
-        `⚠️ *ᴘʟᴜɢɪɴ ᴇʀʀᴏʀ*\n\n` +
-          `> File: \`${info.file}\`\n` +
-          `> Folder: \`${info.folder}\`\n` +
+        `⚠️ *ᴇʀʀᴏʀ ᴇɴ ᴇʟ ᴘʟᴜɢɪɴ*\n\n` +
+          `> Archivo: \`${info.file}\`\n` +
+          `> Carpeta: \`${info.folder}\`\n` +
           `> Error: \`${info.error}\``,
       );
     }
 
     const aliases = info.alias?.join(", ") || "-";
-    const isEnabled = info.isEnabled !== false ? "✅ Ya" : "❌ Tidak";
-    const isOwner = info.isOwner ? "✅ Ya" : "❌ Tidak";
-    const isPremium = info.isPremium ? "✅ Ya" : "❌ Tidak";
-    const isGroup = info.isGroup ? "✅ Ya" : "❌ Tidak";
-    const isAdmin = info.isAdmin ? "✅ Ya" : "❌ Tidak";
+    const isEnabled = info.isEnabled !== false ? "✅ Sí" : "❌ No";
+    const isOwner = info.isOwner ? "✅ Sí" : "❌ No";
+    const isPremium = info.isPremium ? "✅ Sí" : "❌ No";
+    const isGroup = info.isGroup ? "✅ Sí" : "❌ No";
+    const isAdmin = info.isAdmin ? "✅ Sí" : "❌ No";
 
     await m.react("✅");
     return m.reply(
-      `📋 *ɪɴꜰᴏ ᴘʟᴜɢɪɴ*\n\n` +
-        `╭┈┈⬡「 📝 *ᴅᴇᴛᴀɪʟ* 」\n` +
-        `┃ 📛 ɴᴀᴍᴀ: \`${info.name || "-"}\`\n` +
+      `📋 *ɪɴғᴏ ᴅᴇʟ ᴘʟᴜɢɪɴ*\n\n` +
+        `╭┈┈⬡「 📝 *ᴅᴇᴛᴀʟʟᴇs* 」\n` +
+        `┃ 📛 ɴᴏᴍʙʀᴇ: \`${info.name || "-"}\`\n` +
         `┃ 🏷️ ᴀʟɪᴀs: \`${aliases}\`\n` +
-        `┃ 📁 ᴄᴀᴛᴇɢᴏʀʏ: \`${info.category || "-"}\`\n` +
+        `┃ 📁 ᴄᴀᴛᴇɢᴏʀɪ́ᴀ: \`${info.category || "-"}\`\n` +
         `┃ 📄 ᴅᴇsᴄ: ${info.description || "-"}\n` +
-        `┃ 📝 ᴜsᴀɢᴇ: \`${info.usage || "-"}\`\n` +
-        `┃ 📌 ᴇxᴀᴍᴘʟᴇ: \`${info.example || "-"}\`\n` +
+        `┃ 📝 ᴜsᴏ: \`${info.usage || "-"}\`\n` +
+        `┃ 📌 ᴇᴊᴇᴍᴘʟᴏ: \`${info.example || "-"}\`\n` +
         `╰┈┈⬡\n\n` +
-        `╭┈┈⬡「 ⚙️ *sᴇᴛᴛɪɴɢs* 」\n` +
-        `┃ 🔓 ᴇɴᴀʙʟᴇᴅ: ${isEnabled}\n` +
-        `┃ 👑 ᴏᴡɴᴇʀ ᴏɴʟʏ: ${isOwner}\n` +
+        `╭┈┈⬡「 ⚙️ *ᴀᴊᴜsᴛᴇs* 」\n` +
+        `┃ 🔓 ʜᴀʙɪʟɪᴛᴀᴅᴏ: ${isEnabled}\n` +
+        `┃ 👑 sᴏʟᴏ ᴏᴡɴᴇʀ: ${isOwner}\n` +
         `┃ 💎 ᴘʀᴇᴍɪᴜᴍ: ${isPremium}\n` +
-        `┃ 👥 ɢʀᴏᴜᴘ ᴏɴʟʏ: ${isGroup}\n` +
-        `┃ 🛡️ ᴀᴅᴍɪɴ ᴏɴʟʏ: ${isAdmin}\n` +
+        `┃ 👥 sᴏʟᴏ ɢʀᴜᴘᴏs: ${isGroup}\n` +
+        `┃ 🛡️ sᴏʟᴏ ᴀᴅᴍɪɴs: ${isAdmin}\n` +
         `┃ ⏱️ ᴄᴏᴏʟᴅᴏᴡɴ: \`${info.cooldown || 0}s\`\n` +
-        `┃ 🎫 ʟɪᴍɪᴛ: \`${info.limit || 0}\`\n` +
+        `┃ 🎫 ʟɪ́ᴍɪᴛᴇ: \`${info.limit || 0}\`\n` +
         `╰┈┈⬡`,
     );
   } catch (error) {
