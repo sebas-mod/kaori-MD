@@ -1,13 +1,14 @@
 import fs from 'fs'
 import path from 'path'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: 'ganti-ourin-winner.jpg',
-    alias: ['gantiourinwinner', 'setourinwinner'],
+    name: 'cambiar-ourin-winner.jpg',
+    alias: ['cambiarourinwinner', 'setourinwinner'],
     category: 'owner',
-    description: 'Ganti gambar ourin-winner.jpg (thumbnail game winner)',
-    usage: '.ganti-ourin-winner.jpg (reply/kirim gambar)',
-    example: '.ganti-ourin-winner.jpg',
+    description: 'Cambiar la imagen ourin-winner.jpg (miniatura de ganador de juego)',
+    usage: '.cambiar-ourin-winner.jpg (responder/enviar imagen)',
+    example: '.cambiar-ourin-winner.jpg',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -21,7 +22,7 @@ async function handler(m, { sock }) {
     const isImage = m.isImage || (m.quoted && m.quoted.type === 'imageMessage')
     
     if (!isImage) {
-        return m.reply(`🏆 *ɢᴀɴᴛɪ ᴏᴜʀɪɴ-ᴡɪɴɴᴇʀ.ᴊᴘɢ*\n\n> Kirim/reply gambar untuk mengganti\n> File: assets/images/ourin-winner.jpg`)
+        return m.reply(`🏆 *ᴄᴀᴍʙɪᴀʀ ᴏᴜʀɪɴ-ᴡɪɴɴᴇʀ.ᴊᴘɢ*\n\n> Envía o responde a una imagen para cambiarla\n> Archivo: assets/images/ourin-winner.jpg`)
     }
     
     try {
@@ -33,7 +34,7 @@ async function handler(m, { sock }) {
         }
         
         if (!buffer) {
-            return m.reply(`❌ Gagal mendownload gambar`)
+            return m.reply(`❌ Error al descargar la imagen`)
         }
         
         const targetPath = path.join(process.cwd(), 'assets', 'images', 'ourin-winner.jpg')
@@ -45,7 +46,7 @@ async function handler(m, { sock }) {
         
         fs.writeFileSync(targetPath, buffer)
         
-        m.reply(`✅ *ʙᴇʀʜᴀsɪʟ*\n\n> Gambar ourin-winner.jpg telah diganti`)
+        m.reply(`✅ *ᴇ́xɪᴛᴏ*\n\n> La imagen ourin-winner.jpg ha sido reemplazada`)
         
     } catch (error) {
         await m.reply(te(m.prefix, m.command, m.pushName))
