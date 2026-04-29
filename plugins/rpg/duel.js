@@ -1,13 +1,14 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { addExpWithLevelCheck } from '../../src/lib/ourin-level.js'
 import { getRpgContextInfo } from '../../src/lib/ourin-context.js'
+
 const pluginConfig = {
-    name: 'duel',
-    alias: ['pvp', 'fight'],
+    name: 'duelo',
+    alias: ['pvp', 'pelea', 'fight', 'duel'],
     category: 'rpg',
-    description: 'Duel PvP dengan player lain',
-    usage: '.duel @user <bet>',
-    example: '.duel @user 5000',
+    description: 'Retá a un duelo a otro usuario por monedas',
+    usage: '.duelo @user <apuesta>',
+    example: '.duelo @user 5000',
     isOwner: false,
     isPremium: false,
     isGroup: true,
@@ -26,20 +27,20 @@ async function handler(m, { sock }) {
     
     if (!target) {
         return m.reply(
-            `⚔️ *ᴅᴜᴇʟ ᴘᴠᴘ*\n\n` +
-            `╭┈┈⬡「 📋 *ᴜsᴀɢᴇ* 」\n` +
-            `┃ > Tag lawan duel!\n` +
-            `┃ > \`.duel @user 5000\`\n` +
+            `⚔️ *DUELO PvP - 𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃*\n\n` +
+            `╭┈┈⬡「 📋 *COMO PELEAR* 」\n` +
+            `┃ > ¡Etiquetá a tu oponente!\n` +
+            `┃ > \`${m.prefix}duelo @user 5000\`\n` +
             `╰┈┈┈┈┈┈┈┈⬡`
         )
     }
     
     if (target === m.sender) {
-        return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> Tidak bisa duel diri sendiri!`)
+        return m.reply(`❌ *ERROR*\n\n> No podés pegarte a vos mismo, buscate un oponente real.`)
     }
     
     if (bet < 1000) {
-        return m.reply(`❌ *ɪɴᴠᴀʟɪᴅ ʙᴇᴛ*\n\n> Minimal bet Rp 1.000!`)
+        return m.reply(`❌ *APUESTA INVÁLIDA*\n\n> El mínimo para un duelo es de $1.000 monedas.`)
     }
     
     const player1 = db.getUser(m.sender)
@@ -47,16 +48,16 @@ async function handler(m, { sock }) {
     
     if ((player1.koin || 0) < bet) {
         return m.reply(
-            `❌ *sᴀʟᴅᴏ ᴛɪᴅᴀᴋ ᴄᴜᴋᴜᴘ*\n\n` +
-            `> Koin kamu: Rp ${(player1.koin || 0).toLocaleString('id-ID')}\n` +
-            `> Butuh: Rp ${bet.toLocaleString('id-ID')}`
+            `❌ *NO TENÉS RECURSOS*\n\n` +
+            `> Tu saldo: $${(player1.koin || 0).toLocaleString('es-AR')}\n` +
+            `> Necesitás: $${bet.toLocaleString('es-AR')}`
         )
     }
     
     if ((player2.koin || 0) < bet) {
         return m.reply(
-            `❌ *ʟᴀᴡᴀɴ ᴛɪᴅᴀᴋ ᴄᴜᴋᴜᴘ*\n\n` +
-            `> Balance lawan tidak cukup untuk bet!`
+            `❌ *OPONENTE POBRE*\n\n` +
+            `> Tu oponente no tiene suficientes monedas para aceptar la apuesta.`
         )
     }
     
@@ -68,24 +69,29 @@ async function handler(m, { sock }) {
     
     if (player1.rpg.health < 30) {
         return m.reply(
-            `❌ *ʜᴇᴀʟᴛʜ ᴛᴇʀʟᴀʟᴜ ʀᴇɴᴅᴀʜ*\n\n` +
-            `> Minimal 30 HP untuk duel!\n` +
-            `> Health kamu: ${player1.rpg.health} HP`
+            `❌ *SALUD MUY BAJA*\n\n` +
+            `> Necesitás al menos 30 HP para pelear.\n` +
+            `> Salud actual: ${player1.rpg.health} HP`
         )
     }
     
-    await sock.sendMessage(m.chat, { text: `⚔️ *ᴅᴜᴇʟ ᴅɪᴍᴜʟᴀɪ*\n\n> @${m.sender.split('@')[0]} vs @${target.split('@')[0]}\n> 💰 Bet: Rp ${bet.toLocaleString('id-ID')}`, contextInfo: getRpgContextInfo('⚔️ DUEL', 'Fight!') }, { quoted: m })
+    await sock.sendMessage(m.chat, { 
+        text: `⚔️ *EL DUELO COMIENZA*\n\n> @${m.sender.split('@')[0]} 🆚 @${target.split('@')[0]}\n> 💰 Apuesta: $${bet.toLocaleString('es-AR')}`, 
+        contextInfo: getRpgContextInfo('⚔️ DUEL', '¡A LA CARGA!') 
+    }, { quoted: m, mentions: [m.sender, target] })
     
     await new Promise(r => setTimeout(r, 2000))
     
-    const p1Power = (player1.rpg.level || 1) * 10 + Math.random() * 50
-    const p2Power = (player2.rpg.level || 1) * 10 + Math.random() * 50
+    // Cálculo de poder basado en nivel y un poco de suerte
+    const p1Power = (player1.level || 1) * 10 + Math.random() * 50
+    const p2Power = (player2.level || 1) * 10 + Math.random() * 50
     
     const winner = p1Power > p2Power ? m.sender : target
     const loser = winner === m.sender ? target : m.sender
     const winnerData = winner === m.sender ? player1 : player2
     const loserData = winner === m.sender ? player2 : player1
     
+    // Transacción de premios
     winnerData.koin = (winnerData.koin || 0) + bet
     loserData.koin = (loserData.koin || 0) - bet
     loserData.rpg.health = Math.max(0, (loserData.rpg.health || 100) - 20)
@@ -95,13 +101,16 @@ async function handler(m, { sock }) {
     
     db.save()
     
-    let txt = `⚔️ *ʜᴀsɪʟ ᴅᴜᴇʟ*\n\n`
-    txt += `🏆 Pemenang: @${winner.split('@')[0]}\n`
-    txt += `💀 Kalah: @${loser.split('@')[0]}\n\n`
-    txt += `> 💰 Hadiah: Rp ${bet.toLocaleString('id-ID')}\n`
-    txt += `> 🚄 Exp: +${expGain} (winner)`
+    let txt = `⚔️ *RESULTADO DEL COMBATE*\n\n`
+    txt += `🏆 Ganador: @${winner.split('@')[0]}\n`
+    txt += `💀 Derrotado: @${loser.split('@')[0]}\n\n`
+    txt += `> 💰 Premio: $${bet.toLocaleString('es-AR')}\n`
+    txt += `> ✨ EXP: +${expGain} (para el ganador)`
     
-    await sock.sendMessage(m.chat, { text: txt, contextInfo: getRpgContextInfo('⚔️ DUEL', 'Result!') }, { quoted: m })
+    await sock.sendMessage(m.chat, { 
+        text: txt, 
+        contextInfo: getRpgContextInfo('⚔️ DUEL', '¡Combate finalizado!') 
+    }, { quoted: m, mentions: [winner, loser] })
 }
 
 export { pluginConfig as config, handler }
