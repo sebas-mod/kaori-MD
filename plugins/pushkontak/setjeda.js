@@ -1,11 +1,12 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
-    name: 'setjeda',
-    alias: ['setdelay', 'jeda'],
-    category: 'pushkontak',
-    description: 'Atur delay untuk pushkontak/jpm',
-    usage: '.setjeda <push/jpm> <ms>',
-    example: '.setjeda push 5000',
+    name: 'establecerespera',
+    alias: ['setdelay', 'espera', 'setjeda'],
+    category: 'pushkontak', // Categoría original preservada
+    description: 'Configura el intervalo de tiempo para pushkontak/jpm',
+    usage: '.establecerespera <push/jpm> <ms>',
+    example: '.establecerespera push 5000',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -19,20 +20,20 @@ function handler(m, { sock }) {
     const db = getDatabase()
     const args = m.args
     
-    const currentJedaPush = db.setting('jedaPush') || 5000
-    const currentJedaJpm = db.setting('jedaJpm') || 5000
+    const esperaPushActual = db.setting('jedaPush') || 5000
+    const esperaJpmActual = db.setting('jedaJpm') || 5000
     
     if (args.length < 2) {
         return m.reply(
-            `⏱️ *sᴇᴛ ᴊᴇᴅᴀ*\n\n` +
-            `╭┈┈⬡「 📋 *sᴇᴛᴛɪɴɢ sᴀᴀᴛ ɪɴɪ* 」\n` +
-            `┃ 📤 ᴊᴇᴅᴀ ᴘᴜsʜ: \`${currentJedaPush}ms\`\n` +
-            `┃ 📢 ᴊᴇᴅᴀ ᴊᴘᴍ: \`${currentJedaJpm}ms\`\n` +
+            `⏱️ *ᴄᴏɴғɪɢᴜʀᴀʀ ᴇsᴘᴇʀᴀ*\n\n` +
+            `╭┈┈⬡「 📋 *ᴀᴊᴜsᴛᴇs ᴀᴄᴛᴜᴀʟᴇs* 」\n` +
+            `┃ 📤 ᴇsᴘᴇʀᴀ ᴘᴜsʜ: \`${esperaPushActual}ms\`\n` +
+            `┃ 📢 ᴇsᴘᴇʀᴀ ᴊᴘᴍ: \`${esperaJpmActual}ms\`\n` +
             `╰┈┈⬡\n\n` +
-            `*ᴄᴀʀᴀ ᴘᴀᴋᴀɪ:*\n` +
-            `> \`${m.prefix}setjeda push 5000\`\n` +
-            `> \`${m.prefix}setjeda jpm 6000\`\n\n` +
-            `> _1 detik = 1000ms_`
+            `*ᴍᴏᴅᴏ ᴅᴇ ᴜsᴏ:*\n` +
+            `> \`${m.prefix}establecerespera push 5000\`\n` +
+            `> \`${m.prefix}establecerespera jpm 6000\`\n\n` +
+            `> _1 segundo = 1000ms_`
         )
     }
     
@@ -40,27 +41,27 @@ function handler(m, { sock }) {
     const value = parseInt(args[1])
     
     if (!['push', 'jpm'].includes(target)) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Pilihan: \`push\` atau \`jpm\``)
+        return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> Opciones válidas: \`push\` o \`jpm\``)
     }
     
     if (isNaN(value) || value < 1000) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Masukkan angka minimal 1000 (1 detik)`)
+        return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> Ingresa un número mínimo de 1000 (1 segundo)`)
     }
     
     if (value > 60000) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Maksimal 60000 (1 menit)`)
+        return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> El máximo permitido es 60000 (1 minuto)`)
     }
     
     if (target === 'push') {
         db.setting('jedaPush', value)
         m.react('✅')
-        return m.reply(`✅ *ᴊᴇᴅᴀ ᴘᴜsʜ ᴅɪᴜʙᴀʜ*\n\n> Jeda: \`${value}ms\` (${value/1000} detik)`)
+        return m.reply(`✅ *ᴇsᴘᴇʀᴀ ᴘᴜsʜ ᴀᴄᴛᴜᴀʟɪᴢᴀᴅᴀ*\n\n> Intervalo: \`${value}ms\` (${value/1000} segundos)`)
     }
     
     if (target === 'jpm') {
         db.setting('jedaJpm', value)
         m.react('✅')
-        return m.reply(`✅ *ᴊᴇᴅᴀ ᴊᴘᴍ ᴅɪᴜʙᴀʜ*\n\n> Jeda: \`${value}ms\` (${value/1000} detik)`)
+        return m.reply(`✅ *ᴇsᴘᴇʀᴀ ᴊᴘᴍ ᴀᴄᴛᴜᴀʟɪᴢᴀᴅᴀ*\n\n> Intervalo: \`${value}ms\` (${value/1000} segundos)`)
     }
 }
 
