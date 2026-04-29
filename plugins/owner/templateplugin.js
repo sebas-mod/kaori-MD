@@ -1,11 +1,12 @@
 import config from '../../config.js'
+
 const pluginConfig = {
-    name: 'templateplugin',
-    alias: ['tplplugin', 'plugin-template'],
+    name: 'plantillaplugin',
+    alias: ['tplplugin', 'crearplantilla', 'plugin-template'],
     category: 'owner',
-    description: 'Generate plugin template (Owner Only)',
-    usage: '.templateplugin',
-    example: '.templateplugin',
+    description: 'Genera una plantilla base para nuevos plugins (Solo Owner)',
+    usage: '.plantillaplugin',
+    example: '.plantillaplugin',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -14,18 +15,20 @@ const pluginConfig = {
     energi: 0,
     isEnabled: true
 }
+
 function handler(m, { sock }) {
     if (!config.isOwner(m.sender)) {
-        return m.reply('❌ *Owner Only!*')
+        return m.reply('❌ *¡Solo el Propietario (Owner) puede usar esto!*')
     }
+
     const template = `
 const pluginConfig = {
-    name: 'example',
+    name: 'ejemplo',
     alias: ['ex'],
     category: 'general',
-    description: 'Example plugin',
-    usage: '.example',
-    example: '.example',
+    description: 'Plugin de ejemplo',
+    usage: '.ejemplo',
+    example: '.ejemplo',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -34,16 +37,19 @@ const pluginConfig = {
     energi: 1,
     isEnabled: true
 }
+
 async function handler(m, { sock }) {
     try {
-        await m.reply('This is an example plugin!')
+        await m.reply('¡Este es un plugin de ejemplo!')
     } catch (error) {
-        console.error('Example Plugin Error:', error)
-        await m.reply('❌ *GAGAL*\\n\\n> ' + error.message)
+        console.error('Error en Plugin de Ejemplo:', error)
+        await m.reply('❌ *ERROR*\\n\\n> ' + error.message)
     }
 }
+
 export { pluginConfig as config, handler }
 `
     m.reply(`\`\`\`${template}\`\`\``)
 }
+
 export { pluginConfig as config, handler }
