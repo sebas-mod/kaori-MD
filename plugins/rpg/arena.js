@@ -1,10 +1,11 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { addExpWithLevelCheck } from '../../src/lib/ourin-level.js'
+
 const pluginConfig = {
     name: 'arena',
-    alias: ['pvp', 'battle', 'fight'],
+    alias: ['pvp', 'pelea', 'manoamano', 'bardear'],
     category: 'rpg',
-    description: 'Bertarung di arena PvP',
+    description: 'Andá a buscar a uno para dársela en la pera en el Arena PvP',
     usage: '.arena <@user>',
     example: '.arena @user',
     isOwner: false,
@@ -26,23 +27,23 @@ async function handler(m, { sock }) {
     const mentioned = m.mentionedJid?.[0] || m.quoted?.sender
     if (!mentioned) {
         return m.reply(
-            `⚔️ *ᴀʀᴇɴᴀ ᴘᴠᴘ*\n\n` +
-            `> Tantang player lain untuk duel!\n\n` +
-            `╭┈┈⬡「 📋 *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ* 」\n` +
+            `⚔️ *EL ARENA DEL AGUANTE*\n\n` +
+            `> ¡Buscá a un gil para dársela!\n\n` +
+            `╭┈┈⬡「 📋 *CÓMO HACER* 」\n` +
             `┃ ${m.prefix}arena @user\n` +
-            `┃ Reply pesan user + ${m.prefix}arena\n` +
+            `┃ Respondé a un mensaje con ${m.prefix}arena\n` +
             `╰┈┈┈┈┈┈┈┈⬡\n\n` +
-            `⚠️ *Risiko:* Kalah = -20% balance`
+            `⚠️ *Ojo:* Si perdés, te limpian el 20% de tu guita.`
         )
     }
     
     if (mentioned === m.sender) {
-        return m.reply(`❌ Tidak bisa bertarung dengan diri sendiri!`)
+        return m.reply(`❌ ¡No seas boludo, no te podés pelear con vos mismo!`)
     }
     
     const opponent = db.getUser(mentioned)
     if (!opponent) {
-        return m.reply(`❌ Lawan belum terdaftar di database!`)
+        return m.reply(`❌ Ese no está ni registrado, no le podés pegar a un fantasma.`)
     }
     
     if (!opponent.rpg) opponent.rpg = {}
@@ -56,7 +57,7 @@ async function handler(m, { sock }) {
     const oppDefense = (opponent.rpg.defense || 5) + (opponent.level || 1)
     
     await m.react('⚔️')
-    await m.reply(`⚔️ *ᴘᴇʀᴛᴀʀᴜɴɢᴀɴ ᴅɪᴍᴜʟᴀɪ...*\n\n> @${m.sender.split('@')[0]} vs @${mentioned.split('@')[0]}`, { mentions: [m.sender, mentioned] })
+    await m.reply(`⚔️ *¡SE ARMÓ EL QUILOMBO!*\n\n> @${m.sender.split('@')[0]} vs @${mentioned.split('@')[0]}\n\n_Bancá que se están dando..._`, { mentions: [m.sender, mentioned] })
     await new Promise(r => setTimeout(r, 2000))
     
     let myHp = myHealth
@@ -69,25 +70,25 @@ async function handler(m, { sock }) {
         
         const myDmg = Math.max(5, myAttack - oppDefense + Math.floor(Math.random() * 10))
         oppHp -= myDmg
-        battleLog.push(`🔥 Kamu menyerang: *-${myDmg} HP*`)
+        battleLog.push(`🥊 Le diste un viaje: *-${myDmg} HP*`)
         
         if (oppHp <= 0) break
         
         const oppDmg = Math.max(5, oppAttack - myDefense + Math.floor(Math.random() * 10))
         myHp -= oppDmg
-        battleLog.push(`💢 Lawan menyerang: *-${oppDmg} HP*`)
+        battleLog.push(`👊 Te la pusieron: *-${oppDmg} HP*`)
     }
     
     const isWin = myHp > oppHp
     
-    let txt = `⚔️ *ʜᴀsɪʟ ᴘᴇʀᴛᴀʀᴜɴɢᴀɴ*\n\n`
-    txt += `╭┈┈⬡「 📊 *sᴛᴀᴛs* 」\n`
-    txt += `┃ 🧑 Kamu: ${Math.max(0, myHp)}/${myHealth} HP\n`
-    txt += `┃ 👤 Lawan: ${Math.max(0, oppHp)}/${oppHealth} HP\n`
-    txt += `┃ 🔄 Round: ${round}\n`
+    let txt = `⚔️ *RESUMEN DE LA PIÑERA*\n\n`
+    txt += `╭┈┈⬡「 📊 *CÓMO QUEDARON* 」\n`
+    txt += `┃ 🧑 Vos: ${Math.max(0, myHp)}/${myHealth} HP\n`
+    txt += `┃ 👤 El otro: ${Math.max(0, oppHp)}/${oppHealth} HP\n`
+    txt += `┃ 🔄 Rounds: ${round}\n`
     txt += `╰┈┈┈┈┈┈┈┈⬡\n\n`
     
-    txt += `📜 *Battle Log:*\n`
+    txt += `📜 *Lo que pasó:* \n`
     txt += battleLog.slice(-6).map(l => `> ${l}`).join('\n')
     txt += `\n\n`
     
@@ -100,17 +101,17 @@ async function handler(m, { sock }) {
         
         await addExpWithLevelCheck(sock, m, db, user, expReward)
         
-        txt += `🎉 *ᴋᴇᴍᴇɴᴀɴɢᴀɴ!*\n`
-        txt += `> ✨ EXP: +${expReward}\n`
-        txt += `> 💰 Gold: +${goldReward.toLocaleString()}`
+        txt += `🎉 *¡VAMOS TODAVÍA!*\n`
+        txt += `> ✨ Sacaste: +${expReward} EXP\n`
+        txt += `> 💰 Le choreaste: +$${goldReward.toLocaleString()}`
         
         await m.react('🏆')
     } else {
         const goldLoss = Math.floor((user.koin || 0) * 0.2)
         user.koin = Math.max(0, (user.koin || 0) - goldLoss)
         
-        txt += `💀 *ᴋᴇᴋᴀʟᴀʜᴀɴ!*\n`
-        txt += `> 💸 Gold: -${goldLoss.toLocaleString()}`
+        txt += `💀 *COBRASTE POR BONDI*\n`
+        txt += `> 💸 Te limpiaron: -$${goldLoss.toLocaleString()}`
         
         await m.react('💀')
     }
