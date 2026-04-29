@@ -1,10 +1,11 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import config from '../../config.js'
+
 const pluginConfig = {
     name: 'resetlimitdefault',
-    alias: ['defaultlimitreset'],
+    alias: ['restablecerlimitopredeterminado', 'resetlimitpred'],
     category: 'owner',
-    description: 'Reset default limit ke config asli',
+    description: 'Restablece el límite predeterminado a la configuración original',
     usage: '.resetlimitdefault',
     example: '.resetlimitdefault',
     isOwner: true,
@@ -20,12 +21,13 @@ async function handler(m, { sock }) {
     const db = getDatabase()
     const configDefault = config.limits?.default || 25
     
+    // Elimina el valor personalizado de la base de datos para volver al de config.js
     db.setting('defaultLimit', null)
     
     await m.reply(
-        `✅ *ʙᴇʀʜᴀsɪʟ*\n\n` +
-        `> Default limit direset ke config: \`${configDefault}\`\n` +
-        `> User baru akan mendapat limit dari config`
+        `✅ *ᴇ́xɪᴛᴏ*\n\n` +
+        `> El límite predeterminado ha sido restablecido a: \`${configDefault}\`\n` +
+        `> Los nuevos usuarios recibirán el límite de la configuración original.`
     )
 }
 
