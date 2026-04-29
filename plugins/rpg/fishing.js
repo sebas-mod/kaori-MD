@@ -1,14 +1,14 @@
-
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { addExpWithLevelCheck } from '../../src/lib/ourin-level.js'
 import { getRpgContextInfo } from '../../src/lib/ourin-context.js'
+
 const pluginConfig = {
-    name: 'fishing',
-    alias: ['fish', 'mancing'],
+    name: 'pesca',
+    alias: ['fish', 'pescar', 'pancart'],
     category: 'rpg',
-    description: 'Memancing untuk mendapatkan ikan',
-    usage: '.fishing',
-    example: '.fishing',
+    description: 'Pesca algo para obtener alimento o recursos',
+    usage: '.pesca',
+    example: '.pesca',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -30,29 +30,30 @@ async function handler(m, { sock }) {
     
     if (user.rpg.stamina < staminaCost) {
         return m.reply(
-            `⚡ *sᴛᴀᴍɪɴᴀ ʜᴀʙɪs*\n\n` +
-            `> Butuh ${staminaCost} stamina untuk memancing.\n` +
-            `> Stamina kamu: ${user.rpg.stamina}`
+            `⚡ *STAMINA AGOTADA*\n\n` +
+            `> Necesitás ${staminaCost} de stamina para tirar la caña.\n` +
+            `> Tu stamina actual: ${user.rpg.stamina}`
         )
     }
     
     user.rpg.stamina -= staminaCost
     
-    await m.reply('🎣 *sᴇᴅᴀɴɢ ᴍᴇᴍᴀɴᴄɪɴɢ...*')
+    await m.reply('🎣 *TIRANDO LA CAÑA... ESPERÁ QUE PIQUE.*')
     await new Promise(r => setTimeout(r, 2000))
     
     const drops = [
-        { item: 'trash', chance: 20, name: '🗑️ Sampah', exp: 10 },
-        { item: 'fish', chance: 50, name: '🐟 Ikan', exp: 100 },
-        { item: 'prawn', chance: 30, name: '🦐 Udang', exp: 150 },
-        { item: 'octopus', chance: 15, name: '🐙 Gurita', exp: 300 },
-        { item: 'shark', chance: 5, name: '🦈 Hiu', exp: 800 },
-        { item: 'whale', chance: 1, name: '🐳 Paus', exp: 2000 }
+        { item: 'basura', chance: 20, name: '🗑️ Bota Vieja', exp: 10 },
+        { item: 'pescado', chance: 50, name: '🐟 Pescado Fresco', exp: 100 },
+        { item: 'camaron', chance: 30, name: '🦐 Camarón', exp: 150 },
+        { item: 'pulpo', chance: 15, name: '🐙 Pulpo', exp: 300 },
+        { item: 'tiburon', chance: 5, name: '🦈 Tiburón Blanco', exp: 800 },
+        { item: 'ballena', chance: 1, name: '🐳 Ballena Azul', exp: 2000 }
     ]
     
     const rand = Math.random() * 100
     let caught = drops[0]
     
+    // Ordenar por probabilidad para que la lógica de selección funcione correctamente
     for (const drop of drops.sort((a, b) => a.chance - b.chance)) {
         if (rand <= drop.chance) {
             caught = drop
@@ -64,17 +65,19 @@ async function handler(m, { sock }) {
     user.inventory[caught.item] = (user.inventory[caught.item] || 0) + qty
     
     const expReward = caught.exp
-    const levelResult = await addExpWithLevelCheck(sock, m, db, user, expReward)
+    await addExpWithLevelCheck(sock, m, db, user, expReward)
     
     db.save()
     
-    let txt = `🎣 *ꜰɪsʜɪɴɢ sᴇʟᴇsᴀɪ*\n\n`
-    txt += `╭┈┈⬡「 📦 *ʜᴀsɪʟ* 」\n`
-    txt += `┃ ${caught.name}: *+${qty}*\n`
-    txt += `┃ 🚄 Exp: *+${expReward}*\n`
+    let txt = `🎣 *¡PESCA FINALIZADA!*\n\n`
+    txt += `> Has tenido suerte en las aguas de **𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃**.\n\n`
+    txt += `╭┈┈⬡「 📦 *BOTÍN* 」\n`
+    txt += `┃ Obtenido: *${caught.name}*\n`
+    txt += `┃ ✨ Exp: *+${expReward}*\n`
     txt += `┃ ⚡ Stamina: *-${staminaCost}*\n`
     txt += `╰┈┈┈┈┈┈┈┈⬡`
     
+    await m.react('🎣')
     await m.reply(txt)
 }
 
