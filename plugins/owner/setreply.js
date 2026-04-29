@@ -2,12 +2,13 @@ import config from '../../config.js'
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import pkg from 'ourin';
 const { generateWAMessageFromContent, proto } = pkg;
+
 const pluginConfig = {
     name: 'setreply',
-    alias: ['replyvariant', 'replystyle'],
+    alias: ['estiloreply', 'variantereply', 'configreply'],
     category: 'owner',
-    description: 'Mengatur variant tampilan reply',
-    usage: '.setreply <v1-v6>',
+    description: 'Configura el estilo visual de las respuestas (reply)',
+    usage: '.setreply <v1-v9>',
     example: '.setreply v5',
     isOwner: true,
     isPremium: false,
@@ -19,15 +20,15 @@ const pluginConfig = {
 };
 
 const VARIANTS = {
-    v1: { id: 1, name: 'Simple', desc: 'Reply text biasa tanpa styling', emoji: '📝' },
-    v2: { id: 2, name: 'Context', desc: 'Reply dengan externalAdReply (thumbnail kecil)', emoji: '🖼️' },
-    v3: { id: 3, name: 'Forward', desc: 'Full contextInfo + forwardedNewsletter', emoji: '📨' },
-    v4: { id: 4, name: 'Qkontak', desc: 'V3 + fake quoted reply (centang biru)', emoji: '✅' },
-    v5: { id: 5, name: 'FakeTroli', desc: 'V3 + faketroli quoted + large thumbnail', emoji: '🛒' },
-    v6: { id: 6, name: 'Hehe', desc: 'Centang biru + document', emoji: '📄' },
-    v7: { id: 7, name: 'Andalan ku', desc: 'Centang biru + gambar', emoji: '📄' },
-    v8: { id: 8, name: 'Gambar panjang, tanpa centang biru', desc: 'Gambar panjang, tanpa centang biru', emoji: '📄' },
-    v9: { id: 9, name: 'Video GIF', desc: 'Video GIF, tanpa centang biru', emoji: '📄' }
+    v1: { id: 1, name: 'Simple', desc: 'Respuesta de texto normal sin estilo', emoji: '📝' },
+    v2: { id: 2, name: 'Contexto', desc: 'Respuesta con externalAdReply (miniatura pequeña)', emoji: '🖼️' },
+    v3: { id: 3, name: 'Reenvío', desc: 'ContextInfo completo + boletín informativo', emoji: '📨' },
+    v4: { id: 4, name: 'Qcontacto', desc: 'V3 + respuesta citada falsa (verificado azul)', emoji: '✅' },
+    v5: { id: 5, name: 'FakeTroli', desc: 'V3 + citado de carrito falso + miniatura grande', emoji: '🛒' },
+    v6: { id: 6, name: 'Hehe', desc: 'Verificado azul + documento', emoji: '📄' },
+    v7: { id: 7, name: 'Favorito', desc: 'Verificado azul + imagen', emoji: '🌟' },
+    v8: { id: 8, name: 'Imagen Larga', desc: 'Imagen larga, sin verificado azul', emoji: '📐' },
+    v9: { id: 9, name: 'Video GIF', desc: 'Video GIF, sin verificado azul', emoji: '🎞️' }
 };
 
 async function handler(m, { sock, db }) {
@@ -37,14 +38,14 @@ async function handler(m, { sock, db }) {
     if (variant) {
         const selected = VARIANTS[variant];
         if (!selected) {
-            await m.reply(`❌ Variant tidak valid!\n\nGunakan: v1 s/d v9`);
+            await m.reply(`❌ ¡Variante no válida!\n\nUsa: v1 hasta v9`);
             return;
         }
 
         db.setting('replyVariant', selected.id);
 
         await m.reply(
-            `✅ *ʀᴇᴘʟʏ ᴠᴀʀɪᴀɴᴛ ᴅɪᴜʙᴀʜ*\n\n` +
+            `✅ *ᴠᴀʀɪᴀɴᴛᴇ ᴅᴇ ʀᴇᴘʟʏ ᴀᴄᴛᴜᴀʟɪᴢᴀᴅᴀ*\n\n` +
             `> ${selected.emoji} *V${selected.id} — ${selected.name}*\n` +
             `> _${selected.desc}_`
         );
@@ -60,19 +61,19 @@ async function handler(m, { sock, db }) {
     }));
 
     const bodyText =
-        `💬 *sᴇᴛ ʀᴇᴘʟʏ ᴠᴀʀɪᴀɴᴛ*\n\n` +
-        `> Variant aktif: *V${current}*\n` +
-        `> _${VARIANTS[`v${current}`]?.name || 'Unknown'}_\n\n` +
-        `> Pilih variant dari daftar di bawah`;
+        `💬 *ᴄᴏɴғɪɢᴜʀᴀʀ ᴠᴀʀɪᴀɴᴛᴇ ᴅᴇ ʀᴇᴘʟʏ*\n\n` +
+        `> Variante activa: *V${current}*\n` +
+        `> _${VARIANTS[`v${current}`]?.name || 'Desconocido'}_\n\n` +
+        `> Elige una variante de la lista de abajo:`;
 
     try {
         const interactiveButtons = [
             {
                 name: 'single_select',
                 buttonParamsJson: JSON.stringify({
-                    title: '💬 ᴘɪʟɪʜ ᴠᴀʀɪᴀɴᴛ',
+                    title: '💬 sᴇʟᴇᴄᴄɪᴏɴᴀʀ ᴇsᴛɪʟᴏ',
                     sections: [{
-                        title: 'ᴅᴀꜰᴛᴀʀ ᴠᴀʀɪᴀɴᴛ ʀᴇᴘʟʏ',
+                        title: 'ʟɪsᴛᴀ ᴅᴇ ᴠᴀʀɪᴀɴᴛᴇs ᴅᴇ ʀᴇᴘʟʏ',
                         rows
                     }]
                 })
@@ -94,8 +95,8 @@ async function handler(m, { sock, db }) {
                             text: config.bot?.name || 'Ourin-AI'
                         }),
                         header: proto.Message.InteractiveMessage.Header.fromObject({
-                            title: '💬 Reply Variant',
-                            subtitle: `${Object.keys(VARIANTS).length} variant tersedia`,
+                            title: '💬 Variante de Respuesta',
+                            subtitle: `${Object.keys(VARIANTS).length} variantes disponibles`,
                             hasMediaAttachment: false
                         }),
                         nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
@@ -118,13 +119,13 @@ async function handler(m, { sock, db }) {
 
         await sock.relayMessage(m.chat, msg.message, { messageId: msg.key.id });
     } catch {
-        let txt = `💬 *sᴇᴛ ʀᴇᴘʟʏ ᴠᴀʀɪᴀɴᴛ*\n\n`;
-        txt += `> Variant saat ini: *V${current}*\n\n`;
+        let txt = `💬 *ᴄᴏɴғɪɢᴜʀᴀʀ ᴠᴀʀɪᴀɴᴛᴇ ᴅᴇ ʀᴇᴘʟʏ*\n\n`;
+        txt += `> Variante actual: *V${current}*\n\n`;
         for (const [key, val] of Object.entries(VARIANTS)) {
             const mark = val.id === current ? ' ✓' : '';
             txt += `> ${val.emoji} *${key.toUpperCase()}*${mark} — _${val.desc}_\n`;
         }
-        txt += `\n_Gunakan: \`.setreply v1\` s/d \`.setreply v6\`_`;
+        txt += `\n_Usa: \`.setreply v1\` hasta \`.setreply v9\`_`;
         await m.reply(txt);
     }
 }
