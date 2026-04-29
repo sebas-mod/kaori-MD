@@ -1,13 +1,14 @@
 import fs from 'fs'
 import path from 'path'
 import { execSync, exec } from 'child_process'
+
 const pluginConfig = {
-    name: 'updatescript',
-    alias: ['updatebot', 'updatesc'],
+    name: 'actualizarscript',
+    alias: ['updatebot', 'actualizarbot', 'updatesc'],
     category: 'owner',
-    description: 'Update script otomatis dari GitHub dengan backup data penting',
-    usage: '.updatescript',
-    example: '.updatescript',
+    description: 'Actualiza el script automáticamente desde GitHub con copia de seguridad',
+    usage: '.actualizarscript',
+    example: '.actualizarscript',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -20,7 +21,7 @@ const pluginConfig = {
 const REPO_URL = 'https://github.com/LuckyArch/OurinMD.git'
 const BRANCH = 'main'
 
-const PRESERVE_ITEMS = [
+const ELEMENTOS_A_PRESERVAR = [
     'config.js',
     'db.json',
     'sessions',
@@ -32,34 +33,34 @@ const PRESERVE_ITEMS = [
     'temp'
 ]
 
-function formatSize(bytes) {
+function formatearTamano(bytes) {
     if (bytes < 1024) return bytes + ' B'
     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
 }
 
-function copyRecursiveSync(src, dest, preserve, relativePath = '') {
+function copiarRecursivoSync(src, dest, preservar, rutaRelativa = '') {
     const stats = fs.statSync(src)
 
     if (stats.isDirectory()) {
         if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true })
-        const entries = fs.readdirSync(src)
-        let count = 0
+        const entradas = fs.readdirSync(src)
+        let contador = 0
 
-        for (const entry of entries) {
-            const relPath = relativePath ? `${relativePath}/${entry}` : entry
-            const shouldPreserve = preserve.some(p => relPath === p || relPath.startsWith(p + '/'))
+        for (const entrada of entradas) {
+            const relPath = rutaRelativa ? `${rutaRelativa}/${entrada}` : entrada
+            const deberiaPreservar = preservar.some(p => relPath === p || relPath.startsWith(p + '/'))
 
-            if (shouldPreserve) continue
+            if (deberiaPreservar) continue
 
-            count += copyRecursiveSync(
-                path.join(src, entry),
-                path.join(dest, entry),
-                preserve,
+            contador += copiarRecursivoSync(
+                path.join(src, entrada),
+                path.join(dest, entrada),
+                preservar,
                 relPath
             )
         }
-        return count
+        return contador
     }
 
     const dir = path.dirname(dest)
@@ -68,18 +69,18 @@ function copyRecursiveSync(src, dest, preserve, relativePath = '') {
     return 1
 }
 
-function backupFile(baseDir, backupDir, filePath) {
-    const src = path.join(baseDir, filePath)
-    const dest = path.join(backupDir, filePath)
+function respaldarArchivo(baseDir, backupDir, rutaArchivo) {
+    const src = path.join(baseDir, rutaArchivo)
+    const dest = path.join(backupDir, rutaArchivo)
 
     if (!fs.existsSync(src)) return false
 
     const stat = fs.statSync(src)
     if (stat.isDirectory()) {
         if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true })
-        const entries = fs.readdirSync(src, { withFileTypes: true })
-        for (const entry of entries) {
-            backupFile(baseDir, backupDir, path.join(filePath, entry.name))
+        const entradas = fs.readdirSync(src, { withFileTypes: true })
+        for (const entrada of entradas) {
+            respaldarArchivo(baseDir, backupDir, path.join(rutaArchivo, entrada.name))
         }
     } else {
         const dir = path.dirname(dest)
@@ -89,61 +90,61 @@ function backupFile(baseDir, backupDir, filePath) {
     return true
 }
 
-function cleanDir(dirPath) {
-    if (fs.existsSync(dirPath)) {
-        fs.rmSync(dirPath, { recursive: true, force: true })
+function limpiarDirectorio(rutaDir) {
+    if (fs.existsSync(rutaDir)) {
+        fs.rmSync(rutaDir, { recursive: true, force: true })
     }
 }
 
 async function handler(m, { sock }) {
     const baseDir = process.cwd()
-    const tempDir = path.join(baseDir, 'tmp', 'update_clone')
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
-    const backupDir = path.join(baseDir, 'backup', `pre_update_${timestamp}`)
+    const tempDir = path.join(baseDir, 'tmp', 'clonacion_actualizacion')
+    const marcaTiempo = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
+    const backupDir = path.join(baseDir, 'backup', `pre_actualizacion_${marcaTiempo}`)
 
     try {
-        let hasGit = false
+        let tieneGit = false
         try {
             execSync('git --version', { stdio: 'pipe' })
-            hasGit = true
+            tieneGit = true
         } catch {}
 
-        if (!hasGit) {
+        if (!tieneGit) {
             return m.reply(
-                `❌ *ɢᴀɢᴀʟ*\n\n` +
-                `> Git tidak terinstall di server\n` +
-                `> Install git dulu: \`apt install git\` / \`pkg install git\``
+                `❌ *ᴇʀʀᴏʀ*\n\n` +
+                `> Git no está instalado en el servidor\n` +
+                `> Instala git primero: \`apt install git\` / \`pkg install git\``
             )
         }
 
         await m.react('🕕')
         await m.reply(
-            `🔄 *ᴜᴘᴅᴀᴛᴇ sᴄʀɪᴘᴛ*\n\n` +
+            `🔄 *ᴀᴄᴛᴜᴀʟɪᴢᴀᴄɪóɴ ᴅᴇ sᴄʀɪᴘᴛ*\n\n` +
             `> Repo: \`LuckyArch/OurinMD\`\n` +
-            `> Branch: \`${BRANCH}\`\n\n` +
-            `📦 Step 1/4 — Backup data penting...`
+            `> Rama: \`${BRANCH}\`\n\n` +
+            `📦 Paso 1/4 — Creando copia de seguridad...`
         )
 
         if (!fs.existsSync(backupDir)) {
             fs.mkdirSync(backupDir, { recursive: true })
         }
 
-        const backedUp = []
-        for (const item of PRESERVE_ITEMS) {
+        const respaldados = []
+        for (const item of ELEMENTOS_A_PRESERVAR) {
             if (item === 'node_modules' || item === 'tmp' || item === 'temp') continue
-            if (backupFile(baseDir, backupDir, item)) {
-                backedUp.push(item)
+            if (respaldarArchivo(baseDir, backupDir, item)) {
+                respaldados.push(item)
             }
         }
 
         await m.reply(
-            `✅ *ʙᴀᴄᴋᴜᴘ sᴜᴋsᴇs*\n\n` +
-            `> ${backedUp.length} item disimpan\n` +
-            `> ${backedUp.map(i => `\`${i}\``).join(', ')}\n\n` +
-            `📥 Step 2/4 — Clone repo terbaru...`
+            `✅ *ʙᴀᴄᴋᴜᴘ ᴇxɪᴛᴏsᴏ*\n\n` +
+            `> ${respaldados.length} elementos guardados\n` +
+            `> ${respaldados.map(i => `\`${i}\``).join(', ')}\n\n` +
+            `📥 Paso 2/4 — Clonando repositorio nuevo...`
         )
 
-        cleanDir(tempDir)
+        limpiarDirectorio(tempDir)
 
         try {
             execSync(`git clone --depth 1 --branch ${BRANCH} ${REPO_URL} "${tempDir}"`, {
@@ -153,40 +154,40 @@ async function handler(m, { sock }) {
         } catch (e) {
             await m.react('❌')
             return m.reply(
-                `❌ *ɢᴀɢᴀʟ ᴄʟᴏɴᴇ*\n\n` +
+                `❌ *ᴇʀʀᴏʀ ᴀʟ ᴄʟᴏɴᴀʀ*\n\n` +
                 `> ${e.message}\n\n` +
-                `💾 Backup tersimpan di: \`backup/pre_update_${timestamp}\``
+                `💾 Backup guardado en: \`backup/pre_actualizacion_${marcaTiempo}\``
             )
         }
 
         const gitDir = path.join(tempDir, '.git')
-        cleanDir(gitDir)
+        limpiarDirectorio(gitDir)
 
         await m.reply(
-            `✅ *ᴄʟᴏɴᴇ sᴜᴋsᴇs*\n\n` +
-            `> Script terbaru berhasil diunduh\n\n` +
-            `📋 Step 3/4 — Menyalin file baru...`
+            `✅ *ᴄʟᴏɴᴀᴄɪóɴ ᴇxɪᴛᴏsᴀ*\n\n` +
+            `> Script actualizado descargado\n\n` +
+            `📋 Paso 3/4 — Copiando archivos nuevos...`
         )
 
-        let copiedCount = 0
+        let archivosCopiados = 0
         try {
-            copiedCount = copyRecursiveSync(tempDir, baseDir, PRESERVE_ITEMS)
+            archivosCopiados = copiarRecursivoSync(tempDir, baseDir, ELEMENTOS_A_PRESERVAR)
         } catch (e) {
             await m.react('❌')
             return m.reply(
-                `❌ *ɢᴀɢᴀʟ ᴄᴏᴘʏ*\n\n` +
+                `❌ *ᴇʀʀᴏʀ ᴀʟ ᴄᴏᴘɪᴀʀ*\n\n` +
                 `> ${e.message}\n\n` +
-                `💾 Backup tersimpan di: \`backup/pre_update_${timestamp}\``
+                `💾 Backup guardado en: \`backup/pre_actualizacion_${marcaTiempo}\``
             )
         }
 
-        cleanDir(tempDir)
+        limpiarDirectorio(tempDir)
 
         await m.reply(
-            `✅ *ᴄᴏᴘʏ sᴜᴋsᴇs*\n\n` +
-            `> ${copiedCount} file diperbarui\n` +
-            `> Data penting tidak ditimpa\n\n` +
-            `🔧 Step 4/4 — Install dependencies...`
+            `✅ *ᴄᴏᴘɪᴀ ᴇxɪᴛᴏsᴀ*\n\n` +
+            `> ${archivosCopiados} archivos actualizados\n` +
+            `> Los datos importantes no fueron sobrescritos\n\n` +
+            `🔧 Paso 4/4 — Instalando dependencias...`
         )
 
         try {
@@ -195,12 +196,12 @@ async function handler(m, { sock }) {
                 timeout: 300000,
                 stdio: 'pipe'
             })
-            await m.reply(`✅ *ɴᴘᴍ ɪɴsᴛᴀʟʟ sᴜᴋsᴇs*`)
+            await m.reply(`✅ *ɴᴘᴍ ɪɴsᴛᴀʟʟ ᴇxɪᴛᴏsᴏ*`)
         } catch (e) {
             await m.reply(
-                `⚠️ *ɴᴘᴍ ɪɴsᴛᴀʟʟ ɢᴀɢᴀʟ*\n\n` +
+                `⚠️ *ɴᴘᴍ ɪɴsᴛᴀʟʟ ғᴀʟʟɪᴅᴏ*\n\n` +
                 `> ${e.message?.slice(0, 200)}\n` +
-                `> Jalankan \`npm install\` manual`
+                `> Ejecuta \`npm install\` manualmente`
             )
         }
 
@@ -208,14 +209,14 @@ async function handler(m, { sock }) {
 
         await sock.sendMessage(m.chat, {
             text:
-                `✅ *ᴜᴘᴅᴀᴛᴇ sᴇʟᴇsᴀɪ!*\n\n` +
-                `╭┈┈⬡「 📊 *ʀɪɴɢᴋᴀsᴀɴ* 」\n` +
-                `┃ 📄 File diperbarui: \`${copiedCount}\`\n` +
-                `┃ 💾 Backup: \`backup/pre_update_${timestamp}\`\n` +
+                `✅ *ᴀᴄᴛᴜᴀʟɪᴢᴀᴄɪóɴ ғɪɴᴀʟɪᴢᴀᴅᴀ*\n\n` +
+                `╭┈┈⬡「 📊 *ʀᴇsᴜᴍᴇɴ* 」\n` +
+                `┃ 📄 Archivos actualizados: \`${archivosCopiados}\`\n` +
+                `┃ 💾 Backup: \`backup/pre_actualizacion_${marcaTiempo}\`\n` +
                 `┃ 📦 Repo: \`LuckyArch/OurinMD\`\n` +
                 `╰┈┈⬡\n\n` +
-                `> Bot akan restart dalam 3 detik...\n` +
-                `> Jika ada error, restore dari backup`
+                `> El bot se reiniciará en 3 segundos...\n` +
+                `> Si hay errores, restaura desde el backup.`
         }, { quoted: m })
 
         setTimeout(() => {
@@ -223,12 +224,12 @@ async function handler(m, { sock }) {
         }, 3000)
 
     } catch (error) {
-        cleanDir(tempDir)
+        limpiarDirectorio(tempDir)
         await m.react('❌')
         return m.reply(
-            `❌ *ᴜᴘᴅᴀᴛᴇ ɢᴀɢᴀʟ*\n\n` +
+            `❌ *ᴀᴄᴛᴜᴀʟɪᴢᴀᴄɪóɴ ғᴀʟʟɪᴅᴀ*\n\n` +
             `> ${error.message}\n\n` +
-            `💾 Backup tersimpan di: \`backup/pre_update_${timestamp}\``
+            `💾 Backup guardado en: \`backup/pre_actualizacion_${marcaTiempo}\``
         )
     }
 }
