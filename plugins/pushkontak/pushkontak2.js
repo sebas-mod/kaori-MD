@@ -10,7 +10,7 @@ import te from "../../src/lib/ourin-error.js";
 const pluginConfig = {
   name: "pushcontacto2",
   alias: ["puskontak2", "push2", "difusion2"],
-  category: "herramientas",
+  category: "pushkontak", // Categoría original restablecida
   description: "Envía un mensaje junto con una tarjeta de contacto a todos los miembros del grupo",
   usage: ".pushcontacto2 <mensaje>|<nombre_contacto>",
   example: ".pushcontacto2 ¡Hola!|MiTienda",
