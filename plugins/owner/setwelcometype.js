@@ -1,11 +1,12 @@
 import fs from 'fs'
 import config from '../../config.js'
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
     name: 'setwelcometype',
-    alias: ['welcometype', 'welcomevariant', 'welcomestyle'],
+    alias: ['tipobienvenida', 'estilobienvenida', 'variantebienvenida'],
     category: 'owner',
-    description: 'Mengatur variant tampilan welcome message',
+    description: 'Configura el estilo visual del mensaje de bienvenida (welcome)',
     usage: '.setwelcometype',
     example: '.setwelcometype',
     isOwner: true,
@@ -16,28 +17,33 @@ const pluginConfig = {
     energi: 0,
     isEnabled: true
 }
+
 const VARIANTS = {
-    1: { name: 'Canvas Image', desc: 'Gambar canvas dengan foto profil' },
-    2: { name: 'Carousel Cards', desc: 'Kartu interaktif dengan tombol' },
-    3: { name: 'Text Only', desc: 'Pesan teks minimalis tanpa gambar' },
-    4: { name: 'Group', desc: 'ExternalAdReply group' },
-    5: { name: 'Simple', desc: 'Pesan teks simple + poto profile' }
+    1: { name: 'Imagen Canvas', desc: 'Imagen generada con la foto de perfil del usuario' },
+    2: { name: 'Tarjetas Carousel', desc: 'Tarjetas interactivas con botones' },
+    3: { name: 'Solo Texto', desc: 'Mensaje de texto minimalista sin imágenes' },
+    4: { name: 'Grupo', desc: 'Estilo ExternalAdReply de grupo' },
+    5: { name: 'Simple', desc: 'Mensaje de texto simple + foto de perfil' }
 }
+
 async function handler(m, { sock, db }) {
     const args = m.args || []
     const variant = args[0]?.toLowerCase()
     const current = db.setting('welcomeType') || 1
+
     if (variant && /^v?[1-5]$/.test(variant)) {
         const id = parseInt(variant.replace('v', ''))
         db.setting('welcomeType', id)
         await db.save()
+        
         await m.reply(
-            `✅ Welcome type diubah ke *V${id}*\n` +
+            `✅ Tipo de bienvenida cambiado a *V${id}*\n` +
             `*${VARIANTS[id].name}*\n` +
             `_${VARIANTS[id].desc}_`
         )
         return
     }
+
     const buttons = []
     for (const [id, val] of Object.entries(VARIANTS)) {
         const mark = parseInt(id) === current ? ' ✓' : ''
@@ -49,6 +55,19 @@ async function handler(m, { sock, db }) {
             })
         })
     }
-    await sock.sendButton(m.chat, fs.readFileSync('./assets/images/ourin.jpg'), `🥗 *TIPE WELCOME*\n\Tipe saat ini adalah versi *${current}*\n_${VARIANTS[current].name}_\n\nSilahkan pilih variant welcome:`, m, { buttons })
+
+    const caption = `🥗 *ᴛɪᴘᴏ ᴅᴇ ʙɪᴇɴᴠᴇɴɪᴅᴀ*\n\n` +
+                    `El tipo actual es la versión *${current}*\n` +
+                    `_${VARIANTS[current].name}_\n\n` +
+                    `Selecciona una variante de bienvenida:`
+
+    await sock.sendButton(
+        m.chat, 
+        fs.readFileSync('./assets/images/ourin.jpg'), 
+        caption, 
+        m, 
+        { buttons }
+    )
 }
+
 export { pluginConfig as config, handler }
