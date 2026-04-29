@@ -2,11 +2,12 @@ import config from '../../config.js'
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import fs from 'fs'
 import path from 'path'
+
 const pluginConfig = {
     name: 'setownertype',
-    alias: ['ownertype', 'ownervariant', 'ownerstyle'],
+    alias: ['tipoowner', 'estiloowner', 'varianteowner'],
     category: 'owner',
-    description: 'Mengatur variant tampilan owner message',
+    description: 'Configura el estilo visual del mensaje de contacto del owner',
     usage: '.setownertype',
     example: '.setownertype',
     isOwner: true,
@@ -19,9 +20,9 @@ const pluginConfig = {
 }
 
 const VARIANTS = {
-    1: { name: 'Current Design', desc: 'Tampilan default saat ini' },
-    2: { name: 'Carousel Cards', desc: 'Kartu carousel dengan foto owner' },
-    3: { name: 'Multiple Contact', desc: 'Kirim contact card semua owner' }
+    1: { name: 'Diseño Actual', desc: 'Muestra el diseño predeterminado del bot' },
+    2: { name: 'Tarjetas Carousel', desc: 'Tarjetas deslizables con la foto del owner' },
+    3: { name: 'Contacto Múltiple', desc: 'Envía las tarjetas de contacto de todos los owners' }
 }
 
 async function handler(m, { sock, db }) {
@@ -35,7 +36,7 @@ async function handler(m, { sock, db }) {
         await db.save()
         
         await m.reply(
-            `✅ Owner type diubah ke *V${id}*\n\n` +
+            `✅ Tipo de owner cambiado a *V${id}*\n\n` +
             `> *${VARIANTS[id].name}*\n` +
             `> _${VARIANTS[id].desc}_`
         )
@@ -55,7 +56,7 @@ async function handler(m, { sock, db }) {
     }
     
     await sock.sendMessage(m.chat, {
-        text: `🎨 *sᴇᴛ ᴏᴡɴᴇʀ ᴛʏᴘᴇ*\n\n> Type saat ini: *V${current}*\n> _${VARIANTS[current].name}_\n\n> Pilih variant owner:`,
+        text: `🎨 *ᴄᴏɴғɪɢᴜʀᴀʀ ᴇsᴛɪʟᴏ ᴏᴡɴᴇʀ*\n\n> Tipo actual: *V${current}*\n> _${VARIANTS[current].name}_\n\n> Selecciona una variante para el contacto:`,
         footer: config.bot?.name || 'Ourin-AI',
         contextInfo: {
             mentionedJid: [m.sender],
