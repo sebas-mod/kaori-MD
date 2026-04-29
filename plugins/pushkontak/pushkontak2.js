@@ -8,12 +8,12 @@ import {
 import te from "../../src/lib/ourin-error.js";
 
 const pluginConfig = {
-  name: "pushkontak2",
-  alias: ["puskontak2", "push2"],
-  category: "pushkontak",
-  description: "Push pesan dengan nama kontak ke semua member grup",
-  usage: ".pushkontak2 <pesan>|<namakontak>",
-  example: ".pushkontak2 Halo!|TokoBaru",
+  name: "pushcontacto2",
+  alias: ["puskontak2", "push2", "difusion2"],
+  category: "herramientas",
+  description: "Envía un mensaje junto con una tarjeta de contacto a todos los miembros del grupo",
+  usage: ".pushcontacto2 <mensaje>|<nombre_contacto>",
+  example: ".pushcontacto2 ¡Hola!|MiTienda",
   isOwner: true,
   isPremium: false,
   isGroup: true,
@@ -25,30 +25,30 @@ const pluginConfig = {
 
 async function handler(m, { sock }) {
   const db = getDatabase();
-  const groupMode = getGroupMode(m.chat, db);
+  const modoGrupo = getGroupMode(m.chat, db);
 
-  if (groupMode !== "pushkontak" && groupMode !== "all") {
+  if (modoGrupo !== "pushkontak" && modoGrupo !== "all") {
     return m.reply(
-      `❌ *ᴍᴏᴅᴇ ᴛɪᴅᴀᴋ sᴇsᴜᴀɪ*\n\n> Aktifkan mode pushkontak terlebih dahulu\n\n\`${m.prefix}botmode pushkontak\``,
+      `❌ *ᴍᴏᴅᴏ ɴᴏ ᴀᴄᴛɪᴠᴀᴅᴏ*\n\n> Activa el modo pushkontak primero para usar esta función\n\n\`${m.prefix}botmode pushkontak\``,
     );
   }
 
-  const input = m.text?.trim();
-  if (!input || !input.includes("|")) {
+  const entrada = m.text?.trim();
+  if (!entrada || !entrada.includes("|")) {
     return m.reply(
-      `📢 *ᴘᴜsʜ ᴋᴏɴᴛᴀᴋ 2*\n\n> Format: pesan|namakontak\n\n\`Contoh: ${m.prefix}pushkontak2 Halo semuanya!|TokoBaru\``,
+      `📢 *ᴘᴜsʜ ᴄᴏɴᴛᴀᴄᴛᴏ 2*\n\n> Formato: mensaje|nombre_contacto\n\n\`Ejemplo: ${m.prefix}pushcontacto2 ¡Hola a todos!|MiTienda\``,
     );
   }
 
-  const [text, namaKontak] = input.split("|").map((s) => s.trim());
+  const [texto, nombreContacto] = entrada.split("|").map((s) => s.trim());
 
-  if (!text || !namaKontak) {
-    return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Format salah. Gunakan: pesan|namakontak`);
+  if (!texto || !nombreContacto) {
+    return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> Formato incorrecto. Usa: mensaje|nombre_contacto`);
   }
 
   if (global.statuspush) {
     return m.reply(
-      `❌ *ɢᴀɢᴀʟ*\n\n> Pushkontak sedang berjalan. Ketik \`${m.prefix}stoppush\` untuk menghentikan.`,
+      `❌ *ᴇʀʀᴏʀ*\n\n> Ya hay un proceso de push en curso. Escribe \`${m.prefix}stoppush\` para detenerlo.`,
     );
   }
 
@@ -57,7 +57,7 @@ async function handler(m, { sock }) {
   try {
     const metadata = m.groupMetadata;
     const botId = sock.user.id.split(":")[0] + "@s.whatsapp.net";
-    const participants = metadata.participants
+    const participantes = metadata.participants
       .map((p) => {
         if (p.phoneNumber) return p.phoneNumber;
         if (p.jid && !p.jid.endsWith("@lid")) return p.jid;
@@ -75,29 +75,29 @@ async function handler(m, { sock }) {
       })
       .filter((id) => id && id !== botId && !id.includes(m.sender));
 
-    if (participants.length === 0) {
+    if (participantes.length === 0) {
       m.react("❌");
-      return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak ada member yang bisa dikirim`);
+      return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> No se encontraron miembros válidos para el envío.`);
     }
 
     const jedaPush = db.setting("jedaPush") || 5000;
 
     await m.reply(
-      `📢 *ᴘᴜsʜ ᴋᴏɴᴛᴀᴋ 2*\n\n` +
-        `╭┈┈⬡「 📋 *ᴅᴇᴛᴀɪʟ* 」\n` +
-        `┃ 📝 ᴘᴇsᴀɴ: \`${text.substring(0, 50)}${text.length > 50 ? "..." : ""}\`\n` +
-        `┃ 👤 ɴᴀᴍᴀ: \`${namaKontak}\`\n` +
-        `┃ 👥 ᴛᴀʀɢᴇᴛ: \`${participants.length}\` member\n` +
-        `┃ ⏱️ ᴊᴇᴅᴀ: \`${jedaPush}ms\`\n` +
+      `📢 *ᴘᴜsʜ ᴄᴏɴᴛᴀᴄᴛᴏ 2*\n\n` +
+        `╭┈┈⬡「 📋 *ᴅᴇᴛᴀʟʟᴇs* 」\n` +
+        `┃ 📝 ᴍᴇɴsᴀᴊᴇ: \`${texto.substring(0, 50)}${texto.length > 50 ? "..." : ""}\`\n` +
+        `┃ 👤 ɴᴏᴍʙʀᴇ: \`${nombreContacto}\`\n` +
+        `┃ 👥 ᴛᴀʀɢᴇᴛ: \`${participantes.length}\` miembros\n` +
+        `┃ ⏱️ ɪɴᴛᴇʀᴠᴀʟᴏ: \`${jedaPush}ms\`\n` +
         `╰┈┈⬡\n\n` +
-        `> Memulai push dengan kontak...`,
+        `> Iniciando envío masivo con contacto...`,
     );
 
     global.statuspush = true;
     let successCount = 0;
     let failedCount = 0;
 
-    function randomKode(length) {
+    function generarCodigo(length) {
       const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
       let result = "";
       for (let i = 0; i < length; i++) {
@@ -106,38 +106,40 @@ async function handler(m, { sock }) {
       return result;
     }
 
-    for (const member of participants) {
+    for (const miembro of participantes) {
       if (global.stoppush) {
         delete global.stoppush;
         delete global.statuspush;
 
         await m.reply(
-          `⏹️ *ᴘᴜsʜ ᴅɪʜᴇɴᴛɪᴋᴀɴ*\n\n` +
-            `> ✅ Berhasil: \`${successCount}\`\n` +
-            `> ❌ Gagal: \`${failedCount}\``,
+          `⏹️ *ᴘᴜsʜ ᴅᴇᴛᴇɴɪᴅᴏ*\n\n` +
+            `> ✅ Exitosos: \`${successCount}\`\n` +
+            `> ❌ Fallidos: \`${failedCount}\``,
         );
         return;
       }
 
       try {
-        const memberNumber = member.split("@")[0];
-        const kodeUnik = randomKode(6);
-        const pesan = `${text}\n\n#${kodeUnik}`;
+        const numeroMiembro = miembro.split("@")[0];
+        const codigoUnico = generarCodigo(6);
+        const mensajeFinal = `${texto}\n\n#${codigoUnico}`;
 
-        const vcard = `BEGIN:VCARD
-VERSION:3.0
-FN:${namaKontak} - ${memberNumber}
-TEL;type=CELL;type=VOICE;waid=${memberNumber}:+${memberNumber}
-END:VCARD`;
+        const vcard = `BEGIN:VCARD\n` +
+          `VERSION:3.0\n` +
+          `FN:${nombreContacto} - ${numeroMiembro}\n` +
+          `TEL;type=CELL;type=VOICE;waid=${numeroMiembro}:+${numeroMiembro}\n` +
+          `END:VCARD`;
 
-        await sock.sendMessage(member, { text: pesan });
+        // Envía el mensaje de texto
+        await sock.sendMessage(miembro, { text: mensajeFinal });
 
-        await sock.sendMessage(member, {
+        // Envía la tarjeta de contacto
+        await sock.sendMessage(miembro, {
           contacts: {
-            displayName: namaKontak,
+            displayName: nombreContacto,
             contacts: [
               {
-                displayName: namaKontak,
+                displayName: nombreContacto,
                 vcard: vcard,
               },
             ],
@@ -156,11 +158,11 @@ END:VCARD`;
 
     m.react("✅");
     await m.reply(
-      `✅ *ᴘᴜsʜ sᴇʟᴇsᴀɪ*\n\n` +
-        `╭┈┈⬡「 📊 *ʜᴀsɪʟ* 」\n` +
-        `┃ ✅ ʙᴇʀʜᴀsɪʟ: \`${successCount}\`\n` +
-        `┃ ❌ ɢᴀɢᴀʟ: \`${failedCount}\`\n` +
-        `┃ 📊 ᴛᴏᴛᴀʟ: \`${participants.length}\`\n` +
+      `✅ *ᴘᴜsʜ ғɪɴᴀʟɪᴢᴀᴅᴏ*\n\n` +
+        `╭┈┈⬡「 📊 *ʀᴇsᴜʟᴛᴀᴅᴏs* 」\n` +
+        `┃ ✅ ᴇxɪᴛᴏsᴏs: \`${successCount}\`\n` +
+        `┃ ❌ ғᴀʟʟɪᴅᴏs: \`${failedCount}\`\n` +
+        `┃ 📊 ᴛᴏᴛᴀʟ: \`${participantes.length}\`\n` +
         `╰┈┈⬡`,
     );
   } catch (error) {
