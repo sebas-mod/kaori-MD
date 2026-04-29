@@ -1,11 +1,12 @@
 import axios from 'axios'
 import config from '../../config.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'lahelu',
-    alias: ['randommeme'],
-    category: 'random',
-    description: 'Random gambar lahelu',
+    alias: ['randommeme', 'meme'],
+    category: 'random', // Categoría original preservada
+    description: 'Obtén un meme aleatorio de Lahelu',
     usage: '.lahelu',
     example: '.lahelu',
     isOwner: false,
@@ -24,6 +25,7 @@ async function handler(m, { sock }) {
     try {
         const res = (await axios.get(api)).data
         const random = res.data[Math.floor(Math.random() * res.data.length)]
+        
         if(random.media.includes('.mp4')) {
             await sock.sendMedia(m.chat, random.media, random.title, m, {
                 type: 'video'
