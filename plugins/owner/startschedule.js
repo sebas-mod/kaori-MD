@@ -2,12 +2,13 @@ import { startSchedulerByName, getFullSchedulerStatus } from '../../src/lib/ouri
 import { initSholatScheduler } from '../../src/lib/ourin-sholat-scheduler.js'
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'startschedule',
-    alias: ['startscheduler', 'schedstart', 'resumeschedule'],
+    alias: ['iniciarprogramador', 'schedstart', 'resumirhorario'],
     category: 'owner',
-    description: 'Memulai ulang scheduler tertentu atau semua',
-    usage: '.startschedule <nama|all>',
+    description: 'Reinicia un programador específico o todos los programadores del sistema',
+    usage: '.startschedule <nombre|all>',
     example: '.startschedule sholat',
     isOwner: true,
     isPremium: false,
@@ -23,20 +24,20 @@ async function handler(m, { sock, args }) {
         const target = args[0]?.toLowerCase();
         
         if (!target) {
-            const helpText = `▶️ *sᴛᴀʀᴛ sᴄʜᴇᴅᴜʟᴇʀ*
+            const helpText = `▶️ *ɪɴɪᴄɪᴀʀ ᴘʀᴏɢʀᴀᴍᴀᴅᴏʀ*
 
-*Usage:*
-\`.startschedule <nama>\`
+*Uso:*
+\`.startschedule <nombre>\`
 
-*Available schedulers:*
-• \`limitreset\` - Daily Limit Reset
-• \`groupschedule\` - Group Schedule
-• \`sewa\` - Sewa Checker
-• \`messages\` - Scheduled Messages
-• \`sholat\` - Sholat Scheduler
-• \`all\` - Semua scheduler
+*Programadores disponibles:*
+• \`limitreset\` - Reinicio diario de límites
+• \`groupschedule\` - Horarios de grupos
+• \`sewa\` - Verificador de alquileres
+• \`messages\` - Mensajes programados
+• \`sholat\` - Programador de Oración (Sholat)
+• \`all\` - Todos los programadores
 
-*Example:*
+*Ejemplo:*
 \`.startschedule sholat\`
 \`.startschedule all\``;
             
@@ -49,19 +50,19 @@ async function handler(m, { sock, args }) {
             const wasEnabled = db.setting('autoSholat');
             
             if (wasEnabled) {
-                await m.reply(`ℹ️ Sholat Scheduler sudah dalam keadaan aktif`);
+                await m.reply(`ℹ️ El programador de oraciones ya se encuentra activo`);
                 return;
             }
             
             initSholatScheduler(sock);
             db.setting('autoSholat', true);
             
-            await m.reply(`▶️ *sᴄʜᴇᴅᴜʟᴇʀ ᴅɪᴍᴜʟᴀɪ*
+            await m.reply(`▶️ *ᴘʀᴏɢʀᴀᴍᴀᴅᴏʀ ɪɴɪᴄɪᴀᴅᴏ*
 
-> Scheduler: *Sholat Scheduler*
-> Status: ✅ Aktif
+> Programador: *Sholat Scheduler*
+> Estado: ✅ Activo
 
-_Notifikasi waktu sholat akan dikirim ke grup yang mengaktifkan fitur ini_`);
+_Las notificaciones de oración se enviarán a los grupos que tengan esta función activada_`);
             return;
         }
         
@@ -74,16 +75,16 @@ _Notifikasi waktu sholat akan dikirim ke grup yang mengaktifkan fitur ini_`);
         const result = startSchedulerByName(target, sock);
         
         if (result.started) {
-            await m.reply(`▶️ *sᴄʜᴇᴅᴜʟᴇʀ ᴅɪᴍᴜʟᴀɪ*
+            await m.reply(`▶️ *ᴘʀᴏɢʀᴀᴍᴀᴅᴏʀ ɪɴɪᴄɪᴀᴅᴏ*
 
-> Scheduler: *${result.name}*
-> Status: ✅ Aktif
+> Programador: *${result.name}*
+> Estado: ✅ Activo
 
-_Scheduler telah dimulai kembali_`);
+_El programador ha sido reiniciado correctamente_`);
         } else {
-            await m.reply(`❌ Scheduler tidak ditemukan atau sudah aktif
+            await m.reply(`❌ El programador no existe o ya está activo
 
-Gunakan \`.startschedule\` untuk melihat daftar scheduler`);
+Usa \`.startschedule\` para ver la lista de programadores disponibles`);
         }
     } catch (error) {
         console.error('[StartSchedule Error]', error);
