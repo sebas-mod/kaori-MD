@@ -1,12 +1,13 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { getRpgContextInfo } from '../../src/lib/ourin-context.js'
+
 const pluginConfig = {
-    name: 'bank',
-    alias: ['atm', 'nabung', 'deposit', 'tarik', 'withdraw'],
+    name: 'banco',
+    alias: ['atm', 'cajero', 'depositar', 'retirar', 'canuto'],
     category: 'rpg',
-    description: 'Bank system untuk menyimpan uang aman dari rampok',
-    usage: '.bank <deposit/withdraw> <jumlah>',
-    example: '.bank deposit 10000',
+    description: 'Sistema bancario para guardar la guita y que no te la afanen',
+    usage: '.banco <depositar/retirar> <cantidad>',
+    example: '.banco depositar 10000',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -39,16 +40,17 @@ async function handler(m, { sock }) {
     const action = args[0]?.toLowerCase()
     const amountStr = args[1]
     
-    if (action === 'deposit' || action === 'depo') {
+    // Lógica para Depositar
+    if (action === 'deposit' || action === 'depositar' || action === 'depo') {
         let amount = 0
-        if (amountStr === 'all') {
+        if (amountStr === 'all' || amountStr === 'todo') {
             amount = currentBalance
         } else {
             amount = parseInt(amountStr)
         }
         
-        if (!amount || amount <= 0) return m.reply(`❌ Masukkan jumlah valid!`)
-        if (currentBalance < amount) return m.reply(`❌ Uang cash tidak cukup! Cash: Rp ${currentBalance.toLocaleString('id-ID')}`)
+        if (!amount || amount <= 0) return m.reply(`❌ ¡Mandá una cantidad que sirva, che!`)
+        if (currentBalance < amount) return m.reply(`❌ No tenés suficiente guita encima. Tenés: $${currentBalance.toLocaleString('es-AR')}`)
         
         db.db.data.users[cleanJid].koin = currentBalance - amount
         db.db.data.users[cleanJid].rpg.bank = currentBank + amount
@@ -56,19 +58,20 @@ async function handler(m, { sock }) {
         await db.save()
         
         const newBank = db.db.data.users[cleanJid].rpg.bank
-        return m.reply(`✅ Berhasil deposit: Rp ${amount.toLocaleString('id-ID')}\n🏦 Bank: Rp ${newBank.toLocaleString('id-ID')}`)
+        return m.reply(`✅ Guardaste: $${amount.toLocaleString('es-AR')} en el canuto.\n🏦 En el banco tenés: $${newBank.toLocaleString('es-AR')}`)
     }
     
-    if (action === 'withdraw' || action === 'tarik') {
+    // Lógica para Retirar
+    if (action === 'withdraw' || action === 'retirar' || action === 'sacar') {
         let amount = 0
-        if (amountStr === 'all') {
+        if (amountStr === 'all' || amountStr === 'todo') {
             amount = currentBank
         } else {
             amount = parseInt(amountStr)
         }
         
-        if (!amount || amount <= 0) return m.reply(`❌ Masukkan jumlah valid!`)
-        if (currentBank < amount) return m.reply(`❌ Uang di bank tidak cukup! Bank: Rp ${currentBank.toLocaleString('id-ID')}`)
+        if (!amount || amount <= 0) return m.reply(`❌ ¡Poné un número válido para sacar!`)
+        if (currentBank < amount) return m.reply(`❌ No tenés tanto en el banco, fijate bien. Saldo en banco: $${currentBank.toLocaleString('es-AR')}`)
         
         db.db.data.users[cleanJid].rpg.bank = currentBank - amount
         db.db.data.users[cleanJid].koin = currentBalance + amount
@@ -76,15 +79,16 @@ async function handler(m, { sock }) {
         await db.save()
         
         const newBalance = db.db.data.users[cleanJid].koin
-        return m.reply(`✅ Berhasil tarik: Rp ${amount.toLocaleString('id-ID')}\n💰 Cash: Rp ${newBalance.toLocaleString('id-ID')}`)
+        return m.reply(`✅ Sacaste: $${amount.toLocaleString('es-AR')}.\n💰 Ahora tenés en mano: $${newBalance.toLocaleString('es-AR')}`)
     }
     
-    let txt = `🏦 *ʙᴀɴᴋ sʏsᴛᴇᴍ*\n\n`
-    txt += `> 💰 Cash: Rp ${currentBalance.toLocaleString('id-ID')}\n`
-    txt += `> 🏦 Bank: Rp ${currentBank.toLocaleString('id-ID')}\n\n`
-    txt += `> Gunakan: \`.bank deposit <jumlah>\`\n`
-    txt += `> Gunakan: \`.bank withdraw <jumlah>\`\n`
-    txt += `> Tip: Gunakan 'all' untuk semua uang.`
+    // Menú principal del banco
+    let txt = `🏦 *EL BANCO DEL AGUANTE*\n\n`
+    txt += `> 💰 Guita encima: $${currentBalance.toLocaleString('es-AR')}\n`
+    txt += `> 🏦 En el canuto: $${currentBank.toLocaleString('es-AR')}\n\n`
+    txt += `> Usá: \`.banco depositar <cantidad>\`\n`
+    txt += `> Usá: \`.banco retirar <cantidad>\`\n`
+    txt += `> _Consejo: Usá 'all' si querés meter o sacar todos los manguitos de una._`
     
     await m.reply(txt)
 }
