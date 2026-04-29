@@ -2,11 +2,12 @@ import config from '../../config.js'
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import pkg from 'ourin'
 const { generateWAMessageFromContent, proto } = pkg
+
 const pluginConfig = {
     name: 'setmenucat',
-    alias: ['menucatvariant', 'menucatstyle'],
+    alias: ['estilocatmenu', 'variantecatmenu', 'configcat'],
     category: 'owner',
-    description: 'Mengatur variant tampilan menucat',
+    description: 'Configura el estilo visual del menú por categorías (menucat)',
     usage: '.setmenucat <v1-v4>',
     example: '.setmenucat v2',
     isOwner: true,
@@ -19,10 +20,10 @@ const pluginConfig = {
 }
 
 const VARIANTS = {
-    v1: { id: 1, name: 'Simple Text', desc: 'Text biasa tanpa contextInfo', emoji: '📝' },
-    v2: { id: 2, name: 'Context + Newsletter', desc: 'Text + contextInfo + forwardedNewsletter + externalAdReply', emoji: '🖼️' },
-    v3: { id: 3, name: 'Image + Caption', desc: 'Image + caption + contextInfo + forwardedNewsletter', emoji: '📸' },
-    v4: { id: 4, name: 'Interactive Button', desc: 'Interactive message + single_select commands + quick_reply back', emoji: '🔘' }
+    v1: { id: 1, name: 'Texto Simple', desc: 'Texto plano sin información de contexto', emoji: '📝' },
+    v2: { id: 2, name: 'Contexto + Newsletter', desc: 'Texto + contextInfo + boletín + anuncio externo', emoji: '🖼️' },
+    v3: { id: 3, name: 'Imagen + Subtítulo', desc: 'Imagen + descripción + contextInfo + boletín', emoji: '📸' },
+    v4: { id: 4, name: 'Botón Interactivo', desc: 'Mensaje interactivo + selección de comandos + botón de regreso', emoji: '🔘' }
 }
 
 async function handler(m, { sock, db }) {
@@ -32,7 +33,7 @@ async function handler(m, { sock, db }) {
     if (variant) {
         const selected = VARIANTS[variant]
         if (!selected) {
-            await m.reply(`❌ Variant tidak valid!\n\nGunakan: v1 s/d v4`)
+            await m.reply(`❌ ¡Variante no válida!\n\nUsa: v1 hasta v4`)
             return
         }
 
@@ -40,7 +41,7 @@ async function handler(m, { sock, db }) {
         await db.save()
 
         await m.reply(
-            `✅ *ᴍᴇɴᴜᴄᴀᴛ ᴠᴀʀɪᴀɴᴛ ᴅɪᴜʙᴀʜ*\n\n` +
+            `✅ *ᴠᴀʀɪᴀɴᴛᴇ ᴅᴇ ᴍᴇɴᴜᴄᴀᴛ ᴀᴄᴛᴜᴀʟɪᴢᴀᴅᴀ*\n\n` +
             `> ${selected.emoji} *V${selected.id} — ${selected.name}*\n` +
             `> _${selected.desc}_`
         )
@@ -56,19 +57,19 @@ async function handler(m, { sock, db }) {
     }))
 
     const bodyText =
-        `📂 *sᴇᴛ ᴍᴇɴᴜᴄᴀᴛ ᴠᴀʀɪᴀɴᴛ*\n\n` +
-        `> Variant aktif: *V${current}*\n` +
-        `> _${VARIANTS[`v${current}`]?.name || 'Unknown'}_\n\n` +
-        `> Pilih variant dari daftar di bawah`
+        `📂 *ᴄᴏɴғɪɢᴜʀᴀʀ ᴠᴀʀɪᴀɴᴛᴇ ᴅᴇ ᴍᴇɴᴜᴄᴀᴛ*\n\n` +
+        `> Variante activa: *V${current}*\n` +
+        `> _${VARIANTS[`v${current}`]?.name || 'Desconocido'}_\n\n` +
+        `> Elige una variante de la lista de abajo:`
 
     try {
         const interactiveButtons = [
             {
                 name: 'single_select',
                 buttonParamsJson: JSON.stringify({
-                    title: '📂 ᴘɪʟɪʜ ᴠᴀʀɪᴀɴᴛ',
+                    title: '📂 sᴇʟᴇᴄᴄɪᴏɴᴀʀ ᴇsᴛɪʟᴏ',
                     sections: [{
-                        title: 'ᴅᴀꜰᴛᴀʀ ᴠᴀʀɪᴀɴᴛ ᴍᴇɴᴜᴄᴀᴛ',
+                        title: 'ʟɪsᴛᴀ ᴅᴇ ᴠᴀʀɪᴀɴᴛᴇs ᴅɪsᴘᴏɴɪʙʟᴇs',
                         rows
                     }]
                 })
@@ -90,8 +91,8 @@ async function handler(m, { sock, db }) {
                             text: config.bot?.name || 'Ourin-AI'
                         }),
                         header: proto.Message.InteractiveMessage.Header.fromObject({
-                            title: '📂 MenuCat Variant',
-                            subtitle: `${Object.keys(VARIANTS).length} variant tersedia`,
+                            title: '📂 Variante MenuCat',
+                            subtitle: `${Object.keys(VARIANTS).length} variantes disponibles`,
                             hasMediaAttachment: false
                         }),
                         nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
@@ -114,13 +115,13 @@ async function handler(m, { sock, db }) {
 
         await sock.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
     } catch {
-        let txt = `📂 *sᴇᴛ ᴍᴇɴᴜᴄᴀᴛ ᴠᴀʀɪᴀɴᴛ*\n\n`
-        txt += `> Variant saat ini: *V${current}*\n\n`
+        let txt = `📂 *ᴄᴏɴғɪɢᴜʀᴀʀ ᴠᴀʀɪᴀɴᴛᴇ ᴅᴇ ᴍᴇɴᴜᴄᴀᴛ*\n\n`
+        txt += `> Variante actual: *V${current}*\n\n`
         for (const [key, val] of Object.entries(VARIANTS)) {
             const mark = val.id === current ? ' ✓' : ''
             txt += `> ${val.emoji} *${key.toUpperCase()}*${mark} — _${val.desc}_\n`
         }
-        txt += `\n_Gunakan: \`.setmenucat v1\` s/d \`.setmenucat v4\`_`
+        txt += `\n_Usa: \`.setmenucat v1\` hasta \`.setmenucat v4\`_`
         await m.reply(txt)
     }
 }
