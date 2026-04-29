@@ -1,12 +1,13 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { addExpWithLevelCheck } from '../../src/lib/ourin-level.js'
+
 const pluginConfig = {
-    name: 'breeding',
-    alias: ['breed', 'kawin', 'petbreed'],
+    name: 'cruza',
+    alias: ['breed', 'breeding', 'cruzar', 'petbreed'],
     category: 'rpg',
-    description: 'Breeding pets untuk mendapat pet baru',
-    usage: '.breeding @user',
-    example: '.breeding @user',
+    description: 'Cruza tus mascotas con las de otros para obtener una nueva cría',
+    usage: '.cruza @user',
+    example: '.cruza @user',
     isOwner: false,
     isPremium: false,
     isGroup: true,
@@ -17,28 +18,28 @@ const pluginConfig = {
 }
 
 const BREEDING_RESULTS = {
-    'cat+cat': ['cat', 'cat', 'lion'],
-    'dog+dog': ['dog', 'dog', 'wolf'],
-    'cat+dog': ['cat', 'dog', 'rabbit'],
-    'bird+bird': ['bird', 'bird', 'phoenix'],
-    'fish+fish': ['fish', 'fish', 'dragon'],
-    'rabbit+rabbit': ['rabbit', 'rabbit', 'thunderbunny'],
-    'cat+bird': ['cat', 'bird', 'phoenix'],
-    'dog+rabbit': ['dog', 'rabbit', 'wolf'],
-    'default': ['cat', 'dog', 'bird', 'fish', 'rabbit']
+    'gato+gato': ['gato', 'gato', 'leon'],
+    'perro+perro': ['perro', 'perro', 'lobo'],
+    'gato+perro': ['gato', 'perro', 'conejo'],
+    'pajaro+pajaro': ['pajaro', 'pajaro', 'fenix'],
+    'pez+pez': ['pez', 'pez', 'dragon'],
+    'conejo+conejo': ['conejo', 'conejo', 'conejo_trueno'],
+    'gato+pajaro': ['gato', 'pajaro', 'fenix'],
+    'perro+conejo': ['perro', 'conejo', 'lobo'],
+    'default': ['gato', 'perro', 'pajaro', 'pez', 'conejo']
 }
 
 const PET_NAMES = {
-    cat: '🐱 Kucing',
-    dog: '🐕 Anjing',
-    bird: '🐦 Burung',
-    fish: '🐟 Ikan',
-    rabbit: '🐰 Kelinci',
-    lion: '🦁 Singa',
-    wolf: '🐺 Serigala',
-    phoenix: '🔥 Phoenix',
-    dragon: '🐉 Naga',
-    thunderbunny: '⚡ Thunder Bunny'
+    gato: '🐱 Gato',
+    perro: '🐕 Perro',
+    pajaro: '🐦 Pájaro',
+    pez: '🐟 Pez',
+    conejo: '🐰 Conejo',
+    leon: '🦁 León',
+    lobo: '🐺 Lobo',
+    fenix: '🔥 Fénix',
+    dragon: '🐉 Dragón',
+    conejo_trueno: '⚡ Conejo Trueno'
 }
 
 async function handler(m, { sock }) {
@@ -51,65 +52,65 @@ async function handler(m, { sock }) {
     
     if (!mentioned) {
         return m.reply(
-            `🐾 *ʙʀᴇᴇᴅɪɴɢ sʏsᴛᴇᴍ*\n\n` +
-            `> Kawinkan pet-mu dengan pet player lain!\n\n` +
-            `╭┈┈⬡「 📋 *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ* 」\n` +
-            `┃ ${m.prefix}breeding @user\n` +
-            `┃ Reply pesan + ${m.prefix}breeding\n` +
+            `🐾 *SISTEMA DE CRÍA - 𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃*\n\n` +
+            `> ¡Cruzá tu mascota con la de otro usuario para obtener una nueva!\n\n` +
+            `╭┈┈⬡「 📋 *MODO DE USO* 」\n` +
+            `┃ ${m.prefix}cruza @user\n` +
+            `┃ Respondé a un mensaje con ${m.prefix}cruza\n` +
             `╰┈┈┈┈┈┈┈┈⬡\n\n` +
-            `⚠️ *Syarat:*\n` +
-            `> • Kedua player punya pet\n` +
-            `> • Pet level 5+\n` +
-            `> • Biaya: 3000 gold masing-masing`
+            `⚠️ *Requisitos:*\n` +
+            `> • Ambos deben tener una mascota.\n` +
+            `> • Nivel de mascota 5 o superior.\n` +
+            `> • Costo: $3.000 monedas cada uno.`
         )
     }
     
     if (mentioned === m.sender) {
-        return m.reply(`❌ Tidak bisa breeding dengan diri sendiri!`)
+        return m.reply(`❌ No podés cruzar mascotas con vos mismo. ¡Buscá un socio!`)
     }
     
     if (!user.rpg.pet) {
-        return m.reply(`❌ Kamu belum punya pet! Beli di \`${m.prefix}petshop\``)
+        return m.reply(`❌ No tenés ninguna mascota activa. Comprá una en el \`${m.prefix}petshop\`.`)
     }
     
     const partner = db.getUser(mentioned)
     if (!partner?.rpg?.pet) {
-        return m.reply(`❌ Partner belum punya pet!`)
+        return m.reply(`❌ La persona mencionada no tiene mascotas.`)
     }
     
     const myPet = user.rpg.pet
     const partnerPet = partner.rpg.pet
     
     if ((myPet.level || 1) < 5) {
-        return m.reply(`❌ Pet-mu harus level 5+! (Current: ${myPet.level || 1})`)
+        return m.reply(`❌ Tu mascota necesita ser nivel 5+. (Actual: ${myPet.level || 1})`)
     }
     
     if ((partnerPet.level || 1) < 5) {
-        return m.reply(`❌ Pet partner harus level 5+! (Current: ${partnerPet.level || 1})`)
+        return m.reply(`❌ La mascota de tu compañero necesita ser nivel 5+. (Actual: ${partnerPet.level || 1})`)
     }
     
     const breedingCost = 3000
     if ((user.koin || 0) < breedingCost) {
-        return m.reply(`❌ Balance kurang! Butuh ${breedingCost.toLocaleString()}`)
+        return m.reply(`❌ No tenés guita suficiente. Necesitás $${breedingCost.toLocaleString('es-AR')}`)
     }
     
     user.koin -= breedingCost
     
     await m.react('🐾')
-    await m.reply(`🐾 *ʙʀᴇᴇᴅɪɴɢ...*\n\n> ${PET_NAMES[myPet.type]} + ${PET_NAMES[partnerPet.type]}`)
+    await m.reply(`🐾 *INICIANDO CRUZA...*\n\n> ${PET_NAMES[myPet.type]} + ${PET_NAMES[partnerPet.type]}`)
     await new Promise(r => setTimeout(r, 3000))
     
     const breedKey = [myPet.type, partnerPet.type].sort().join('+')
     const possibleResults = BREEDING_RESULTS[breedKey] || BREEDING_RESULTS['default']
     const resultPetType = possibleResults[Math.floor(Math.random() * possibleResults.length)]
     
-    const isRare = ['lion', 'wolf', 'phoenix', 'dragon', 'thunderbunny'].includes(resultPetType)
+    const isRare = ['leon', 'lobo', 'fenix', 'dragon', 'conejo_trueno'].includes(resultPetType)
     
     if (!user.rpg.petStorage) user.rpg.petStorage = []
     
     const newPet = {
         type: resultPetType,
-        name: PET_NAMES[resultPetType]?.split(' ')[1] || 'Baby',
+        name: 'Cría de ' + (PET_NAMES[resultPetType]?.split(' ')[1] || 'Baby'),
         level: 1,
         exp: 0,
         hunger: 100,
@@ -125,14 +126,14 @@ async function handler(m, { sock }) {
     
     await m.react(isRare ? '🎉' : '✅')
     
-    let txt = `${isRare ? '🎉' : '✅'} *ʙʀᴇᴇᴅɪɴɢ ʙᴇʀʜᴀsɪʟ!*\n\n`
-    txt += `╭┈┈⬡「 🐾 *ʙᴀʙʏ ᴘᴇᴛ* 」\n`
-    txt += `┃ 🏷️ Jenis: *${PET_NAMES[resultPetType]}*\n`
-    txt += `┃ ${isRare ? '⭐ *RARE PET!*' : '📊 Common pet'}\n`
+    let txt = `${isRare ? '🎉' : '✅'} *¡CRUZA COMPLETADA!*\n\n`
+    txt += `╭┈┈⬡「 🐾 *NUEVA MASCOTA* 」\n`
+    txt += `┃ 🏷️ Tipo: *${PET_NAMES[resultPetType]}*\n`
+    txt += `┃ ${isRare ? '⭐ *¡ES UNA MASCOTA RARA!*' : '📊 Mascota común'}\n`
     txt += `┃ ✨ EXP: *+${expReward}*\n`
-    txt += `┃ 💰 Cost: *-${breedingCost.toLocaleString()}*\n`
+    txt += `┃ 💰 Costo: *-$${breedingCost.toLocaleString('es-AR')}*\n`
     txt += `╰┈┈┈┈┈┈┈┈⬡\n\n`
-    txt += `> Pet disimpan di storage. Total: ${user.rpg.petStorage.length}`
+    txt += `> La cría se guardó en el depósito. Tenés un total de ${user.rpg.petStorage.length} mascotas guardadas.`
     
     return m.reply(txt, { mentions: [m.sender, mentioned] })
 }
