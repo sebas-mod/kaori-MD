@@ -1,11 +1,12 @@
 import util from 'util'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'q',
-    alias: ['quoted', 'inspect'],
+    alias: ['quoted', 'inspeccionar', 'vermensaje'],
     category: 'tools',
-    description: 'Ambil JSON message dari pesan yang direply',
-    usage: '.q (reply pesan)',
+    description: 'Obtén el JSON del mensaje que has respondido',
+    usage: '.q (responde a un mensaje)',
     isOwner: true,
     cooldown: 3,
     isEnabled: true
@@ -13,14 +14,16 @@ const pluginConfig = {
 
 async function handler(m) {
     if (!m.quoted) {
-        return m.reply('❌ *Reply pesan yang ingin di-inspect*')
+        return m.reply('❌ *Responde al mensaje que deseas inspeccionar*')
     }
 
     try {
         const quoted = m.quoted || {}
 
+        // Se envía el JSON formateado del mensaje citado
         await m.reply(JSON.stringify(quoted, null, 2))
     } catch (err) {
+        // En caso de error, utiliza la función de error personalizada
         await m.reply(te(m.prefix, m.command, m.pushName))
     }
 }
