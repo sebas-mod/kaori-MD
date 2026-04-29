@@ -1,13 +1,14 @@
 import axios from 'axios'
 import config from '../../config.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: 'cecanthai',
-    alias: ['cewekthai', 'cewekthailand'],
-    category: 'cecan',
-    description: 'Random gambar cewek cantik Thailand',
-    usage: '.cecanthai',
-    example: '.cecanthai',
+    name: 'cecankorea',
+    alias: ['cewekkorea', 'cewekkor', 'koreachica'],
+    category: 'cecan', // Categoría original preservada
+    description: 'Obtén una imagen aleatoria de chicas de Corea',
+    usage: '.cecankorea',
+    example: '.cecankorea',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -18,8 +19,8 @@ const pluginConfig = {
 }
 
 async function handler(m, { sock }) {
-    const api = 'https://api.nexray.web.id/random/cecan/thailand'
-    await m.react('🇹🇭')
+    const api = 'https://api.nexray.web.id/random/cecan/korea'
+    await m.react('🇰🇷')
     try {
         await sock.sendMedia(m.chat, api, null, m, {
             type: 'image'
