@@ -33,9 +33,9 @@ const SOURCES = {
 const pluginConfig = {
     name: 'anime',
     alias: Object.keys(SOURCES),
-    category: 'random',
-    description: 'Random gambar anime/wallpaper (Leoo7z Source)',
-    usage: '.<nama> (lihat daftar di bawah)',
+    category: 'random', // Categoría original preservada
+    description: 'Imágenes aleatorias de anime/wallpapers (Fuente Leoo7z)',
+    usage: '.<nombre> (mira la lista de alias)',
     example: '.naruto',
     isOwner: false,
     isPremium: false,
@@ -71,27 +71,27 @@ async function handler(m, { sock }) {
     const source = SOURCES[cmd]
     
     if (!source) {
-        return m.reply(`❌ Source tidak ditemukan.`)
+        return m.reply(`❌ Fuente no encontrada.`)
     }
     
     try {
         const images = await getImages(source)
         
         if (!images || images.length === 0) {
-            return m.reply(`❌ Gagal mengambil data ${cmd}.`)
+            return m.reply(`❌ Error al obtener datos de ${cmd}.`)
         }
 
         if(m.command === 'loli') {
             return await sock.sendMessage(m.chat , {
                 image: { url: 'https://api.nexray.web.id/random/loli' },
-                caption: `👧 *ʀᴀɴᴅᴏᴍ ʟᴏʟɪ*`
+                caption: `👧 *ʟᴏʟɪ ᴀʟᴇᴀᴛᴏʀɪᴀ*`
             }, { quoted: m })
         } 
         
         if(m.command === 'neko') {
             return await sock.sendMessage(m.chat , {
                 image: { url: 'https://api.siputzx.my.id/api/r/neko' },
-                caption: `🐱 *ʀᴀɴᴅᴏᴍ ɴᴇᴋᴏ*`
+                caption: `🐱 *ɴᴇᴋᴏ ᴀʟᴇᴀᴛᴏʀɪᴀ*`
             }, { quoted: m })
         }
         
@@ -102,7 +102,7 @@ async function handler(m, { sock }) {
                 text: imageUrl,
                 contextInfo: {
                     externalAdReply: {
-                        title: '💬 *Random Quote*',
+                        title: '💬 *Frase Aleatoria*',
                         body: 'Anime Quotes',
                         mediaType: 1,
                         thumbnailUrl: 'https://files.catbox.moe/k9233s.jpg',
@@ -113,7 +113,7 @@ async function handler(m, { sock }) {
         } else {
              await sock.sendMessage(m.chat, {
                 image: { url: imageUrl },
-                caption: `🖼️ *Random ${cmd.charAt(0).toUpperCase() + cmd.slice(1)}*\n> ${randomIndex + 1}/${images.length}`
+                caption: `🖼️ *${cmd.charAt(0).toUpperCase() + cmd.slice(1)} Aleatorio*\n> ${randomIndex + 1}/${images.length}`
             }, { quoted: m })
         }
         
