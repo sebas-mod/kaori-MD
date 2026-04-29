@@ -1,13 +1,14 @@
 import fs from 'fs'
 import path from 'path'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: 'ganti-ourin3.jpg',
-    alias: ['gantiourin3', 'setourin3'],
+    name: 'cambiar-ourin3.jpg',
+    alias: ['cambiarourin3', 'setourin3'],
     category: 'owner',
-    description: 'Ganti gambar ourin3.jpg',
-    usage: '.ganti-ourin3.jpg (reply/kirim gambar)',
-    example: '.ganti-ourin3.jpg',
+    description: 'Cambiar la imagen ourin3.jpg',
+    usage: '.cambiar-ourin3.jpg (responder/enviar imagen)',
+    example: '.cambiar-ourin3.jpg',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -21,7 +22,7 @@ async function handler(m, { sock }) {
     const isImage = m.isImage || (m.quoted && m.quoted.type === 'imageMessage')
     
     if (!isImage) {
-        return m.reply(`🖼️ *ɢᴀɴᴛɪ ᴏᴜʀɪɴ3.ᴊᴘɢ*\n\n> Kirim/reply gambar untuk mengganti\n> File: assets/images/ourin3.jpg`)
+        return m.reply(`🖼️ *ᴄᴀᴍʙɪᴀʀ ᴏᴜʀɪɴ3.ᴊᴘɢ*\n\n> Envía o responde a una imagen para cambiarla\n> Archivo: assets/images/ourin3.jpg`)
     }
     
     try {
@@ -33,7 +34,7 @@ async function handler(m, { sock }) {
         }
         
         if (!buffer) {
-            return m.reply(`❌ Gagal mendownload gambar`)
+            return m.reply(`❌ Error al descargar la imagen`)
         }
         
         const targetPath = path.join(process.cwd(), 'assets', 'images', 'ourin3.jpg')
@@ -45,7 +46,7 @@ async function handler(m, { sock }) {
         
         fs.writeFileSync(targetPath, buffer)
         
-        m.reply(`✅ *ʙᴇʀʜᴀsɪʟ*\n\n> Gambar ourin3.jpg telah diganti`)
+        m.reply(`✅ *ᴇ́xɪᴛᴏ*\n\n> La imagen ourin3.jpg ha sido reemplazada`)
         
     } catch (error) {
         await m.reply(te(m.prefix, m.command, m.pushName))
