@@ -1,12 +1,13 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { addExpWithLevelCheck } from '../../src/lib/ourin-level.js'
+
 const pluginConfig = {
-    name: 'expedition',
-    alias: ['ekspedisi', 'exp', 'explore'],
+    name: 'expedicion',
+    alias: ['exp', 'explorar', 'mision', 'aventura'],
     category: 'rpg',
-    description: 'Kirim ekspedisi otomatis untuk item',
-    usage: '.expedition <start/claim/status>',
-    example: '.expedition start forest',
+    description: 'Enviá expediciones automáticas para conseguir items',
+    usage: '.expedicion <start/claim/status/list>',
+    example: '.expedicion start bosque',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -17,11 +18,11 @@ const pluginConfig = {
 }
 
 const EXPEDITIONS = {
-    forest: { name: '🌲 Hutan', duration: 1800000, rewards: ['wood', 'herb', 'mushroom'], exp: 100, minLevel: 1 },
-    cave: { name: '🏔️ Gua', duration: 3600000, rewards: ['iron', 'gold', 'gem'], exp: 200, minLevel: 5 },
-    volcano: { name: '🌋 Gunung Api', duration: 7200000, rewards: ['lava', 'dragonscale', 'titancore'], exp: 400, minLevel: 15 },
-    ocean: { name: '🌊 Samudra', duration: 5400000, rewards: ['fish', 'pearl', 'seagem'], exp: 300, minLevel: 10 },
-    ruins: { name: '🏛️ Reruntuhan', duration: 10800000, rewards: ['ancientcoin', 'relic', 'mysterybox'], exp: 600, minLevel: 20 }
+    bosque: { name: '🌲 Bosque Profundo', duration: 1800000, rewards: ['madera', 'hierba', 'hongo'], exp: 100, minLevel: 1 },
+    cueva: { name: '🏔️ Cueva Sombría', duration: 3600000, rewards: ['hierro', 'oro', 'gema'], exp: 200, minLevel: 5 },
+    volcan: { name: '🌋 Volcán de Sangre', duration: 7200000, rewards: ['lava', 'escama_dragon', 'nucleo_titan'], exp: 400, minLevel: 15 },
+    oceano: { name: '🌊 Océano Abisal', duration: 5400000, rewards: ['pescado', 'perla', 'gema_marina'], exp: 300, minLevel: 10 },
+    ruinas: { name: '🏛️ Ruinas Antiguas', duration: 10800000, rewards: ['moneda_antigua', 'reliquia', 'cofre_misterioso'], exp: 600, minLevel: 20 }
 }
 
 function formatTime(ms) {
@@ -44,33 +45,34 @@ async function handler(m, { sock }) {
     const action = args[0]?.toLowerCase()
     const expType = args[1]?.toLowerCase()
     
+    // Slots máximos: 1 base + 1 cada 10 niveles (máximo 5)
     const maxExpeditions = Math.min(5, 1 + Math.floor((user.level || 1) / 10))
     
     if (!action || !['start', 'claim', 'status', 'list'].includes(action)) {
-        let txt = `🗺️ *ᴇxᴘᴇᴅɪᴛɪᴏɴ sʏsᴛᴇᴍ*\n\n`
-        txt += `> Kirim ekspedisi untuk farming otomatis!\n\n`
-        txt += `╭┈┈⬡「 📋 *ᴄᴏᴍᴍᴀɴᴅ* 」\n`
-        txt += `┃ ${m.prefix}expedition list\n`
-        txt += `┃ ${m.prefix}expedition start <area>\n`
-        txt += `┃ ${m.prefix}expedition status\n`
-        txt += `┃ ${m.prefix}expedition claim\n`
+        let txt = `🗺️ *𝐒𝐈𝐒𝐓𝐄𝐌𝐀 𝐃𝐄 𝐄𝐗𝐏𝐄𝐃𝐈𝐂𝐈𝐎𝐍𝐄𝐒*\n\n`
+        txt += `> ¡Mandá a tu equipo a farmear de forma automática!\n\n`
+        txt += `╭┈┈⬡「 📋 *COMANDOS* 」\n`
+        txt += `┃ ${m.prefix}expedicion list\n`
+        txt += `┃ ${m.prefix}expedicion start <zona>\n`
+        txt += `┃ ${m.prefix}expedicion status\n`
+        txt += `┃ ${m.prefix}expedicion claim\n`
         txt += `╰┈┈┈┈┈┈┈┈⬡\n\n`
-        txt += `> 📊 Slot: ${user.rpg.expeditions.length}/${maxExpeditions}`
+        txt += `> 📊 Slots ocupados: ${user.rpg.expeditions.length}/${maxExpeditions}`
         return m.reply(txt)
     }
     
     if (action === 'list') {
-        let txt = `🗺️ *ᴅᴀꜰᴛᴀʀ ᴇxᴘᴇᴅɪsɪ*\n\n`
-        txt += `╭┈┈⬡「 📍 *ᴀʀᴇᴀ* 」\n`
+        let txt = `🗺️ *𝐙𝐎𝐍𝐀𝐒 𝐃𝐄 𝐄𝐗𝐏𝐄𝐃𝐈𝐂𝐈𝐎́𝐍*\n\n`
+        txt += `╭┈┈⬡「 📍 *AREAS* 」\n`
         
         for (const [key, exp] of Object.entries(EXPEDITIONS)) {
             const canGo = (user.level || 1) >= exp.minLevel
             txt += `┃ ${exp.name} ${canGo ? '✅' : '🔒'}\n`
-            txt += `┃ ⏱️ Durasi: ${formatTime(exp.duration)}\n`
-            txt += `┃ 📦 Rewards: ${exp.rewards.join(', ')}\n`
+            txt += `┃ ⏱️ Duración: ${formatTime(exp.duration)}\n`
+            txt += `┃ 📦 Recompensas: ${exp.rewards.join(', ')}\n`
             txt += `┃ ✨ EXP: ${exp.exp}\n`
-            txt += `┃ 📊 Min Level: ${exp.minLevel}\n`
-            txt += `┃ → \`${key}\`\n┃\n`
+            txt += `┃ 📊 Nivel Mínimo: ${exp.minLevel}\n`
+            txt += `┃ → Comando: \`${key}\`\n┃\n`
         }
         txt += `╰┈┈┈┈┈┈┈┈⬡`
         return m.reply(txt)
@@ -78,20 +80,20 @@ async function handler(m, { sock }) {
     
     if (action === 'start') {
         if (user.rpg.expeditions.length >= maxExpeditions) {
-            return m.reply(`❌ Slot ekspedisi penuh! (${user.rpg.expeditions.length}/${maxExpeditions})`)
+            return m.reply(`❌ ¡No tenés más slots libres! (${user.rpg.expeditions.length}/${maxExpeditions})`)
         }
         
         if (!expType) {
-            return m.reply(`❌ Pilih area!\n\n> Contoh: \`${m.prefix}expedition start forest\``)
+            return m.reply(`❌ ¡Tenés que elegir una zona!\n\n> Ejemplo: \`${m.prefix}expedicion start bosque\``)
         }
         
         const exp = EXPEDITIONS[expType]
         if (!exp) {
-            return m.reply(`❌ Area tidak ditemukan!`)
+            return m.reply(`❌ ¡Esa zona no existe en el mapa!`)
         }
         
         if ((user.level || 1) < exp.minLevel) {
-            return m.reply(`❌ Level kurang! Minimal level ${exp.minLevel}`)
+            return m.reply(`❌ Nivel insuficiente. Necesitás ser Nivel ${exp.minLevel} para ir acá.`)
         }
         
         user.rpg.expeditions.push({
@@ -102,20 +104,20 @@ async function handler(m, { sock }) {
         db.save()
         
         return m.reply(
-            `✅ *ᴇxᴘᴇᴅɪsɪ ᴅɪᴍᴜʟᴀɪ*\n\n` +
-            `> 📍 Area: *${exp.name}*\n` +
-            `> ⏱️ Durasi: *${formatTime(exp.duration)}*\n\n` +
-            `💡 Claim setelah selesai dengan \`${m.prefix}expedition claim\``
+            `✅ *𝐄𝐗𝐏𝐄𝐃𝐈𝐂𝐈𝐎́𝐍 𝐄𝐍 𝐌𝐀𝐑𝐂𝐇𝐀*\n\n` +
+            `> 📍 Destino: *${exp.name}*\n` +
+            `> ⏱️ Tiempo estimado: *${formatTime(exp.duration)}*\n\n` +
+            `💡 Podés reclamar las recompensas al terminar con \`${m.prefix}expedicion claim\``
         )
     }
     
     if (action === 'status') {
         if (user.rpg.expeditions.length === 0) {
-            return m.reply(`❌ Tidak ada ekspedisi aktif!`)
+            return m.reply(`❌ No tenés ninguna expedición activa en este momento.`)
         }
         
-        let txt = `🗺️ *sᴛᴀᴛᴜs ᴇxᴘᴇᴅɪsɪ*\n\n`
-        txt += `╭┈┈⬡「 📍 *ᴀᴋᴛɪꜰ* 」\n`
+        let txt = `🗺️ *𝐄𝐒𝐓𝐀𝐃𝐎 𝐃𝐄 𝐄𝐗𝐏𝐄𝐃𝐈𝐂𝐈𝐎𝐍𝐄𝐒*\n\n`
+        txt += `╭┈┈⬡「 📍 *𝐀𝐂𝐓𝐈𝐕𝐀𝐒* 」\n`
         
         for (let i = 0; i < user.rpg.expeditions.length; i++) {
             const exp = user.rpg.expeditions[i]
@@ -125,7 +127,7 @@ async function handler(m, { sock }) {
             const done = remaining <= 0
             
             txt += `┃ ${i + 1}. ${expInfo.name}\n`
-            txt += `┃ ${done ? '✅ SELESAI!' : `🕕 ${formatTime(remaining)}`}\n`
+            txt += `┃ ${done ? '✅ ¡LISTO PARA COBRAR!' : `🕕 Restante: ${formatTime(remaining)}`}\n`
             txt += `┃\n`
         }
         txt += `╰┈┈┈┈┈┈┈┈⬡`
@@ -138,7 +140,7 @@ async function handler(m, { sock }) {
         })
         
         if (completedExps.length === 0) {
-            return m.reply(`❌ Belum ada ekspedisi selesai!`)
+            return m.reply(`❌ Todavía ninguna expedición ha terminado. ¡Tené paciencia!`)
         }
         
         let totalExp = 0
@@ -157,6 +159,7 @@ async function handler(m, { sock }) {
             }
         }
         
+        // Limpiamos las expediciones reclamadas
         user.rpg.expeditions = user.rpg.expeditions.filter(e => {
             return Date.now() - e.startedAt < e.duration
         })
@@ -166,15 +169,17 @@ async function handler(m, { sock }) {
         
         await m.react('✅')
         
-        let txt = `🎉 *ᴇxᴘᴇᴅɪsɪ sᴇʟᴇsᴀɪ*\n\n`
-        txt += `> Klaim ${completedExps.length} ekspedisi\n\n`
-        txt += `╭┈┈⬡「 🎁 *ʀᴇᴡᴀʀᴅ* 」\n`
-        txt += `┃ ✨ EXP: *+${totalExp}*\n`
+        let txt = `🎉 *𝐄𝐗𝐏𝐄𝐃𝐈𝐂𝐈𝐎́𝐍 𝐅𝐈𝐍𝐀𝐋𝐈𝐙𝐀𝐃𝐀*\n\n`
+        txt += `> Se completaron ${completedExps.length} expediciones con éxito.\n\n`
+        txt += `╭┈┈⬡「 🎁 *𝐁𝐎𝐓𝐈́𝐍* 」\n`
+        txt += `┃ ✨ EXP total: *+${totalExp}*\n`
         if (allRewards.length > 0) {
-            txt += `┃ 📦 Items:\n`
+            txt += `┃ 📦 Items encontrados:\n`
             for (const r of allRewards) {
-                txt += `┃   • ${r}\n`
+                txt += `┃    • ${r}\n`
             }
+        } else {
+            txt += `┃ 📦 No encontraste items esta vez.\n`
         }
         txt += `╰┈┈┈┈┈┈┈┈⬡`
         
