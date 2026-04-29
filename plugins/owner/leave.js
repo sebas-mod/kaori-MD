@@ -1,12 +1,13 @@
 import config from '../../config.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: 'leave',
-    alias: ['leavegrup', 'leavegroup', 'keluar', 'bye'],
+    name: 'salir',
+    alias: ['salirgrupo', 'leavegroup', 'leave', 'bye', 'chau'],
     category: 'owner',
-    description: 'Bot keluar dari grup',
-    usage: '.leave [link]',
-    example: '.leave',
+    description: 'El bot sale del grupo',
+    usage: '.salir [enlace]',
+    example: '.salir',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -40,37 +41,37 @@ async function handler(m, { sock }) {
         targetGroupJid = m.chat
         try {
             const meta = m.groupMetadata
-            groupName = meta.subject || 'Grup ini'
+            groupName = meta.subject || 'este grupo'
         } catch {
-            groupName = 'Grup ini'
+            groupName = 'este grupo'
         }
     } else if (input) {
         const inviteCode = await extractInviteCode(input)
         
         if (!inviteCode) {
-            return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Link invite tidak valid`)
+            return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> El enlace de invitación no es válido`)
         }
         
         try {
             const groupInfo = await sock.groupGetInviteInfo(inviteCode)
             targetGroupJid = groupInfo.id
-            groupName = groupInfo.subject || 'Unknown'
+            groupName = groupInfo.subject || 'Desconocido'
         } catch (error) {
-            return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak dapat mengambil info grup dari link`)
+            return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> No se pudo obtener la información del grupo desde el enlace`)
         }
     } else {
         return m.reply(
-            `🚪 *ʟᴇᴀᴠᴇ ɢʀᴜᴘ*\n\n` +
-            `╭┈┈⬡「 📋 *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ* 」\n` +
-            `┃ ◦ Di grup: \`.leave\`\n` +
-            `┃ ◦ Via link: \`.leave <link>\`\n` +
+            `🚪 *sᴀʟɪʀ ᴅᴇʟ ɢʀᴜᴘᴏ*\n\n` +
+            `╭┈┈⬡「 📋 *ᴍᴏᴅᴏ ᴅᴇ ᴜsᴏ* 」\n` +
+            `┃ ◦ En un grupo: \`.salir\`\n` +
+            `┃ ◦ Vía enlace: \`.salir <enlace>\`\n` +
             `╰┈┈⬡\n\n` +
-            `\`Contoh: ${m.prefix}leave https://chat.whatsapp.com/xxx\``
+            `\`Ejemplo: ${m.prefix}salir https://chat.whatsapp.com/xxx\``
         )
     }
     
     if (!targetGroupJid) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Grup tidak ditemukan`)
+        return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> Grupo no encontrado`)
     }
     
     await m.react('🕕')
@@ -83,9 +84,9 @@ async function handler(m, { sock }) {
         
         if (m.isGroup && targetGroupJid === m.chat) {
             await sock.sendMessage(m.chat, {
-                text: `👋 *ɢᴏᴏᴅʙʏᴇ*\n\n` +
-                    `> Bot akan keluar dari grup ini.\n` +
-                    `> Terima kasih sudah menggunakan bot!`,
+                text: `👋 *ᴀᴅɪᴏ́s*\n\n` +
+                    `> El bot saldrá de este grupo.\n` +
+                    `> ¡Gracias por usar el servicio!`,
                 contextInfo: {
                     forwardingScore: 9999,
                     isForwarded: true,
@@ -105,8 +106,8 @@ async function handler(m, { sock }) {
         if (!m.isGroup || targetGroupJid !== m.chat) {
             await m.react('✅')
             await m.reply(
-                `✅ *ʙᴇʀʜᴀsɪʟ ᴋᴇʟᴜᴀʀ*\n\n` +
-                `> Bot telah keluar dari: *${groupName}*`
+                `✅ *sᴀʟɪᴅᴀ ᴇxɪᴛᴏsᴀ*\n\n` +
+                `> El bot ha salido de: *${groupName}*`
             )
         }
         
