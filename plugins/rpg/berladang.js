@@ -3,13 +3,14 @@ import { addExpWithLevelCheck } from '../../src/lib/ourin-level.js'
 import config from '../../config.js'
 import path from 'path'
 import fs from 'fs'
+
 const pluginConfig = {
-    name: 'berladang',
-    alias: ['farm', 'tanam', 'berkebun'],
+    name: 'cultivar',
+    alias: ['farm', 'quinta', 'cosechar', 'berladang'],
     category: 'rpg',
-    description: 'Berladang untuk mendapat hasil panen',
-    usage: '.berladang',
-    example: '.berladang',
+    description: 'Laburá en la quinta para sacar algo de cosecha',
+    usage: '.cultivar',
+    example: '.cultivar',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -25,9 +26,9 @@ try {
     if (fs.existsSync(thumbPath)) thumbRpg = fs.readFileSync(thumbPath)
 } catch (e) {}
 
-function getContextInfo(title = '🌾 *ʙᴇʀʟᴀᴅᴀɴɢ*', body = 'Hasil Panen') {
+function getContextInfo(title = '🌾 *LABURANDO EN LA QUINTA*', body = 'Cosecha del día') {
     const saluranId = config.saluran?.id || '120363208449943317@newsletter'
-    const saluranName = config.saluran?.name || config.bot?.name || 'Ourin-AI'
+    const saluranName = config.saluran?.name || config.bot?.name || 'KAORI MD'
     
     const contextInfo = {
         forwardingScore: 9999,
@@ -65,25 +66,25 @@ async function handler(m, { sock }) {
     
     if (user.rpg.stamina < staminaCost) {
         return m.reply(
-            `⚡ *sᴛᴀᴍɪɴᴀ ʜᴀʙɪs*\n\n` +
-            `> Butuh ${staminaCost} stamina untuk berladang\n` +
-            `> Stamina kamu: ${user.rpg.stamina}`
+            `⚡ *ESTÁS RENDIDO*\n\n` +
+            `> Necesitás ${staminaCost} de stamina para laburar la tierra.\n` +
+            `> Stamina actual: ${user.rpg.stamina}`
         )
     }
     
     user.rpg.stamina -= staminaCost
     
     await m.react('🌾')
-    await m.reply(`🌾 *sᴇᴅᴀɴɢ ʙᴇʀʟᴀᴅᴀɴɢ...*`)
+    await m.reply(`🌾 *SEMBRANDO Y REGANDO LA QUINTA...*`)
     await new Promise(r => setTimeout(r, 2500))
     
     const crops = [
-        { item: 'padi', name: '🌾 Padi', chance: 90, min: 2, max: 8, price: 100 },
-        { item: 'jagung', name: '🌽 Jagung', chance: 70, min: 1, max: 5, price: 150 },
-        { item: 'tomat', name: '🍅 Tomat', chance: 50, min: 1, max: 4, price: 200 },
-        { item: 'wortel', name: '🥕 Wortel', chance: 40, min: 1, max: 3, price: 250 },
-        { item: 'strawberry', name: '🍓 Strawberry', chance: 20, min: 1, max: 2, price: 500 },
-        { item: 'melon', name: '🍈 Melon', chance: 10, min: 1, max: 1, price: 1000 }
+        { item: 'trigo', name: '🌾 Trigo', chance: 90, min: 2, max: 8, price: 100 },
+        { item: 'maiz', name: '🌽 Maíz', chance: 70, min: 1, max: 5, price: 150 },
+        { item: 'tomate', name: '🍅 Tomate', chance: 50, min: 1, max: 4, price: 200 },
+        { item: 'zanahoria', name: '🥕 Zanahoria', chance: 40, min: 1, max: 3, price: 250 },
+        { item: 'frutilla', name: '🍓 Frutilla', chance: 20, min: 1, max: 2, price: 500 },
+        { item: 'zapallo', name: '🎃 Zapallo', chance: 10, min: 1, max: 1, price: 1000 }
     ]
     
     let results = []
@@ -100,29 +101,29 @@ async function handler(m, { sock }) {
     }
     
     if (results.length === 0) {
-        user.inventory['padi'] = (user.inventory['padi'] || 0) + 1
-        results.push({ name: '🌾 Padi', qty: 1, value: 100 })
+        user.inventory['trigo'] = (user.inventory['trigo'] || 0) + 1
+        results.push({ name: '🌾 Trigo', qty: 1, value: 100 })
         totalValue = 100
     }
     
     const expGain = Math.floor(totalValue / 10) + Math.floor(Math.random() * 100)
-    const levelResult = await addExpWithLevelCheck(sock, m, db, user, expGain)
+    await addExpWithLevelCheck(sock, m, db, user, expGain)
     
     db.save()
     
     await m.react('✅')
     
-    let txt = `🌾 *ʙᴇʀʟᴀᴅᴀɴɢ sᴇʟᴇsᴀɪ*\n\n`
-    txt += `╭┈┈⬡「 🧺 *ʜᴀsɪʟ ᴘᴀɴᴇɴ* 」\n`
+    let txt = `🌾 *COSECHA TERMINADA*\n\n`
+    txt += `╭┈┈⬡「 🧺 *LO QUE SACASTE* 」\n`
     for (const r of results) {
-        txt += `┃ ${r.name}: *+${r.qty}* (Rp ${r.value.toLocaleString('id-ID')})\n`
+        txt += `┃ ${r.name}: *+${r.qty}* ($${r.value.toLocaleString('es-AR')})\n`
     }
     txt += `┃ ─────────\n`
-    txt += `┃ 💰 Total Nilai: *Rp ${totalValue.toLocaleString('id-ID')}*\n`
-    txt += `┃ 🚄 Exp: *+${expGain}*\n`
+    txt += `┃ 💰 Valor total: *$${totalValue.toLocaleString('es-AR')}*\n`
+    txt += `┃ ✨ Exp: *+${expGain}*\n`
     txt += `┃ ⚡ Stamina: *-${staminaCost}*\n`
     txt += `╰┈┈┈┈┈┈┈┈⬡\n\n`
-    txt += `> Jual hasil panen dengan \`${m.prefix}sellall\``
+    txt += `> Vendé todo con \`${m.prefix}sellall\``
     
     await sock.sendMessage(m.chat, {
         text: txt,
