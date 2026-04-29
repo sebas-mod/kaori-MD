@@ -1,12 +1,13 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { getRpgContextInfo } from '../../src/lib/ourin-context.js'
+
 const pluginConfig = {
-    name: 'gift',
-    alias: ['kasih', 'hadiah'],
+    name: 'regalo',
+    alias: ['regalar', 'gift', 'obsequio'],
     category: 'rpg',
-    description: 'Beri hadiah ke pasangan untuk meningkatkan love',
-    usage: '.gift <item> <jumlah>',
-    example: '.gift diamond 1',
+    description: 'Dale un regalo a tu pareja para aumentar el nivel de amor',
+    usage: '.regalo <item> <cantidad>',
+    example: '.regalo diamante 1',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -24,9 +25,9 @@ async function handler(m, { sock }) {
     
     if (!user.rpg.spouse) {
         return m.reply(
-            `❌ *ʙᴇʟᴜᴍ ᴍᴇɴɪᴋᴀʜ*\n\n` +
-            `> Kamu belum menikah!\n` +
-            `> Nikah dulu dengan \`.marry @user\``
+            `❌ *SIN PAREJA*\n\n` +
+            `> ¡Todavía no te has casado con nadie!\n` +
+            `> Primero casate con alguien usando \`.marry @user\``
         )
     }
     
@@ -36,10 +37,10 @@ async function handler(m, { sock }) {
     
     if (!itemKey) {
         return m.reply(
-            `🎁 *ɢɪꜰᴛ*\n\n` +
-            `╭┈┈⬡「 📋 *ᴜsᴀɢᴇ* 」\n` +
-            `┃ > Pilih item untuk diberikan\n` +
-            `┃ > \`.gift diamond 1\`\n` +
+            `🎁 *𝐒𝐈𝐒𝐓𝐄𝐌𝐀 𝐃𝐄 𝐑𝐄𝐆𝐀𝐋𝐎𝐒*\n\n` +
+            `╭┈┈⬡「 📋 *MODO DE USO* 」\n` +
+            `┃ > Elegí un item de tu inventario\n` +
+            `┃ > Ejemplo: \`.regalo diamante 1\`\n` +
             `╰┈┈┈┈┈┈┈┈⬡`
         )
     }
@@ -48,9 +49,10 @@ async function handler(m, { sock }) {
     
     if ((user.inventory[itemKey] || 0) < amount) {
         return m.reply(
-            `❌ *ɪᴛᴇᴍ ᴛɪᴅᴀᴋ ᴄᴜᴋᴜᴘ*\n\n` +
-            `> Item *${itemKey}* kamu: ${user.inventory[itemKey] || 0}\n` +
-            `> Butuh: ${amount}`
+            `❌ *RECURSOS INSUFICIENTES*\n\n` +
+            `> No tenés suficiente *${itemKey}*.\n` +
+            `> En tu inventario: ${user.inventory[itemKey] || 0}\n` +
+            `> Cantidad necesaria: ${amount}`
         )
     }
     
@@ -58,24 +60,27 @@ async function handler(m, { sock }) {
     const partner = db.getUser(spouseJid)
     
     if (!partner) {
-        return m.reply(`❌ *ᴘᴀsᴀɴɢᴀɴ ɴᴏᴛ ꜰᴏᴜɴᴅ*\n\n> Pasangan tidak ditemukan di database!`)
+        return m.reply(`❌ *ERROR DE BASE DE DATOS*\n\n> Tu pareja no figura en nuestros registros.`)
     }
     
     partner.inventory = partner.inventory || {}
     
+    // Transferencia de items
     user.inventory[itemKey] -= amount
     partner.inventory[itemKey] = (partner.inventory[itemKey] || 0) + amount
     
-    user.rpg.love = (user.rpg.love || 0) + (amount * 10)
-    if (partner.rpg) partner.rpg.love = (partner.rpg.love || 0) + (amount * 10)
+    // Aumento de puntos de amor (Love)
+    const loveGain = amount * 10
+    user.rpg.love = (user.rpg.love || 0) + loveGain
+    if (partner.rpg) partner.rpg.love = (partner.rpg.love || 0) + loveGain
     
     db.save()
     
-    let txt = `🎁 *ɢɪꜰᴛ sᴜᴋsᴇs*\n\n`
-    txt += `> 💝 Kamu memberikan ${amount}x ${itemKey}\n`
-    txt += `> 👤 Untuk: @${spouseJid.split('@')[0]}\n`
-    txt += `> 💕 Love: +${amount * 10}\n\n`
-    txt += `> _So sweet! 💖_`
+    let txt = `🎁 *¡𝐑𝐄𝐆𝐀𝐋𝐎 𝐄𝐍𝐕𝐈𝐀𝐃𝐎!*\n\n`
+    txt += `> 💝 Le has dado ${amount}x ${itemKey} a tu pareja.\n`
+    txt += `> 👤 Para: @${spouseJid.split('@')[0]}\n`
+    txt += `> 💕 Amor: +${loveGain}\n\n`
+    txt += `> _¡Qué romántico! 💖_`
     
     await m.reply(txt, { mentions: [spouseJid] })
 }
