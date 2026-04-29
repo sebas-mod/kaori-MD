@@ -1,13 +1,14 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { getGroupMode } from '../group/botmode.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: 'savenomor',
-    alias: ['sv', 'save', 'simpannomor'],
-    category: 'pushkontak',
-    description: 'Simpan nomor ke kontak bot',
-    usage: '.savenomor <nama>',
-    example: '.savenomor JohnDoe',
+    name: 'guardarnumero',
+    alias: ['sv', 'save', 'guardar'],
+    category: 'pushkontak', // Categoría original sin traducir
+    description: 'Guarda un número en los contactos del bot',
+    usage: '.guardarnumero <nombre>',
+    example: '.guardarnumero JuanPerez',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -21,67 +22,67 @@ async function handler(m, { sock }) {
     const db = getDatabase()
     
     if (m.isGroup) {
-        const groupMode = getGroupMode(m.chat, db)
-        if (groupMode !== 'pushkontak' && groupMode !== 'all') {
-            return m.reply(`❌ *ᴍᴏᴅᴇ ᴛɪᴅᴀᴋ sᴇsᴜᴀɪ*\n\n> Aktifkan mode pushkontak terlebih dahulu\n\n\`${m.prefix}botmode pushkontak\``)
+        const modoGrupo = getGroupMode(m.chat, db)
+        if (modoGrupo !== 'pushkontak' && modoGrupo !== 'all') {
+            return m.reply(`❌ *ᴍᴏᴅᴏ ɴᴏ ᴀᴄᴛɪᴠᴀᴅᴏ*\n\n> Activa el modo pushkontak primero para usar esta función\n\n\`${m.prefix}botmode pushkontak\``)
         }
     }
     
-    let targetNumber = ''
-    let nama = ''
+    let numeroTarget = ''
+    let nombre = ''
     
     if (m.isGroup) {
         if (m.quoted) {
-            targetNumber = m.quoted.sender
-            nama = m.text?.trim()
+            numeroTarget = m.quoted.sender
+            nombre = m.text?.trim()
         } else if (m.mentionedJid?.length) {
-            targetNumber = m.mentionedJid[0]
-            const input = m.text?.trim()
-            nama = input?.split('|')[1]?.trim() || input?.replace(/@\d+/g, '').trim()
+            numeroTarget = m.mentionedJid[0]
+            const entrada = m.text?.trim()
+            nombre = entrada?.split('|')[1]?.trim() || entrada?.replace(/@\d+/g, '').trim()
         } else if (m.text?.includes('|')) {
             const [num, nm] = m.text.split('|').map(s => s.trim())
-            targetNumber = num.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
-            nama = nm
+            numeroTarget = num.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
+            nombre = nm
         } else {
             return m.reply(
-                `📱 *sᴀᴠᴇ ɴᴏᴍᴏʀ*\n\n` +
-                `> Di grup:\n` +
-                `┃ \`${m.prefix}savenomor nama\` (reply pesan)\n` +
-                `┃ \`${m.prefix}savenomor @tag|nama\`\n` +
-                `┃ \`${m.prefix}savenomor 628xxx|nama\`\n\n` +
-                `> Di private:\n` +
-                `┃ \`${m.prefix}savenomor nama\``
+                `📱 *ɢᴜᴀʀᴅᴀʀ ɴᴜᴍᴇʀᴏ*\n\n` +
+                `> En grupo:\n` +
+                `┃ \`${m.prefix}guardarnumero nombre\` (respondiendo un mensaje)\n` +
+                `┃ \`${m.prefix}guardarnumero @tag|nombre\`\n` +
+                `┃ \`${m.prefix}guardarnumero 549xxx|nombre\`\n\n` +
+                `> En privado:\n` +
+                `┃ \`${m.prefix}guardarnumero nombre\``
             )
         }
     } else {
-        targetNumber = m.chat
-        nama = m.text?.trim()
+        numeroTarget = m.chat
+        nombre = m.text?.trim()
     }
     
-    if (!nama) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Masukkan nama kontak`)
+    if (!nombre) {
+        return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> Por favor, ingresa un nombre para el contacto`)
     }
     
-    if (!targetNumber) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak dapat menentukan nomor target`)
+    if (!numeroTarget) {
+        return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> No se pudo determinar el número de destino`)
     }
     
     m.react('📱')
     
     try {
-        const contactAction = {
-            fullName: nama,
-            lidJid: targetNumber,
+        const accionContacto = {
+            fullName: nombre,
+            lidJid: numeroTarget,
             saveOnPrimaryAddressbook: true
         }
         
-        await sock.addOrEditContact(targetNumber, contactAction)
+        await sock.addOrEditContact(numeroTarget, accionContacto)
         
         m.react('✅')
         await m.reply(
-            `✅ *ᴋᴏɴᴛᴀᴋ ᴅɪsɪᴍᴘᴀɴ*\n\n` +
-            `> ɴᴏᴍᴏʀ: \`${targetNumber.split('@')[0]}\`\n` +
-            `> ɴᴀᴍᴀ: \`${nama}\``
+            `✅ *ᴄᴏɴᴛᴀᴄᴛᴏ ɢᴜᴀʀᴅᴀᴅᴏ*\n\n` +
+            `> ɴᴜᴍᴇʀᴏ: \`${numeroTarget.split('@')[0]}\`\n` +
+            `> ɴᴏᴍʙʀᴇ: \`${nombre}\``
         )
         
     } catch (error) {
