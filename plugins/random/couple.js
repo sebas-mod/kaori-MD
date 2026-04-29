@@ -3,11 +3,12 @@ import { downloadMediaMessage } from 'ourin'
 import fs from 'fs'
 import { default as axios } from 'axios'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'ppcouple',
-    alias: ['cp', 'ppcp'],
-    category: 'random',
-    description: 'Random gambar pp couple',
+    alias: ['cp', 'ppcp', 'perfilpareja'],
+    category: 'random', // Categoría original preservada
+    description: 'Obtén imágenes aleatorias para compartir en pareja (Avatar Couple)',
     usage: '.ppcouple',
     isGroup: true,
     isBotAdmin: false,
@@ -23,6 +24,7 @@ async function handler(m, { sock }) {
         const data = res.data.result
         const cowo = data.cowo
         const cewe = data.cewe
+        
         await sock.sendMessage(m.chat, {
             albumMessage: [
                 {
@@ -33,8 +35,9 @@ async function handler(m, { sock }) {
                 }
             ]
         }, { quoted: m })
+        
    } catch (error) {
-    m.reply(te(m.prefix, m.command, m.pushName))
+        m.reply(te(m.prefix, m.command, m.pushName))
    }
 }
 
