@@ -1,11 +1,12 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import config from '../../config.js'
+
 const pluginConfig = {
     name: 'setlimitdefault',
-    alias: ['setdefaultlimit', 'limitdefault'],
+    alias: ['setlimitpordefecto', 'limitodefecto', 'limiteinicial'],
     category: 'owner',
-    description: 'Set default limit untuk user baru',
-    usage: '.setlimitdefault <jumlah>',
+    description: 'Establece el límite predeterminado para nuevos usuarios',
+    usage: '.setlimitdefault <cantidad>',
     example: '.setlimitdefault 50',
     isOwner: true,
     isPremium: false,
@@ -26,25 +27,25 @@ async function handler(m, { sock }) {
         
         return m.reply(
             `📊 *sᴇᴛ ᴅᴇғᴀᴜʟᴛ ʟɪᴍɪᴛ*\n\n` +
-            `> Limit default saat ini: \`${currentDefault}\`\n\n` +
-            `*Cara pakai:*\n` +
-            `> \`${m.prefix}setlimitdefault <jumlah>\`\n\n` +
-            `*Contoh:*\n` +
+            `> Límite actual por defecto: \`${currentDefault}\`\n\n` +
+            `*Modo de uso:*\n` +
+            `> \`${m.prefix}setlimitdefault <cantidad>\`\n\n` +
+            `*Ejemplo:*\n` +
             `> \`${m.prefix}setlimitdefault 50\``
         )
     }
     
     if (newLimit < 1 || newLimit > 1000) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Limit harus antara 1 - 1000`)
+        return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> El límite debe estar entre 1 y 1000`)
     }
     
     const db = getDatabase()
     db.setting('defaultLimit', newLimit)
     
     await m.reply(
-        `✅ *ʙᴇʀʜᴀsɪʟ*\n\n` +
-        `> Default limit diubah menjadi: \`${newLimit}\`\n` +
-        `> User baru akan mendapat limit ini`
+        `✅ *ᴄᴏɴғɪɢᴜʀᴀᴅᴏ*\n\n` +
+        `> El límite por defecto ha cambiado a: \`${newLimit}\`\n` +
+        `> Los nuevos usuarios recibirán esta cantidad.`
     )
 }
 
