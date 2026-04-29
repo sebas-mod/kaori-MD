@@ -1,12 +1,13 @@
 import axios from 'axios'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: 'zodiak',
-    alias: ['horoscope', 'ramalan'],
-    category: 'primbon',
-    description: 'Ramalan zodiak',
-    usage: '.zodiak <nama zodiak>',
-    example: '.zodiak aries',
+    name: 'zodiaco',
+    alias: ['horoscopo', 'prediccion'],
+    category: 'diversion',
+    description: 'Consulta la predicción de tu signo del zodiaco',
+    usage: '.zodiaco <nombre del signo>',
+    example: '.zodiaco aries',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -16,13 +17,30 @@ const pluginConfig = {
     isEnabled: true
 }
 
-const validZodiacs = ['aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo', 'libra', 'scorpio', 'sagitarius', 'capricorn', 'aquarius', 'pisces']
+const validZodiacs = ['aries', 'tauro', 'geminis', 'cancer', 'leo', 'virgo', 'libra', 'escorpio', 'sagitario', 'capricornio', 'acuario', 'piscis']
+
+// Mapeo para la API (ya que la API espera los nombres en inglés/indonesio)
+const zodiacMap = {
+    'aries': 'aries',
+    'tauro': 'taurus',
+    'geminis': 'gemini',
+    'cancer': 'cancer',
+    'leo': 'leo',
+    'virgo': 'virgo',
+    'libra': 'libra',
+    'escorpio': 'scorpio',
+    'sagitario': 'sagitarius',
+    'capricornio': 'capricorn',
+    'acuario': 'aquarius',
+    'piscis': 'pisces'
+}
 
 async function handler(m, { sock }) {
-    const zodiac = m.args[0]?.toLowerCase()
+    const input = m.args[0]?.toLowerCase()
+    const zodiac = zodiacMap[input]
     
-    if (!zodiac || !validZodiacs.includes(zodiac)) {
-        return m.reply(`⭐ *ᴢᴏᴅɪᴀᴋ*\n\n> Masukkan nama zodiak:\n\n${validZodiacs.map(z => `• ${z}`).join('\n')}\n\n\`Contoh: ${m.prefix}zodiak aries\``)
+    if (!input || !zodiac) {
+        return m.reply(`⭐ *ᴢᴏᴅɪᴀᴄᴏ*\n\n> Ingresa el nombre de un signo:\n\n${validZodiacs.map(z => `• ${z}`).join('\n')}\n\n\`Ejemplo: ${m.prefix}zodiaco aries\``)
     }
     
     m.react('⭐')
@@ -33,19 +51,19 @@ async function handler(m, { sock }) {
         
         if (!data?.status || !data?.data) {
             m.react('❌')
-            return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Gagal mendapatkan ramalan`)
+            return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> No se pudo obtener la predicción.`)
         }
         
         const r = data.data
-        const response = `⭐ *ᴢᴏᴅɪᴀᴋ ${zodiac.toUpperCase()}*\n\n` +
+        const response = `⭐ *ᴢᴏᴅɪᴀᴄᴏ ${input.toUpperCase()}*\n\n` +
             `${r.zodiak}\n\n` +
-            `🔢 *ɴᴏᴍᴏʀ:* ${r.nomor_keberuntungan}\n` +
-            `🌸 *ʙᴜɴɢᴀ:* ${r.bunga_keberuntungan}\n` +
-            `🎨 *ᴡᴀʀɴᴀ:* ${r.warna_keberuntungan}\n` +
-            `💎 *ʙᴀᴛᴜ:* ${r.batu_keberuntungan}\n` +
-            `🔥 *ᴇʟᴇᴍᴇɴ:* ${r.elemen_keberuntungan}\n` +
-            `🪐 *ᴘʟᴀɴᴇᴛ:* ${r.planet_yang_mengitari}\n` +
-            `💕 *ᴘᴀsᴀɴɢᴀɴ:* ${r.pasangan_zodiak}`
+            `🔢 *ɴúᴍᴇʀᴏ sᴜᴇʀᴛᴇ:* ${r.nomor_keberuntungan}\n` +
+            `🌸 *ғʟᴏʀ:* ${r.bunga_keberuntungan}\n` +
+            `🎨 *ᴄᴏʟᴏʀ:* ${r.warna_keberuntungan}\n` +
+            `💎 *ᴘɪᴇᴅʀᴀ:* ${r.batu_keberuntungan}\n` +
+            `🔥 *ᴇʟᴇᴍᴇɴᴛᴏ:* ${r.elemen_keberuntungan}\n` +
+            `🪐 *ᴘʟᴀɴᴇᴛᴀ:* ${r.planet_yang_mengitari}\n` +
+            `💕 *ᴘᴀʀᴇᴊᴀ ɪᴅᴇᴀʟ:* ${r.pasangan_zodiak}`
         
         m.react('✅')
         await m.reply(response)
