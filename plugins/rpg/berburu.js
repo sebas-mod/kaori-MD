@@ -3,13 +3,14 @@ import { addExpWithLevelCheck } from '../../src/lib/ourin-level.js'
 import config from '../../config.js'
 import path from 'path'
 import fs from 'fs'
+
 const pluginConfig = {
-    name: 'berburu',
-    alias: ['huntanimal', 'buru'],
+    name: 'cazar',
+    alias: ['hunt', 'berburu', 'caza'],
     category: 'rpg',
-    description: 'Berburu hewan untuk mendapat item',
-    usage: '.berburu',
-    example: '.berburu',
+    description: 'Salí a cazar unos bichos para ganar Exp y vender el botín',
+    usage: '.cazar',
+    example: '.cazar',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -25,7 +26,7 @@ try {
     if (fs.existsSync(thumbPath)) thumbRpg = fs.readFileSync(thumbPath)
 } catch (e) {}
 
-function getContextInfo(title = '🏹 *ʙᴇʀʙᴜʀᴜ*', body = 'Hasil Buruan') {
+function getContextInfo(title = '🏹 *CAZANDO BICHOS*', body = 'Lo que cazaste') {
     const saluranId = config.saluran?.id || '120363208449943317@newsletter'
     const saluranName = config.saluran?.name || config.bot?.name || 'Ourin-AI'
     
@@ -65,25 +66,25 @@ async function handler(m, { sock }) {
     
     if (user.rpg.stamina < staminaCost) {
         return m.reply(
-            `⚡ *sᴛᴀᴍɪɴᴀ ʜᴀʙɪs*\n\n` +
-            `> Butuh ${staminaCost} stamina untuk berburu\n` +
-            `> Stamina kamu: ${user.rpg.stamina}`
+            `⚡ *ESTÁS SIN NAFTA*\n\n` +
+            `> Necesitás ${staminaCost} de stamina para irte al monte.\n` +
+            `> Tu stamina: ${user.rpg.stamina}`
         )
     }
     
     user.rpg.stamina -= staminaCost
     
     await m.react('🏹')
-    await m.reply(`🏹 *sᴇᴅᴀɴɢ ʙᴇʀʙᴜʀᴜ...*`)
+    await m.reply(`🏹 *APUNTANDO... BANCÁ QUE APAREZCA ALGO.*`)
     await new Promise(r => setTimeout(r, 3000))
     
     const animals = [
-        { name: '🐰 Kelinci', item: 'daging_kelinci', chance: 80, min: 1, max: 3, exp: 50, money: 500 },
-        { name: '🦌 Rusa', item: 'daging_rusa', chance: 50, min: 1, max: 2, exp: 100, money: 1500 },
-        { name: '🐗 Babi Hutan', item: 'daging_babi', chance: 40, min: 1, max: 2, exp: 150, money: 2000 },
-        { name: '🦊 Rubah', item: 'bulu_rubah', chance: 30, min: 1, max: 1, exp: 200, money: 3000 },
-        { name: '🐻 Beruang', item: 'cakar_beruang', chance: 15, min: 1, max: 1, exp: 500, money: 10000 },
-        { name: '🦁 Singa', item: 'taring_singa', chance: 5, min: 1, max: 1, exp: 1000, money: 25000 }
+        { name: '🐰 Liebre', item: 'carne_liebre', chance: 80, min: 1, max: 3, exp: 50, money: 500 },
+        { name: '🦌 Ciervo', item: 'carne_ciervo', chance: 50, min: 1, max: 2, exp: 100, money: 1500 },
+        { name: '🐗 Chancho del monte', item: 'carne_chancho', chance: 40, min: 1, max: 2, exp: 150, money: 2000 },
+        { name: '🦊 Zorro', item: 'piel_zorro', chance: 30, min: 1, max: 1, exp: 200, money: 3000 },
+        { name: '🐻 Oso', item: 'garra_oso', chance: 15, min: 1, max: 1, exp: 500, money: 10000 },
+        { name: '🐆 Yaguareté', item: 'colmillo_yaguarete', chance: 5, min: 1, max: 1, exp: 1000, money: 25000 }
     ]
     
     const caught = animals.filter(a => Math.random() * 100 <= a.chance)
@@ -92,9 +93,9 @@ async function handler(m, { sock }) {
         await m.react('😢')
         db.save()
         return m.reply(
-            `🏹 *ʙᴇʀʙᴜʀᴜ ɢᴀɢᴀʟ*\n\n` +
-            `> Kamu tidak mendapat buruan kali ini\n` +
-            `> Stamina: *-${staminaCost}*`
+            `🏹 *VOLVISTE CON LAS MANOS VACÍAS*\n\n` +
+            `> No se te cruzó ni un bicho esta vez.\n` +
+            `> Stamina perdida: *-${staminaCost}*`
         )
     }
     
@@ -117,14 +118,14 @@ async function handler(m, { sock }) {
     
     await m.react('✅')
     
-    let txt = `🏹 *ʙᴇʀʙᴜʀᴜ sᴇʟᴇsᴀɪ*\n\n`
-    txt += `╭┈┈⬡「 🎯 *ʜᴀsɪʟ ʙᴜʀᴜᴀɴ* 」\n`
+    let txt = `🏹 *CAZA TERMINADA*\n\n`
+    txt += `╭┈┈⬡「 🎯 *BOTÍN DEL MONTE* 」\n`
     for (const r of results) {
         txt += `┃ ${r.name}: *+${r.qty}*\n`
     }
     txt += `┃ ─────────\n`
-    txt += `┃ 💵 Jual: *+Rp ${totalMoney.toLocaleString('id-ID')}*\n`
-    txt += `┃ 🚄 Exp: *+${totalExp}*\n`
+    txt += `┃ 💵 Lo vendiste por: *+$${totalMoney.toLocaleString('es-AR')}*\n`
+    txt += `┃ ✨ Exp: *+${totalExp}*\n`
     txt += `┃ ⚡ Stamina: *-${staminaCost}*\n`
     txt += `╰┈┈┈┈┈┈┈┈⬡`
     
