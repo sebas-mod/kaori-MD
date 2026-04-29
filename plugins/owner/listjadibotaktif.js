@@ -1,11 +1,12 @@
 import { getActiveJadibots } from '../../src/lib/ourin-jadibot-manager.js'
+
 const pluginConfig = {
-    name: 'listjadibotaktif',
-    alias: ['jadibotaktif', 'activejadibots'],
+    name: 'listajadibotactivo',
+    alias: ['jadibotactivo', 'activejadibots', 'subbotsactivos'],
     category: 'owner',
-    description: 'Lihat jadibot yang sedang aktif dengan detail',
-    usage: '.listjadibotaktif',
-    example: '.listjadibotaktif',
+    description: 'Ver los jadibots que están activos actualmente con detalles',
+    usage: '.listajadibotactivo',
+    example: '.listajadibotactivo',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -28,20 +29,20 @@ async function handler(m, { sock }) {
     const active = getActiveJadibots()
 
     if (active.length === 0) {
-        return m.reply(`❌ Tidak ada jadibot yang aktif saat ini`)
+        return m.reply(`❌ No hay jadibots activos en este momento`)
     }
 
-    let txt = `🟢 *ᴊᴀᴅɪʙᴏᴛ ᴀᴋᴛɪꜰ*\n\n`
-    txt += `> 📊 Total: *${active.length}* bot aktif\n\n`
+    let txt = `🟢 *ᴊᴀᴅɪʙᴏᴛs ᴀᴄᴛɪᴠᴏs*\n\n`
+    txt += `> 📊 Total: *${active.length}* bots en línea\n\n`
 
     active.forEach((s, i) => {
         const uptime = formatUptime(Date.now() - s.startedAt)
-        const owner = s.ownerJid?.split('@')[0] || 'Unknown'
+        const owner = s.ownerJid?.split('@')[0] || 'Desconocido'
         txt += `*${i + 1}.* 🟢 @${s.id}\n`
-        txt += `   ⏱️ *${uptime}* — 👤 @${owner}\n\n`
+        txt += `    ⏱️ *${uptime}* — 👤 @${owner}\n\n`
     })
 
-    txt += `> \`${m.prefix}stopalljadibot\` — Hentikan semua`
+    txt += `> \`${m.prefix}stopalljadibot\` — Detener todos`
 
     const mentions = active.flatMap(s => [s.jid, s.ownerJid].filter(Boolean))
 
@@ -52,7 +53,7 @@ async function handler(m, { sock }) {
             {
                 name: 'quick_reply',
                 buttonParamsJson: JSON.stringify({
-                    display_text: '🛑 Stop Semua',
+                    display_text: '🛑 Detener Todos',
                     id: `${m.prefix}stopalljadibot`
                 })
             }
