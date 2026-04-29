@@ -2,16 +2,17 @@ import { getDatabase } from '../../src/lib/ourin-database.js'
 import config from '../../config.js'
 import path from 'path'
 import fs from 'fs'
+
 const pluginConfig = {
     name: 'casino',
-    alias: ['judi', 'gamble'],
+    alias: ['apostar', 'judi', 'gamble', 'suerte'],
     category: 'rpg',
-    description: 'Bermain casino untuk judi',
-    usage: '.casino <jumlah>',
+    description: 'Jugá al casino para ganar (o perder) monedas',
+    usage: '.casino <cantidad>',
     example: '.casino 10000',
     isOwner: false,
     isPremium: false,
-    isGroup: false,
+    isGroup: false, // Cambiá a true si querés que solo sea en grupos
     isPrivate: false,
     cooldown: 10,
     energi: 1,
@@ -24,9 +25,9 @@ try {
     if (fs.existsSync(thumbPath)) thumbRpg = fs.readFileSync(thumbPath)
 } catch (e) {}
 
-function getContextInfo(title = '🎰 *ᴄᴀsɪɴᴏ*', body = 'Gambling') {
+function getContextInfo(title = '🎰 *CASINO*', body = 'Suerte o Verdad') {
     const saluranId = config.saluran?.id || '120363208449943317@newsletter'
-    const saluranName = config.saluran?.name || config.bot?.name || 'Ourin-AI'
+    const saluranName = config.saluran?.name || '𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃'
     
     const contextInfo = {
         forwardingScore: 9999,
@@ -61,11 +62,11 @@ async function handler(m, { sock }) {
     
     if (!bet) {
         return m.reply(
-            `⚠️ *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ*\n\n` +
-            `> \`${m.prefix}casino <jumlah>\`\n\n` +
-            `> Contoh:\n` +
-            `> \`${m.prefix}casino 10000\`\n` +
-            `> \`${m.prefix}casino all\``
+            `⚠️ *CÓMO APOSTAR*\n\n` +
+            `> Usá: \`${m.prefix}casino <cantidad>\`\n\n` +
+            `> Ejemplos:\n` +
+            `> • \`${m.prefix}casino 10000\`\n` +
+            `> • \`${m.prefix}casino all\` (Jugás todo tu sueldo)`
         )
     }
     
@@ -76,19 +77,19 @@ async function handler(m, { sock }) {
     }
     
     if (isNaN(bet) || bet < 1000) {
-        return m.reply(`❌ *ᴍɪɴɪᴍᴀʟ ʙᴇᴛ*\n\n> Minimal taruhan Rp 1.000`)
+        return m.reply(`❌ *MÍNIMO DE APUESTA*\n\n> La apuesta mínima es de $1.000 monedas. ¡No seas rata!`)
     }
     
     if (bet > (user.koin || 0)) {
         return m.reply(
-            `❌ *sᴀʟᴅᴏ ᴛɪᴅᴀᴋ ᴄᴜᴋᴜᴘ*\n\n` +
-            `> Saldo kamu: Rp ${(user.koin || 0).toLocaleString('id-ID')}\n` +
-            `> Taruhan: Rp ${bet.toLocaleString('id-ID')}`
+            `❌ *NO TENÉS UN MANGO*\n\n` +
+            `> Tu saldo: $${(user.koin || 0).toLocaleString('es-AR')}\n` +
+            `> Querés apostar: $${bet.toLocaleString('es-AR')}`
         )
     }
     
     await m.react('🎰')
-    await m.reply(`🎰 *ᴍᴇᴍᴜᴛᴀʀ ʀᴏᴅᴀ...*`)
+    await m.reply(`🎰 *GIRANDO LA RULETA... CRUZÁ LOS DEDOS.*`)
     await new Promise(r => setTimeout(r, 2000))
     
     const playerScore = Math.floor(Math.random() * 100)
@@ -97,17 +98,17 @@ async function handler(m, { sock }) {
     let result, emoji, moneyChange
     
     if (playerScore > botScore) {
-        result = 'MENANG'
+        result = '¡GANASTE!'
         emoji = '🎉'
         moneyChange = bet
         user.koin = (user.koin || 0) + bet
     } else if (playerScore < botScore) {
-        result = 'KALAH'
+        result = 'PERDISTE'
         emoji = '💔'
         moneyChange = -bet
         user.koin = (user.koin || 0) - bet
     } else {
-        result = 'SERI'
+        result = 'EMPATE'
         emoji = '🤝'
         moneyChange = 0
     }
@@ -116,21 +117,23 @@ async function handler(m, { sock }) {
     
     await m.react(emoji)
     
-    let txt = `🎰 *ᴄᴀsɪɴᴏ ʀᴇsᴜʟᴛ*\n\n`
-    txt += `╭┈┈⬡「 🎲 *sᴋᴏʀ* 」\n`
-    txt += `┃ 👤 Kamu: *${playerScore}* poin\n`
-    txt += `┃ 🤖 Bot: *${botScore}* poin\n`
+    let txt = `🎰 *RESULTADO DEL CASINO*\n\n`
+    txt += `╭┈┈⬡「 🎲 *PUNTAJE* 」\n`
+    txt += `┃ 👤 Vos: *${playerScore}* pts\n`
+    txt += `┃ 🤖 Kei: *${botScore}* pts\n`
     txt += `┃ ─────────\n`
-    txt += `┃ ${emoji} Hasil: *${result}*\n`
+    txt += `┃ ${emoji} Resultado: *${result}*\n`
     if (moneyChange !== 0) {
-        txt += `┃ 💵 ${moneyChange > 0 ? '+' : ''}Rp ${moneyChange.toLocaleString('id-ID')}\n`
+        txt += `┃ 💰 ${moneyChange > 0 ? 'Ganaste' : 'Perdiste'}: *$${Math.abs(moneyChange).toLocaleString('es-AR')}*\n`
+    } else {
+        txt += `┃ 💰 No pasó nada, recuperás tu apuesta.\n`
     }
     txt += `╰┈┈┈┈┈┈┈┈⬡\n\n`
-    txt += `> Saldo: Rp ${(user.koin || 0).toLocaleString('id-ID')}`
+    txt += `> Tu saldo actual: $${(user.koin || 0).toLocaleString('es-AR')}`
     
     await sock.sendMessage(m.chat, {
         text: txt,
-        contextInfo: getContextInfo(`🎰 *${result}*`, `${moneyChange > 0 ? '+' : ''}Rp ${moneyChange.toLocaleString('id-ID')}`)
+        contextInfo: getContextInfo(`🎰 ${result}`, `${moneyChange >= 0 ? '+' : '-'}$${Math.abs(moneyChange).toLocaleString('es-AR')}`)
     }, { quoted: m })
 }
 
