@@ -1,12 +1,13 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { getRpgContextInfo } from '../../src/lib/ourin-context.js'
+
 const pluginConfig = {
-    name: 'dice',
-    alias: ['dadu', 'roll'],
+    name: 'dados',
+    alias: ['dice', 'dadu', 'roll', 'suerte'],
     category: 'rpg',
-    description: 'Lempar dadu untuk gambling',
-    usage: '.dice <1-6> <bet>',
-    example: '.dice 6 5000',
+    description: 'Tirá los dados y apostá tus monedas',
+    usage: '.dados <1-6> <apuesta>',
+    example: '.dados 6 5000',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -26,32 +27,36 @@ async function handler(m, { sock }) {
     
     if (!guess || guess < 1 || guess > 6) {
         return m.reply(
-            `🎲 *ᴅɪᴄᴇ ɢᴀᴍᴇ*\n\n` +
-            `╭┈┈⬡「 📋 *ᴜsᴀɢᴇ* 」\n` +
-            `┃ > Tebak angka 1-6!\n` +
-            `┃ > \`.dice 6 5000\`\n` +
+            `🎲 *JUEGO DE DADOS - 𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃*\n\n` +
+            `╭┈┈⬡「 📋 *COMO JUGAR* 」\n` +
+            `┃ > ¡Elegí un número del 1 al 6!\n` +
+            `┃ > \`${m.prefix}dados 6 5000\`\n` +
             `╰┈┈┈┈┈┈┈┈⬡`
         )
     }
     
     if (!bet || bet < 1000) {
         return m.reply(
-            `❌ *ɪɴᴠᴀʟɪᴅ ʙᴇᴛ*\n\n` +
-            `> Minimal bet Rp 1.000!`
+            `❌ *APUESTA INVÁLIDA*\n\n` +
+            `> El mínimo para jugar es de $1.000 monedas.`
         )
     }
     
     if ((user.koin || 0) < bet) {
         return m.reply(
-            `❌ *sᴀʟᴅᴏ ᴛɪᴅᴀᴋ ᴄᴜᴋᴜᴘ*\n\n` +
-            `> Koin kamu: Rp ${(user.koin || 0).toLocaleString('id-ID')}\n` +
-            `> Butuh: Rp ${bet.toLocaleString('id-ID')}`
+            `❌ *NO TENÉS RECURSOS*\n\n` +
+            `> Tus monedas: $${(user.koin || 0).toLocaleString('es-AR')}\n` +
+            `> Necesitás: $${bet.toLocaleString('es-AR')}`
         )
     }
     
     user.koin -= bet
     
-    await sock.sendMessage(m.chat, { text: `🎲 *ᴍᴇʟᴇᴍᴘᴀʀ ᴅᴀᴅᴜ...*`, contextInfo: getRpgContextInfo('🎲 DICE', 'Rolling!') }, { quoted: m })
+    await sock.sendMessage(m.chat, { 
+        text: `🎲 *VOLEANDO LOS DADOS...*`, 
+        contextInfo: getRpgContextInfo('🎲 DADOS', '¡Suerte en la timba!') 
+    }, { quoted: m })
+    
     await new Promise(r => setTimeout(r, 1500))
     
     const result = Math.floor(Math.random() * 6) + 1
@@ -59,22 +64,25 @@ async function handler(m, { sock }) {
     
     const isWin = guess === result
     
-    let txt = `🎲 *ᴅɪᴄᴇ ɢᴀᴍᴇ*\n\n`
-    txt += `> ${diceEmoji} Hasil: *${result}*\n`
-    txt += `> 🎯 Tebakan: *${guess}*\n\n`
+    let txt = `🎲 *RESULTADO DEL TIRO*\n\n`
+    txt += `> ${diceEmoji} Salió el: *${result}*\n`
+    txt += `> 🎯 Tu número: *${guess}*\n\n`
     
     if (isWin) {
         const winnings = bet * 5
         user.koin = (user.koin || 0) + winnings
-        txt += `✅ *ᴋᴀᴍᴜ ᴍᴇɴᴀɴɢ!*\n`
-        txt += `> 💰 Win: *+Rp ${winnings.toLocaleString('id-ID')}* (5x)`
+        txt += `✅ *¡TE LLEVASTE EL PREMIO MAYOR!*\n`
+        txt += `> 💰 Ganaste: *+$${winnings.toLocaleString('es-AR')}* (x5)`
     } else {
-        txt += `❌ *ᴋᴀᴍᴜ ᴋᴀʟᴀʜ!*\n`
-        txt += `> 💸 Lost: *-Rp ${bet.toLocaleString('id-ID')}*`
+        txt += `❌ *¡PERDISTE TODO!*\n`
+        txt += `> 💸 Perdiste: *-$${bet.toLocaleString('es-AR')}*`
     }
     
     db.save()
-    await sock.sendMessage(m.chat, { text: txt, contextInfo: getRpgContextInfo('🎲 DICE', 'Result!') }, { quoted: m })
+    await sock.sendMessage(m.chat, { 
+        text: txt, 
+        contextInfo: getRpgContextInfo('🎲 DADOS', '¡Resultado final!') 
+    }, { quoted: m })
 }
 
 export { pluginConfig as config, handler }
