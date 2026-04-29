@@ -1,12 +1,13 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { getRpgContextInfo } from '../../src/lib/ourin-context.js'
+
 const pluginConfig = {
-    name: 'divorce',
-    alias: ['cerai', 'pisah'],
+    name: 'divorcio',
+    alias: ['cerai', 'pisah', 'divorce', 'separarse'],
     category: 'rpg',
-    description: 'Bercerai dari pasangan',
-    usage: '.divorce',
-    example: '.divorce',
+    description: 'Tramitá el divorcio de tu pareja actual',
+    usage: '.divorcio',
+    example: '.divorcio',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -24,9 +25,9 @@ async function handler(m, { sock }) {
     
     if (!user.rpg.spouse) {
         return m.reply(
-            `❌ *ʙᴇʟᴜᴍ ᴍᴇɴɪᴋᴀʜ*\n\n` +
-            `> Kamu belum menikah!\n` +
-            `> Nikah dengan \`.marry @user\``
+            `❌ *ESTÁS SOLTERO/A*\n\n` +
+            `> ¡No tenés a nadie de quien divorciarte!\n` +
+            `> Primero casate con \`${m.prefix}marry @user\``
         )
     }
     
@@ -36,12 +37,13 @@ async function handler(m, { sock }) {
     const divorceCost = 25000
     if ((user.koin || 0) < divorceCost) {
         return m.reply(
-            `❌ *sᴀʟᴅᴏ ᴛɪᴅᴀᴋ ᴄᴜᴋᴜᴘ*\n\n` +
-            `> Koin kamu: Rp ${(user.koin || 0).toLocaleString('id-ID')}\n` +
-            `> Butuh: Rp ${divorceCost.toLocaleString('id-ID')}`
+            `❌ *NO TENÉS PLATA PARA EL TRÁMITE*\n\n` +
+            `> Tus monedas: $${(user.koin || 0).toLocaleString('es-AR')}\n` +
+            `> El abogado cobra: $${divorceCost.toLocaleString('es-AR')}`
         )
     }
     
+    // Proceso de divorcio
     user.koin -= divorceCost
     user.rpg.spouse = null
     user.rpg.marriedAt = null
@@ -53,11 +55,11 @@ async function handler(m, { sock }) {
     
     db.save()
     
-    let txt = `💔 *ᴘᴇʀᴄᴇʀᴀɪᴀɴ*\n\n`
-    txt += `> 😢 @${m.sender.split('@')[0]} & @${spouseJid.split('@')[0]}\n`
-    txt += `> Resmi bercerai!\n`
-    txt += `> 💸 Biaya: Rp ${divorceCost.toLocaleString('id-ID')}\n\n`
-    txt += `> _Move on yaa..._`
+    let txt = `💔 *DIVORCIO OFICIAL - 𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃*\n\n`
+    txt += `> 😢 @${m.sender.split('@')[0]} y @${spouseJid.split('@')[0]}\n`
+    txt += `> ¡Han decidido seguir caminos separados!\n`
+    txt += `> 💸 Gastos legales: $${divorceCost.toLocaleString('es-AR')}\n\n`
+    txt += `> _A otra cosa, mariposa..._`
     
     await m.reply(txt, { mentions: [m.sender, spouseJid] })
 }
