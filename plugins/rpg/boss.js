@@ -1,12 +1,13 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { addExpWithLevelCheck } from '../../src/lib/ourin-level.js'
+
 const pluginConfig = {
-    name: 'boss',
-    alias: ['raidboss', 'bigboss'],
+    name: 'jefe',
+    alias: ['boss', 'raid', 'bigboss', 'pelear'],
     category: 'rpg',
-    description: 'Lawan boss untuk hadiah besar',
-    usage: '.boss',
-    example: '.boss',
+    description: 'Enfrentate a un jefe poderoso para ganar recompensas épicas',
+    usage: '.jefe',
+    example: '.jefe',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -17,13 +18,13 @@ const pluginConfig = {
 }
 
 const BOSSES = [
-    { name: '🐉 Elder Dragon', hp: 500, attack: 50, minLevel: 10, exp: 2000, gold: 5000, drops: ['dragonscale', 'dragonbone'] },
-    { name: '👹 Demon Lord', hp: 400, attack: 60, minLevel: 15, exp: 2500, gold: 7000, drops: ['demonsoul', 'cursedgem'] },
-    { name: '🧟 Undead King', hp: 350, attack: 45, minLevel: 8, exp: 1500, gold: 4000, drops: ['soulstone', 'ancientbone'] },
-    { name: '🦑 Kraken', hp: 600, attack: 40, minLevel: 12, exp: 2200, gold: 6000, drops: ['krakententacle', 'seagem'] },
-    { name: '🌋 Volcanic Titan', hp: 700, attack: 55, minLevel: 20, exp: 3000, gold: 10000, drops: ['titancore', 'lavagem'] },
-    { name: '❄️ Frost Queen', hp: 450, attack: 50, minLevel: 18, exp: 2800, gold: 8000, drops: ['frostheart', 'icecrown'] },
-    { name: '⚡ Thunder God', hp: 550, attack: 65, minLevel: 25, exp: 4000, gold: 15000, drops: ['thunderstone', 'divinecore'] }
+    { name: '🐉 Dragón Ancestral', hp: 500, attack: 50, minLevel: 10, exp: 2000, gold: 5000, drops: ['escama_dragon', 'hueso_dragon'] },
+    { name: '👹 Señor de los Demonios', hp: 400, attack: 60, minLevel: 15, exp: 2500, gold: 7000, drops: ['alma_demonio', 'gema_maldita'] },
+    { name: '🧟 Rey No-Muerto', hp: 350, attack: 45, minLevel: 8, exp: 1500, gold: 4000, drops: ['piedra_alma', 'hueso_antiguo'] },
+    { name: '🦑 Kraken de las Profundidades', hp: 600, attack: 40, minLevel: 12, exp: 2200, gold: 6000, drops: ['tentaculo_kraken', 'perla_marina'] },
+    { name: '🌋 Titán Volcánico', hp: 700, attack: 55, minLevel: 20, exp: 3000, gold: 10000, drops: ['nucleo_titan', 'gema_lava'] },
+    { name: '❄️ Reina de la Escarcha', hp: 450, attack: 50, minLevel: 18, exp: 2800, gold: 8000, drops: ['corazon_hielo', 'corona_invierno'] },
+    { name: '⚡ Dios del Trueno', hp: 550, attack: 65, minLevel: 25, exp: 4000, gold: 15000, drops: ['piedra_trueno', 'nucleo_divino'] }
 ]
 
 async function handler(m, { sock }) {
@@ -39,10 +40,10 @@ async function handler(m, { sock }) {
     if (availableBosses.length === 0) {
         const lowestBoss = BOSSES.reduce((a, b) => a.minLevel < b.minLevel ? a : b)
         return m.reply(
-            `❌ *ʟᴇᴠᴇʟ ᴛᴇʀʟᴀʟᴜ ʀᴇɴᴅᴀʜ*\n\n` +
-            `> Level kamu: ${userLevel}\n` +
-            `> Minimal level: ${lowestBoss.minLevel}\n\n` +
-            `💡 *Tips:* Farming EXP dari dungeon, fishing, mining, dll`
+            `❌ *NIVEL MUY BAJO*\n\n` +
+            `> Tu nivel: ${userLevel}\n` +
+            `> Nivel mínimo para el jefe más débil: ${lowestBoss.minLevel}\n\n` +
+            `💡 *Data:* Subí de nivel cazando, laburando en la quinta o minando.`
         )
     }
     
@@ -51,9 +52,9 @@ async function handler(m, { sock }) {
     
     if (user.rpg.stamina < staminaCost) {
         return m.reply(
-            `⚡ *sᴛᴀᴍɪɴᴀ ʜᴀʙɪs*\n\n` +
-            `> Butuh ${staminaCost} stamina untuk boss fight.\n` +
-            `> Stamina kamu: ${user.rpg.stamina}`
+            `⚡ *SIN ENERGÍA*\n\n` +
+            `> Necesitás ${staminaCost} de stamina para una pelea de este calibre.\n` +
+            `> Tu stamina: ${user.rpg.stamina}`
         )
     }
     
@@ -62,7 +63,7 @@ async function handler(m, { sock }) {
     const boss = availableBosses[Math.floor(Math.random() * availableBosses.length)]
     
     await m.react('⚔️')
-    await m.reply(`👹 *ʙᴏss ᴍᴜɴᴄᴜʟ!*\n\n${boss.name}\n\n> ❤️ HP: ${boss.hp}\n> ⚔️ ATK: ${boss.attack}`)
+    await m.reply(`👹 *¡APARECIÓ UN JEFE!* \n\n*${boss.name.toUpperCase()}*\n\n> ❤️ HP: ${boss.hp}\n> ⚔️ ATK: ${boss.attack}`)
     await new Promise(r => setTimeout(r, 2000))
     
     const userAttack = (user.rpg.attack || 10) + userLevel * 3
@@ -83,23 +84,22 @@ async function handler(m, { sock }) {
         bossHp -= finalPlayerDmg
         
         if (critChance > 0.9) {
-            battleLog.push(`💥 *CRITICAL!* Kamu: -${finalPlayerDmg} HP`)
+            battleLog.push(`💥 *¡CRÍTICO!* Le diste masa: -${finalPlayerDmg} HP`)
         } else {
-            battleLog.push(`⚔️ Kamu menyerang: -${finalPlayerDmg} HP`)
+            battleLog.push(`⚔️ Atacaste: -${finalPlayerDmg} HP`)
         }
         
         if (bossHp <= 0) break
         
         const bossDmg = Math.max(10, boss.attack - userDefense + Math.floor(Math.random() * 15))
         userHp -= bossDmg
-        battleLog.push(`👹 Boss menyerang: -${bossDmg} HP`)
+        battleLog.push(`👹 El jefe te sacudió: -${bossDmg} HP`)
     }
     
-    await m.reply(`⚔️ *ᴘᴇʀᴛᴀʀᴜɴɢᴀɴ...*\n\n${battleLog.slice(-6).map(l => `> ${l}`).join('\n')}`)
+    await m.reply(`⚔️ *COMBATIENDO...*\n\n${battleLog.slice(-6).map(l => `> ${l}`).join('\n')}`)
     await new Promise(r => setTimeout(r, 1500))
     
     const isWin = bossHp <= 0
-    
     let txt = ``
     
     if (isWin) {
@@ -118,15 +118,15 @@ async function handler(m, { sock }) {
             }
         }
         
-        txt = `🏆 *ʙᴏss ᴅɪᴋᴀʟᴀʜᴋᴀɴ!*\n\n`
-        txt += `> ${boss.name} telah dikalahkan!\n\n`
-        txt += `╭┈┈⬡「 🎁 *ʀᴇᴡᴀʀᴅ* 」\n`
-        txt += `┃ ✨ EXP: *+${expReward.toLocaleString()}*\n`
-        txt += `┃ 💰 Gold: *+${goldReward.toLocaleString()}*\n`
+        txt = `🏆 *¡JEFE DERROTADO!*\n\n`
+        txt += `> ¡Liquidaste a ${boss.name}!\n\n`
+        txt += `╭┈┈⬡「 🎁 *BOTÍN ÉPICO* 」\n`
+        txt += `┃ ✨ EXP: *+${expReward.toLocaleString('es-AR')}*\n`
+        txt += `┃ 💰 Guita: *+$${goldReward.toLocaleString('es-AR')}*\n`
         if (droppedItems.length > 0) {
             txt += `┃ 📦 Loot: *${droppedItems.join(', ')}*\n`
         }
-        txt += `┃ ❤️ HP tersisa: *${Math.max(0, userHp)}/${userMaxHp}*\n`
+        txt += `┃ ❤️ Vida restante: *${Math.max(0, userHp)}/${userMaxHp}*\n`
         txt += `╰┈┈┈┈┈┈┈┈⬡`
         
         await m.react('🏆')
@@ -135,13 +135,13 @@ async function handler(m, { sock }) {
         user.koin = Math.max(0, (user.koin || 0) - goldLoss)
         user.rpg.health = Math.max(1, (user.rpg.health || 100) - 50)
         
-        txt = `💀 *ᴋᴀʟᴀʜ ᴅᴀʀɪ ʙᴏss*\n\n`
-        txt += `> ${boss.name} terlalu kuat!\n\n`
-        txt += `╭┈┈⬡「 💔 *ᴘᴇɴᴀʟᴛʏ* 」\n`
-        txt += `┃ 💸 Gold: *-${goldLoss.toLocaleString()}*\n`
-        txt += `┃ ❤️ HP: *-50*\n`
+        txt = `💀 *FUISTE AL MAZO*\n\n`
+        txt += `> ${boss.name} te pegó un baile bárbaro.\n\n`
+        txt += `╭┈┈⬡「 💔 *PENALIZACIÓN* 」\n`
+        txt += `┃ 💸 Perdiste: *-$${goldLoss.toLocaleString('es-AR')}*\n`
+        txt += `┃ ❤️ Vida: *-50 HP*\n`
         txt += `╰┈┈┈┈┈┈┈┈⬡\n\n`
-        txt += `💡 *Tips:* Level up dan upgrade equipment!`
+        txt += `💡 *Tips:* Forjá mejor equipo en la herrería y subí de nivel.`
         
         await m.react('💀')
     }
