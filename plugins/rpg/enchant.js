@@ -1,125 +1,130 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { addExpWithLevelCheck } from '../../src/lib/ourin-level.js'
+
 const pluginConfig = {
-    name: 'enchant',
-    alias: ['upgrade', 'enhance', 'tingkatkan'],
+    name: 'mazmorra',
+    alias: ['dg', 'dungeon', 'explorar', 'laberinto', 'aventura'],
     category: 'rpg',
-    description: 'Upgrade equipment dengan enchantment',
-    usage: '.enchant <item>',
-    example: '.enchant sword',
+    description: 'Explorá mazmorras peligrosas para conseguir loot',
+    usage: '.mazmorra',
+    example: '.mazmorra',
     isOwner: false,
     isPremium: false,
     isGroup: false,
     isPrivate: false,
-    cooldown: 120,
+    cooldown: 300, // 5 minutos
     energi: 2,
     isEnabled: true
 }
 
-const ENCHANTABLE = {
-    sword: { name: '⚔️ Pedang', stat: 'attack', bonus: 5, cost: 500, successRate: 70 },
-    shield: { name: '🛡️ Perisai', stat: 'defense', bonus: 4, cost: 500, successRate: 70 },
-    armor: { name: '🦺 Armor', stat: 'health', bonus: 20, cost: 800, successRate: 60 },
-    helmet: { name: '⛑️ Helm', stat: 'defense', bonus: 3, cost: 400, successRate: 75 },
-    bow: { name: '🏹 Busur', stat: 'attack', bonus: 4, cost: 450, successRate: 72 },
-    goldsword: { name: '🗡️ Pedang Emas', stat: 'attack', bonus: 10, cost: 2000, successRate: 50 },
-    diamondarmor: { name: '💎 Armor Berlian', stat: 'health', bonus: 50, cost: 5000, successRate: 40 }
-}
+const DUNGEONS = [
+    { name: '🌲 Bosque Oscuro', difficulty: 1, monsters: ['Goblin Chupe', 'Slime Pegajoso', 'Lobo Hambriento'], minReward: 100, maxReward: 300 },
+    { name: '🏰 Castillo Abandonado', difficulty: 2, monsters: ['Esqueleto Guerrero', 'Zombi Putrefacto', 'Fantasma Vengativo'], minReward: 200, maxReward: 500 },
+    { name: '🌋 Volcán de Fuego', difficulty: 3, monsters: ['Elemental de Fuego', 'Golem de Magma', 'Cría de Dragón'], minReward: 400, maxReward: 800 },
+    { name: '🧊 Cueva Helada', difficulty: 4, monsters: ['Golem de Hielo', 'Gigante de Escarcha', 'Yeti de las Nieves'], minReward: 600, maxReward: 1200 },
+    { name: '👹 Inframundo', difficulty: 5, monsters: ['Demonio Infernal', 'Súcubo', 'Señor del Caos'], minReward: 1000, maxReward: 2500 }
+]
+
+const LOOT_TABLE = [
+    { item: 'hierro', chance: 40, qty: [1, 5] },
+    { item: 'oro', chance: 20, qty: [1, 3] },
+    { item: 'diamante', chance: 5, qty: [1, 2] },
+    { item: 'pocion', chance: 30, qty: [1, 3] },
+    { item: 'hierba', chance: 25, qty: [2, 6] },
+    { item: 'cuero', chance: 35, qty: [2, 5] },
+    { item: 'cofre_misterioso', chance: 3, qty: [1, 1] }
+]
 
 async function handler(m, { sock }) {
     const db = getDatabase()
     const user = db.getUser(m.sender)
     
-    if (!user.inventory) user.inventory = {}
     if (!user.rpg) user.rpg = {}
-    if (!user.rpg.enchants) user.rpg.enchants = {}
+    if (!user.inventory) user.inventory = {}
     
-    const args = m.args || []
-    const itemName = args[0]?.toLowerCase()
+    const staminaCost = 30
+    user.rpg.stamina = user.rpg.stamina ?? 100
     
-    if (!itemName) {
-        let txt = `✨ *ᴇɴᴄʜᴀɴᴛ - ᴜᴘɢʀᴀᴅᴇ ᴇǫᴜɪᴘ*\n\n`
-        txt += `> Tingkatkan equipment untuk bonus stats!\n\n`
-        txt += `╭┈┈⬡「 📦 *ɪᴛᴇᴍ* 」\n`
+    if (user.rpg.stamina < staminaCost) {
+        return m.reply(
+            `⚡ *SIN STAMINA*\n\n` +
+            `> Necesitás ${staminaCost} de energía para entrar a una mazmorra.\n` +
+            `> Tu energía actual: ${user.rpg.stamina}\n\n` +
+            `💡 *Tips:* Usá \`${m.prefix}rest\` o comé algo para recuperar fuerzas.`
+        )
+    }
+    
+    const userLevel = user.level || 1
+    const availableDungeons = DUNGEONS.filter(d => userLevel >= d.difficulty * 5)
+    
+    if (availableDungeons.length === 0) {
+        return m.reply(`❌ *NIVEL MUY BAJO*\n\n> Necesitás ser al menos Nivel 5 para empezar tus aventuras en **𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃**.`)
+    }
+    
+    const dungeon = availableDungeons[Math.floor(Math.random() * availableDungeons.length)]
+    const monster = dungeon.monsters[Math.floor(Math.random() * dungeon.monsters.length)]
+    
+    user.rpg.stamina -= staminaCost
+    
+    await m.react('⚔️')
+    await m.reply(`🚪 *ENTRANDO A ${dungeon.name.toUpperCase()}...*\n\n> Gastaste ${staminaCost} de stamina.`)
+    await new Promise(r => setTimeout(r, 1500))
+    
+    await m.reply(`👹 *¡UN ${monster.toUpperCase()} SE CRUZA EN TU CAMINO!*\n\n> ¡Preparate para pelear!`)
+    await new Promise(r => setTimeout(r, 2000))
+    
+    const userPower = (user.rpg.attack || 10) + userLevel * 3 + Math.floor(Math.random() * 20)
+    const monsterPower = dungeon.difficulty * 15 + Math.floor(Math.random() * 30)
+    
+    const isWin = userPower >= monsterPower || Math.random() > 0.3
+    
+    let txt = ``
+    
+    if (isWin) {
+        const expReward = 150 * dungeon.difficulty + Math.floor(Math.random() * 100)
+        const goldReward = Math.floor(Math.random() * (dungeon.maxReward - dungeon.minReward)) + dungeon.minReward
         
-        for (const [key, item] of Object.entries(ENCHANTABLE)) {
-            const currentLevel = user.rpg.enchants[key] || 0
-            txt += `┃ ${item.name}\n`
-            txt += `┃ 📊 Level: ${currentLevel}/10\n`
-            txt += `┃ 💪 Bonus: +${item.bonus} ${item.stat}\n`
-            txt += `┃ 💰 Cost: ${item.cost.toLocaleString()}\n`
-            txt += `┃ 🎯 Rate: ${item.successRate}%\n`
-            txt += `┃ → \`${key}\`\n┃\n`
+        const droppedItems = []
+        for (const loot of LOOT_TABLE) {
+            if (Math.random() * 100 < loot.chance * (1 + dungeon.difficulty * 0.1)) {
+                const qty = Math.floor(Math.random() * (loot.qty[1] - loot.qty[0] + 1)) + loot.qty[0]
+                user.inventory[loot.item] = (user.inventory[loot.item] || 0) + qty
+                droppedItems.push(`${loot.item} x${qty}`)
+            }
+        }
+        
+        user.koin = (user.koin || 0) + goldReward
+        await addExpWithLevelCheck(sock, m, db, user, expReward)
+        
+        txt = `🎉 *¡VICTORIA EN LA MAZMORRA!*\n\n`
+        txt += `> Derrotaste al ${monster} en el ${dungeon.name}.\n\n`
+        txt += `╭┈┈⬡「 🎁 *RECOMPENSAS* 」\n`
+        txt += `┃ ✨ EXP: *+${expReward}*\n`
+        txt += `┃ 💰 Monedas: *+$${goldReward.toLocaleString('es-AR')}*\n`
+        if (droppedItems.length > 0) {
+            txt += `┃ 📦 Loot: *${droppedItems.join(', ')}*\n`
         }
         txt += `╰┈┈┈┈┈┈┈┈⬡`
         
-        return m.reply(txt)
-    }
-    
-    const item = ENCHANTABLE[itemName]
-    if (!item) {
-        return m.reply(`❌ Item tidak bisa di-enchant!\n\n> Ketik \`${m.prefix}enchant\` untuk melihat daftar.`)
-    }
-    
-    if ((user.inventory[itemName] || 0) < 1) {
-        return m.reply(`❌ Kamu tidak punya ${item.name}!`)
-    }
-    
-    const currentLevel = user.rpg.enchants[itemName] || 0
-    if (currentLevel >= 10) {
-        return m.reply(`❌ ${item.name} sudah level MAX (10)!`)
-    }
-    
-    const cost = item.cost * (currentLevel + 1)
-    if ((user.koin || 0) < cost) {
-        return m.reply(
-            `❌ *ʙᴀʟᴀɴᴄᴇ ᴋᴜʀᴀɴɢ*\n\n` +
-            `> Butuh: ${cost.toLocaleString()}\n` +
-            `> Balance: ${(user.koin || 0).toLocaleString()}`
-        )
-    }
-    
-    user.koin -= cost
-    
-    await m.react('✨')
-    await m.reply(`✨ *ᴍᴇɴɢ-ᴇɴᴄʜᴀɴᴛ ${item.name.toUpperCase()}...*\n\n> Level ${currentLevel} → ${currentLevel + 1}`)
-    await new Promise(r => setTimeout(r, 2000))
-    
-    const adjustedRate = Math.max(20, item.successRate - (currentLevel * 5))
-    const isSuccess = Math.random() * 100 < adjustedRate
-    
-    if (isSuccess) {
-        user.rpg.enchants[itemName] = currentLevel + 1
-        user.rpg[item.stat] = (user.rpg[item.stat] || 0) + item.bonus
-        
-        await addExpWithLevelCheck(sock, m, db, user, 150)
-        db.save()
-        
-        await m.react('🎉')
-        return m.reply(
-            `🎉 *ᴇɴᴄʜᴀɴᴛ ʙᴇʀʜᴀsɪʟ!*\n\n` +
-            `╭┈┈⬡「 ✨ *ʀᴇsᴜʟᴛ* 」\n` +
-            `┃ 📦 Item: *${item.name}*\n` +
-            `┃ 📊 Level: *${currentLevel} → ${currentLevel + 1}*\n` +
-            `┃ 💪 Bonus: *+${item.bonus} ${item.stat}*\n` +
-            `┃ 💰 Cost: *-${cost.toLocaleString()}*\n` +
-            `┃ ✨ EXP: *+150*\n` +
-            `╰┈┈┈┈┈┈┈┈⬡`
-        )
+        await m.react('🏆')
     } else {
-        db.save()
+        const goldLoss = Math.floor((user.koin || 0) * 0.1)
+        user.koin = Math.max(0, (user.koin || 0) - goldLoss)
+        user.rpg.health = Math.max(10, (user.rpg.health || 100) - 30)
         
-        await m.react('💔')
-        return m.reply(
-            `💔 *ᴇɴᴄʜᴀɴᴛ ɢᴀɢᴀʟ!*\n\n` +
-            `╭┈┈⬡「 😢 *ʀᴇsᴜʟᴛ* 」\n` +
-            `┃ 📦 Item: *${item.name}*\n` +
-            `┃ 📊 Level: *${currentLevel}* (tidak naik)\n` +
-            `┃ 💰 Cost: *-${cost.toLocaleString()}* (hangus)\n` +
-            `╰┈┈┈┈┈┈┈┈⬡\n\n` +
-            `💡 *Tips:* Coba lagi! Rate: ${adjustedRate}%`
-        )
+        txt = `💀 *¡FUISTE DERROTADO!*\n\n`
+        txt += `> El ${monster} te dio una paliza en el ${dungeon.name}...\n\n`
+        txt += `╭┈┈⬡「 💔 *PENALIZACIÓN* 」\n`
+        txt += `┃ 💸 Pérdida: *-$${goldLoss.toLocaleString('es-AR')}*\n`
+        txt += `┃ ❤️ Salud: *-30 HP*\n`
+        txt += `╰┈┈┈┈┈┈┈┈⬡\n\n`
+        txt += `💡 *Tips:* Subí de nivel o mejorá tu equipo antes de volver.`
+        
+        await m.react('💀')
     }
+    
+    db.save()
+    return m.reply(txt)
 }
 
 export { pluginConfig as config, handler }
