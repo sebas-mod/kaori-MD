@@ -1,12 +1,13 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { getRpgContextInfo } from '../../src/lib/ourin-context.js'
+
 const pluginConfig = {
-    name: 'craft',
-    alias: ['buat', 'create'],
+    name: 'craftear',
+    alias: ['craft', 'buat', 'crear', 'forjar'],
     category: 'rpg',
-    description: 'Craft item dari materials',
-    usage: '.craft <item>',
-    example: '.craft sword',
+    description: 'Fabricá ítems usando tus materiales',
+    usage: '.craftear <item>',
+    example: '.craftear espada',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -17,33 +18,33 @@ const pluginConfig = {
 }
 
 const RECIPES = {
-    sword: {
-        name: '⚔️ Iron Sword',
-        materials: { iron: 5, coal: 3 },
+    espada: {
+        name: '⚔️ Espada de Hierro',
+        materials: { hierro: 5, carbon: 3 },
         result: 'sword',
         bonus: { attack: 10 }
     },
-    armor: {
-        name: '🛡️ Iron Armor',
-        materials: { iron: 10, coal: 5 },
+    armadura: {
+        name: '🛡️ Armadura de Hierro',
+        materials: { hierro: 10, carbon: 5 },
         result: 'armor',
         bonus: { defense: 15 }
     },
-    pickaxe: {
-        name: '⛏️ Diamond Pickaxe',
-        materials: { diamond: 3, iron: 2 },
+    pico: {
+        name: '⛏️ Pico de Diamante',
+        materials: { diamante: 3, hierro: 2 },
         result: 'pickaxe',
         bonus: { mining: 20 }
     },
-    rod: {
-        name: '🎣 Golden Rod',
-        materials: { gold: 5, iron: 2 },
+    caña: {
+        name: '🎣 Caña de Oro',
+        materials: { oro: 5, hierro: 2 },
         result: 'rod',
         bonus: { fishing: 20 }
     },
-    potion: {
-        name: '🥤 Health Potion',
-        materials: { fish: 3, rabbit: 2 },
+    pocion: {
+        name: '🥤 Poción de Vida',
+        materials: { pescado: 3, conejo: 2 },
         result: 'potion',
         qty: 2
     }
@@ -60,11 +61,11 @@ async function handler(m, { sock }) {
     const itemKey = args[0]?.toLowerCase()
     
     if (!itemKey) {
-        let txt = `🔨 *ᴄʀᴀꜰᴛ ʀᴇᴄɪᴘᴇs*\n\n`
+        let txt = `🔨 *FORJA DE OBJETOS - 𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃*\n\n`
         
         for (const [key, recipe] of Object.entries(RECIPES)) {
             txt += `╭┈┈⬡「 ${recipe.name} 」\n`
-            txt += `┃ 📦 Materials:\n`
+            txt += `┃ 📦 Materiales:\n`
             for (const [mat, qty] of Object.entries(recipe.materials)) {
                 const userHas = user.inventory[mat] || 0
                 const status = userHas >= qty ? '✅' : '❌'
@@ -74,21 +75,29 @@ async function handler(m, { sock }) {
             txt += `╰┈┈┈┈┈┈┈┈⬡\n\n`
         }
         
-        txt += `> Craft: \`.craft <id>\``
+        txt += `> Para fabricar usá: \`${m.prefix}craftear <id>\``
         return m.reply(txt)
     }
     
     const recipe = RECIPES[itemKey]
     if (!recipe) {
-        return m.reply(`❌ Recipe tidak ditemukan!\nLihat list: \`.craft\``)
+        return m.reply(`❌ ¡Esa receta no la tengo! Mirá la lista con \`${m.prefix}craftear\``)
     }
     
+    // Verificación de materiales
+    const missing = []
     for (const [mat, qty] of Object.entries(recipe.materials)) {
-        if ((user.inventory[mat] || 0) < qty) {
-            return m.reply(`❌ Material tidak cukup!\n> ${mat}: ${user.inventory[mat] || 0}/${qty}`)
+        const have = user.inventory[mat] || 0
+        if (have < qty) {
+            missing.push(`${mat} (${have}/${qty})`)
         }
     }
     
+    if (missing.length > 0) {
+        return m.reply(`❌ *MATERIALES INSUFICIENTES*\n\n> Te falta:\n> ${missing.join('\n> ')}`)
+    }
+    
+    // Descontar materiales
     for (const [mat, qty] of Object.entries(recipe.materials)) {
         user.inventory[mat] -= qty
     }
@@ -96,19 +105,23 @@ async function handler(m, { sock }) {
     const resultQty = recipe.qty || 1
     user.inventory[recipe.result] = (user.inventory[recipe.result] || 0) + resultQty
     
+    // Aplicar bonus permanentes si existen
     if (recipe.bonus) {
         for (const [stat, value] of Object.entries(recipe.bonus)) {
             user.rpg[stat] = (user.rpg[stat] || 0) + value
         }
     }
     
-    let txt = `🔨 *ᴄʀᴀꜰᴛ sᴜᴋsᴇs*\n\n`
-    txt += `> ✅ Berhasil membuat ${recipe.name} x${resultQty}!`
+    db.save()
+    
+    let txt = `🔨 *¡FORJA EXITOSA!*\n\n`
+    txt += `> ✅ Fabricaste: *${recipe.name} x${resultQty}*\n`
     
     if (recipe.bonus) {
-        txt += `\n> 📈 Stat bonus applied!`
+        txt += `> 📈 Stats mejorados permanentemente.`
     }
     
+    await m.react('⚒️')
     await m.reply(txt)
 }
 
