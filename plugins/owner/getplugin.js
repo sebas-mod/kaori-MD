@@ -1,13 +1,14 @@
 import fs from 'fs'
 import path from 'path'
 import config from '../../config.js'
+
 const pluginConfig = {
-    name: 'getplugin',
-    alias: ['gp', 'getcode', 'plugincode', 'sourcecode'],
+    name: 'obtenerplugin',
+    alias: ['gp', 'getplugin', 'getcode', 'sourcecode'],
     category: 'owner',
-    description: 'Dapatkan source code plugin',
-    usage: '.getplugin <nama plugin>',
-    example: '.getplugin menu',
+    description: 'Obtener el código fuente de un plugin',
+    usage: '.obtenerplugin <nombre del plugin>',
+    example: '.obtenerplugin menu',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -90,22 +91,22 @@ function getSimilarPlugins(name, pluginsDir) {
 
 async function handler(m, { sock }) {
     if (!config.isOwner(m.sender)) {
-        return m.reply('❌ *Owner Only!*')
+        return m.reply('❌ *¡Solo el Propietario (Owner)!*')
     }
     
     const pluginName = m.args?.[0]?.trim()
     
     if (!pluginName) {
         return m.reply(
-            `📦 *ɢᴇᴛ ᴘʟᴜɢɪɴ*\n\n` +
-            `> Dapatkan source code plugin\n\n` +
-            `╭┈┈⬡「 📋 *ғᴏʀᴍᴀᴛ* 」\n` +
-            `┃ .getplugin <nama>\n` +
+            `📦 *ᴏʙᴛᴇɴᴇʀ ᴘʟᴜɢɪɴ*\n\n` +
+            `> Obtén el código fuente de cualquier plugin\n\n` +
+            `╭┈┈⬡「 📋 *ғᴏʀᴍᴀᴛᴏ* 」\n` +
+            `┃ .obtenerplugin <nombre>\n` +
             `╰┈┈┈┈┈┈┈┈⬡\n\n` +
-            `*Contoh:*\n` +
-            `> .getplugin menu\n` +
-            `> .getplugin sticker\n` +
-            `> .getplugin game/tebakgambar`
+            `*Ejemplos:*\n` +
+            `> .obtenerplugin menu\n` +
+            `> .obtenerplugin sticker\n` +
+            `> .obtenerplugin game/tebakgambar`
         )
     }
     
@@ -129,11 +130,11 @@ async function handler(m, { sock }) {
     
     if (!pluginInfo) {
         const similar = getSimilarPlugins(pluginName, pluginsDir)
-        let text = `❌ *ᴘʟᴜɢɪɴ ᴛɪᴅᴀᴋ ᴅɪᴛᴇᴍᴜᴋᴀɴ*\n\n`
-        text += `> Plugin \`${pluginName}\` tidak ditemukan\n\n`
+        let text = `❌ *ᴘʟᴜɢɪɴ ɴᴏ ᴇɴᴄᴏɴᴛʀᴀᴅᴏ*\n\n`
+        text += `> El plugin \`${pluginName}\` no existe en el sistema\n\n`
         
         if (similar.length > 0) {
-            text += `*Mungkin maksud kamu:*\n`
+            text += `*Quizás quisiste decir:*\n`
             similar.forEach(s => {
                 text += `> - \`${s}\`\n`
             })
@@ -145,11 +146,11 @@ async function handler(m, { sock }) {
     const code = fs.readFileSync(pluginInfo.path, 'utf-8')
     
     await sock.sendCodeBlock(m.chat, code, m, {
-        title: `📦 *PLUGIN DITEMUKAN*\n` +
-            `Hallo Ownerku ${m.pushName}, berikut ini adalah source code dari plugin yang kamu minta\n\n ` +
-            `- 🌾 *Plugin:* \`${pluginInfo.file}\`\n` +
-            `- 🍃 *Category:* \`${pluginInfo.category}\`\n`,
-        footer: `\n_Note_: *Kamu bisa langsung copy code di atas*`
+        title: `📦 *ᴘʟᴜɢɪɴ ᴇɴᴄᴏɴᴛʀᴀᴅᴏ*\n` +
+            `Hola Owner ${m.pushName}, aquí tienes el código fuente del plugin que solicitaste:\n\n ` +
+            `- 🌾 *Archivo:* \`${pluginInfo.file}\`\n` +
+            `- 🍃 *Categoría:* \`${pluginInfo.category}\`\n`,
+        footer: `\n_Nota_: *Puedes copiar el código directamente arriba*`
     })
 }
 
