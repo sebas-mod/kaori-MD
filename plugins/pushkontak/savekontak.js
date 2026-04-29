@@ -11,7 +11,7 @@ import te from "../../src/lib/ourin-error.js";
 const pluginConfig = {
   name: "guardarcontacto",
   alias: ["svcontacto", "savecontact", "guardar"],
-  category: "herramientas",
+  category: "pushkontak", // Categoría original restablecida
   description: "Exporta todos los contactos del grupo a formato VCF",
   usage: ".guardarcontacto <nombre_contacto>",
   example: ".guardarcontacto ListaClientes",
