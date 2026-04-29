@@ -1,12 +1,13 @@
 import config from '../../config.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: 'join',
-    alias: ['joingrup', 'joingroup', 'gabung'],
+    name: 'unirse',
+    alias: ['unirsegrupo', 'join', 'entrar'],
     category: 'owner',
-    description: 'Bot join ke grup via link invite',
-    usage: '.join <link>',
-    example: '.join https://chat.whatsapp.com/xxx',
+    description: 'El bot se une a un grupo mediante un enlace de invitación',
+    usage: '.unirse <enlace>',
+    example: '.unirse https://chat.whatsapp.com/xxx',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -36,19 +37,19 @@ async function handler(m, { sock }) {
     
     if (!input) {
         return m.reply(
-            `🔗 *ᴊᴏɪɴ ɢʀᴜᴘ*\n\n` +
-            `╭┈┈⬡「 📋 *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ* 」\n` +
-            `┃ ◦ Kirim link invite grup\n` +
-            `┃ ◦ Bot akan otomatis join\n` +
+            `🔗 *ᴜɴɪʀsᴇ ᴀʟ ɢʀᴜᴘᴏ*\n\n` +
+            `╭┈┈⬡「 📋 *ᴍᴏᴅᴏ ᴅᴇ ᴜsᴏ* 」\n` +
+            `┃ ◦ Envía el enlace de invitación\n` +
+            `┃ ◦ El bot se unirá automáticamente\n` +
             `╰┈┈⬡\n\n` +
-            `\`Contoh: ${m.prefix}join https://chat.whatsapp.com/xxx\``
+            `\`Ejemplo: ${m.prefix}unirse https://chat.whatsapp.com/xxx\``
         )
     }
     
     const inviteCode = extractInviteCode(input)
     
     if (!inviteCode) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Link invite tidak valid`)
+        return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> El enlace de invitación no es válido`)
     }
     
     await m.react('🕕')
@@ -58,7 +59,7 @@ async function handler(m, { sock }) {
         
         if (!groupInfo) {
             await m.react('❌')
-            return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak dapat mengambil info grup`)
+            return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> No se pudo obtener la información del grupo`)
         }
         
         const botJid = sock.user?.id?.replace(/:.*@/, '@') || ''
@@ -68,7 +69,7 @@ async function handler(m, { sock }) {
         
         if (isMember) {
             await m.react('❌')
-            return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Bot sudah menjadi member di grup ini`)
+            return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> El bot ya es miembro de este grupo`)
         }
         
         await sock.groupAcceptInvite(inviteCode)
@@ -79,11 +80,11 @@ async function handler(m, { sock }) {
         const saluranName = config.saluran?.name || config.bot?.name || 'Ourin-AI'
         
         await m.reply({
-            text: `✅ *ʙᴇʀʜᴀsɪʟ ᴊᴏɪɴ*\n\n` +
-                `╭┈┈⬡「 📋 *ɪɴꜰᴏ ɢʀᴜᴘ* 」\n` +
-                `┃ 🏠 ɴᴀᴍᴀ: *${groupInfo.subject || 'Unknown'}*\n` +
-                `┃ 👥 ᴍᴇᴍʙᴇʀ: *${groupInfo.size || groupInfo.participants?.length || 0}*\n` +
-                `┃ 👤 ᴏᴡɴᴇʀ: *${groupInfo.owner?.split('@')[0] || 'Unknown'}*\n` +
+            text: `✅ *ᴜɴɪᴅᴏ ᴄᴏɴ ᴇ́xɪᴛᴏ*\n\n` +
+                `╭┈┈⬡「 📋 *ɪɴғᴏ ᴅᴇʟ ɢʀᴜᴘᴏ* 」\n` +
+                `┃ 🏠 ɴᴏᴍʙʀᴇ: *${groupInfo.subject || 'Desconocido'}*\n` +
+                `┃ 👥 ᴍɪᴇᴍʙʀᴏs: *${groupInfo.size || groupInfo.participants?.length || 0}*\n` +
+                `┃ 👤 ᴄʀᴇᴀᴅᴏʀ: *${groupInfo.owner?.split('@')[0] || 'Desconocido'}*\n` +
                 `╰┈┈⬡`,
             contextInfo: {
                 forwardingScore: 9999,
@@ -101,11 +102,11 @@ async function handler(m, { sock }) {
         
         let errorMsg = error.message
         if (errorMsg.includes('not-authorized')) {
-            errorMsg = 'Link sudah tidak valid atau expired'
+            errorMsg = 'El enlace ya no es válido o ha expirado'
         } else if (errorMsg.includes('gone')) {
-            errorMsg = 'Grup sudah tidak ada'
+            errorMsg = 'El grupo ya no existe'
         } else if (errorMsg.includes('conflict')) {
-            errorMsg = 'Bot sudah menjadi member'
+            errorMsg = 'El bot ya es miembro'
         }
         
         await m.reply(te(m.prefix, m.command, m.pushName))
