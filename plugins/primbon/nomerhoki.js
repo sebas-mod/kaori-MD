@@ -1,12 +1,13 @@
 import axios from 'axios'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: 'nomerhoki',
-    alias: ['nomorhoki', 'ceknomor'],
-    category: 'primbon',
-    description: 'Cek keberuntungan nomor HP',
-    usage: '.nomerhoki <nomor>',
-    example: '.nomerhoki 6281234567890',
+    name: 'numerosuerte',
+    alias: ['numerohoki', 'ceknomor', 'suertetelefono'],
+    category: 'diversion',
+    description: 'Consulta la suerte y energías de tu número de teléfono',
+    usage: '.numerosuerte <número>',
+    example: '.numerosuerte 521234567890',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -17,40 +18,42 @@ const pluginConfig = {
 }
 
 async function handler(m, { sock }) {
-    let nomor = m.args.join('').replace(/[^0-9]/g, '')
-    if (!nomor) {
-        return m.reply(`🍀 *ɴᴏᴍᴏʀ ʜᴏᴋɪ*\n\n> Masukkan nomor HP\n\n\`Contoh: ${m.prefix}nomerhoki 6281234567890\``)
+    // Limpia el número dejando solo dígitos
+    let numero = m.args.join('').replace(/[^0-9]/g, '')
+    
+    if (!numero) {
+        return m.reply(`🍀 *ɴᴜ́ᴍᴇʀᴏ ᴅᴇ ʟᴀ sᴜᴇʀᴛᴇ*\n\n> Ingresa un número de teléfono\n\n\`Ejemplo: ${m.prefix}numerosuerte 521234567890\``)
     }
     
     m.react('🍀')
     
     try {
-        const url = `https://api.siputzx.my.id/api/primbon/nomorhoki?phoneNumber=${nomor}`
+        const url = `https://api.siputzx.my.id/api/primbon/nomorhoki?phoneNumber=${numero}`
         const { data } = await axios.get(url, { timeout: 30000 })
         
         if (!data?.status || !data?.data) {
             m.react('❌')
-            return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Gagal menganalisa nomor`)
+            return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> No se pudo analizar el número.`)
         }
         
         const r = data.data
         const ep = r.energi_positif.details
         const en = r.energi_negatif.details
         
-        const response = `🍀 *ɴᴏᴍᴏʀ ʜᴏᴋɪ*\n\n` +
-            `> Nomor: *${r.nomor}*\n\n` +
-            `📊 *ᴀɴɢᴋᴀ ʙᴀɢᴜᴀ:* ${r.angka_bagua_shuzi.value}%\n\n` +
-            `✅ *ᴇɴᴇʀɢɪ ᴘᴏꜱɪᴛɪꜰ:* ${r.energi_positif.total}%\n` +
-            `├ Kekayaan: ${ep.kekayaan}\n` +
-            `├ Kesehatan: ${ep.kesehatan}\n` +
-            `├ Cinta: ${ep.cinta}\n` +
-            `└ Kestabilan: ${ep.kestabilan}\n\n` +
-            `❌ *ᴇɴᴇʀɢɪ ɴᴇɢᴀᴛɪꜰ:* ${r.energi_negatif.total}%\n` +
-            `├ Perselisihan: ${en.perselisihan}\n` +
-            `├ Kehilangan: ${en.kehilangan}\n` +
-            `├ Malapetaka: ${en.malapetaka}\n` +
-            `└ Kehancuran: ${en.kehancuran}\n\n` +
-            `> Status: ${r.analisis.status ? '✅ HOKI' : '❌ TIDAK HOKI'}`
+        const response = `🍀 *ɴᴜ́ᴍᴇʀᴏ ᴅᴇ ʟᴀ sᴜᴇʀᴛᴇ*\n\n` +
+            `> Número: *${r.nomor}*\n\n` +
+            `📊 *ᴘᴜɴᴛᴜᴀᴄɪóɴ ʙᴀɢᴜᴀ:* ${r.angka_bagua_shuzi.value}%\n\n` +
+            `✅ *ᴇɴᴇʀɢíᴀ ᴘᴏsɪᴛɪᴠᴀ:* ${r.energi_positif.total}%\n` +
+            `├ Riqueza: ${ep.kekayaan}\n` +
+            `├ Salud: ${ep.kesehatan}\n` +
+            `├ Amor: ${ep.cinta}\n` +
+            `└ Estabilidad: ${ep.kestabilan}\n\n` +
+            `❌ *ᴇɴᴇʀɢíᴀ ɴᴇɢᴀᴛɪᴠᴀ:* ${r.energi_negatif.total}%\n` +
+            `├ Conflictos: ${en.perselisihan}\n` +
+            `├ Pérdidas: ${en.kehilangan}\n` +
+            `├ Infortunios: ${en.malapetaka}\n` +
+            `└ Destrucción: ${en.kehancuran}\n\n` +
+            `> Estado: ${r.analisis.status ? '✅ CON SUERTE' : '❌ SIN SUERTE'}`
         
         m.react('✅')
         await m.reply(response)
