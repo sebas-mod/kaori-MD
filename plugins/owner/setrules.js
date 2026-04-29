@@ -1,11 +1,12 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
     name: 'setrules',
-    alias: ['setbotrules', 'setaturanbot'],
+    alias: ['setreglas', 'setnormas', 'configurarreglas'],
     category: 'owner',
-    description: 'Set rules/aturan bot custom',
-    usage: '.setrules <text>',
-    example: '.setrules 1. Jangan spam\n2. Hormati sesama',
+    description: 'Establece reglas o normas personalizadas para el bot',
+    usage: '.setrules <texto>',
+    example: '.setrules 1. No hacer spam\n2. Respetar a los demás',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -22,18 +23,18 @@ function handler(m) {
     if (!text) {
         return m.reply(
             `📝 *sᴇᴛ ʙᴏᴛ ʀᴜʟᴇs*\n\n` +
-            `> Masukkan teks rules yang baru\n\n` +
-            `\`Contoh:\`\n` +
-            `\`${m.prefix}setrules 1. Jangan spam\\n2. Hormati sesama\``
+            `> Por favor, ingresa el nuevo texto de las reglas.\n\n` +
+            `\`Ejemplo:\`\n` +
+            `\`${m.prefix}setrules 1. No hacer spam\\n2. Respetar a los demás\``
         )
     }
     
     db.setting('botRules', text)
     
     m.reply(
-        `✅ *ʙᴏᴛ ʀᴜʟᴇs ᴅɪᴜᴘᴅᴀᴛᴇ*\n\n` +
-        `> Rules bot berhasil diubah!\n` +
-        `> Ketik \`${m.prefix}rules\` untuk melihat.`
+        `✅ *ʀᴇɢʟᴀs ᴀᴄᴛᴜᴀʟɪᴢᴀᴅᴀs*\n\n` +
+        `> ¡Las normas del bot se han cambiado correctamente!\n` +
+        `> Escribe \`${m.prefix}rules\` para verlas.`
     )
 }
 
