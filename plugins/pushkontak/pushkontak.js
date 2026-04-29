@@ -10,12 +10,12 @@ import {
 import te from "../../src/lib/ourin-error.js";
 
 const pluginConfig = {
-  name: "pushkontak",
-  alias: ["puskontak", "push"],
-  category: "pushkontak",
-  description: "Push pesan ke semua member grup + auto simpan kontak ke VCF",
-  usage: ".pushkontak <pesan>",
-  example: ".pushkontak Halo semuanya!",
+  name: "pushcontacto",
+  alias: ["puskontak", "push", "difusion"],
+  category: "herramientas",
+  description: "Envía mensajes a todos los miembros del grupo + guarda contactos en VCF",
+  usage: ".pushcontacto <mensaje>",
+  example: ".pushcontacto ¡Hola a todos!",
   isOwner: true,
   isPremium: false,
   isGroup: true,
@@ -25,7 +25,7 @@ const pluginConfig = {
   isEnabled: true,
 };
 
-function createSerial(len) {
+function generarSerial(len) {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   let r = "";
   for (let i = 0; i < len; i++)
@@ -33,14 +33,14 @@ function createSerial(len) {
   return r;
 }
 
-function buildVcf(contacts) {
-  return contacts
+function construirVcf(contactos) {
+  return contactos
     .map((jid) => {
       const num = jid.split("@")[0];
       return [
         "BEGIN:VCARD",
         "VERSION:3.0",
-        `FN:WA[${createSerial(2)}] ${num}`,
+        `FN:WA[${generarSerial(2)}] ${num}`,
         `TEL;type=CELL;type=VOICE;waid=${num}:+${num}`,
         "END:VCARD",
         "",
@@ -51,24 +51,25 @@ function buildVcf(contacts) {
 
 async function handler(m, { sock }) {
   const db = getDatabase();
-  const groupMode = getGroupMode(m.chat, db);
+  const modoGrupo = getGroupMode(m.chat, db);
 
-  if (groupMode !== "pushkontak" && groupMode !== "all") {
+  // Verificación de modo de bot
+  if (modoGrupo !== "pushkontak" && modoGrupo !== "all") {
     return m.reply(
-      `❌ *ᴍᴏᴅᴇ ᴛɪᴅᴀᴋ sᴇsᴜᴀɪ*\n\n> Aktifkan mode pushkontak terlebih dahulu\n\n\`${m.prefix}botmode pushkontak\``,
+      `❌ *ᴍᴏᴅᴏ ɴᴏ ᴀᴄᴛɪᴠᴀᴅᴏ*\n\n> Activa el modo pushkontak primero para usar esta función\n\n\`${m.prefix}botmode pushkontak\``,
     );
   }
 
-  const text = m.text?.trim();
-  if (!text) {
+  const texto = m.text?.trim();
+  if (!texto) {
     return m.reply(
-      `📢 *ᴘᴜsʜ ᴋᴏɴᴛᴀᴋ*\n\n> Masukkan pesan yang ingin dikirim\n\n\`Contoh: ${m.prefix}pushkontak Halo semuanya!\``,
+      `📢 *ᴘᴜsʜ ᴄᴏɴᴛᴀᴄᴛᴏ*\n\n> Ingresa el mensaje que deseas enviar\n\n\`Ejemplo: ${m.prefix}pushcontacto ¡Hola a todos!\``,
     );
   }
 
   if (global.statuspush) {
     return m.reply(
-      `❌ *ɢᴀɢᴀʟ*\n\n> Pushkontak sedang berjalan. Ketik \`${m.prefix}stoppush\` untuk menghentikan.`,
+      `❌ *ᴇʀʀᴏʀ*\n\n> Ya hay un proceso de push en curso. Escribe \`${m.prefix}stoppush\` para detenerlo.`,
     );
   }
 
@@ -77,7 +78,7 @@ async function handler(m, { sock }) {
   try {
     const metadata = m.groupMetadata;
     const botId = sock.user.id.split(":")[0] + "@s.whatsapp.net";
-    const participants = metadata.participants
+    const participantes = metadata.participants
       .map((p) => {
         if (p.phoneNumber) return p.phoneNumber;
         if (p.jid && !p.jid.endsWith("@lid")) return p.jid;
@@ -95,54 +96,54 @@ async function handler(m, { sock }) {
       })
       .filter((id) => id && id !== botId && !id.includes(m.sender));
 
-    if (participants.length === 0) {
+    if (participantes.length === 0) {
       m.react("❌");
-      return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak ada member yang bisa dikirim`);
+      return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> No se encontraron miembros válidos para el envío.`);
     }
 
     const jedaPush = db.setting("jedaPush") || 5000;
 
     await m.reply(
-      `📢 *ᴘᴜsʜ ᴋᴏɴᴛᴀᴋ*\n\n` +
-        `╭┈┈⬡「 📋 *ᴅᴇᴛᴀɪʟ* 」\n` +
-        `┃ 📝 ᴘᴇsᴀɴ: \`${text.substring(0, 50)}${text.length > 50 ? "..." : ""}\`\n` +
-        `┃ 👥 ᴛᴀʀɢᴇᴛ: \`${participants.length}\` member\n` +
-        `┃ ⏱️ ᴊᴇᴅᴀ: \`${jedaPush}ms\`\n` +
-        `┃ 📊 ᴇsᴛɪᴍᴀsɪ: \`${Math.ceil((participants.length * jedaPush) / 60000)} menit\`\n` +
-        `┃ 💾 ᴀᴜᴛᴏ-sᴀᴠᴇ: \`Aktif (VCF)\`\n` +
+      `📢 *ᴘᴜsʜ ᴄᴏɴᴛᴀᴄᴛᴏ*\n\n` +
+        `╭┈┈⬡「 📋 *ᴅᴇᴛᴀʟʟᴇs* 」\n` +
+        `┃ 📝 ᴍᴇɴsᴀᴊᴇ: \`${texto.substring(0, 50)}${texto.length > 50 ? "..." : ""}\`\n` +
+        `┃ 👥 ᴛᴀʀɢᴇᴛ: \`${participantes.length}\` miembros\n` +
+        `┃ ⏱️ ɪɴᴛᴇʀᴠᴀʟᴏ: \`${jedaPush}ms\`\n` +
+        `┃ 📊 ᴇsᴛɪᴍᴀᴅᴏ: \`${Math.ceil((participantes.length * jedaPush) / 60000)} min\`\n` +
+        `┃ 💾 ᴀᴜᴛᴏ-ɢᴜᴀʀᴅᴀᴅᴏ: \`Activo (VCF)\`\n` +
         `╰┈┈⬡\n\n` +
-        `> Memulai push...`,
+        `> Iniciando envío masivo...`,
     );
 
     global.statuspush = true;
     let successCount = 0;
     let failedCount = 0;
-    const savedContacts = [];
+    const contactosGuardados = [];
 
-    for (const member of participants) {
+    for (const miembro of participantes) {
       if (global.stoppush) {
         delete global.stoppush;
         delete global.statuspush;
 
         await m.reply(
-          `⏹️ *ᴘᴜsʜ ᴅɪʜᴇɴᴛɪᴋᴀɴ*\n\n` +
-            `> ✅ Berhasil: \`${successCount}\`\n` +
-            `> ❌ Gagal: \`${failedCount}\`\n` +
-            `> ⏸️ Sisa: \`${participants.length - successCount - failedCount}\``,
+          `⏹️ *ᴘᴜsʜ ᴅᴇᴛᴇɴɪᴅᴏ*\n\n` +
+            `> ✅ Exitosos: \`${successCount}\`\n` +
+            `> ❌ Fallidos: \`${failedCount}\`\n` +
+            `> ⏸️ Restantes: \`${participantes.length - successCount - failedCount}\``,
         );
 
-        if (savedContacts.length > 0) {
-          await sendVcfToOwner(sock, m.sender, savedContacts, metadata.subject);
+        if (contactosGuardados.length > 0) {
+          await enviarVcfAlOwner(sock, m.sender, contactosGuardados, metadata.subject);
         }
         return;
       }
 
       try {
-        const kodeUnik = createSerial(6);
-        const pesan = `${text}\n\n#${kodeUnik}`;
+        const codigoUnico = generarSerial(6);
+        const mensajeFinal = `${texto}\n\n#${codigoUnico}`;
 
-        await sock.sendMessage(member, { text: pesan });
-        savedContacts.push(member);
+        await sock.sendMessage(miembro, { text: mensajeFinal });
+        contactosGuardados.push(miembro);
         successCount++;
       } catch (err) {
         failedCount++;
@@ -153,18 +154,18 @@ async function handler(m, { sock }) {
 
     delete global.statuspush;
 
-    if (savedContacts.length > 0) {
-      await sendVcfToOwner(sock, m.sender, savedContacts, metadata.subject);
+    if (contactosGuardados.length > 0) {
+      await enviarVcfAlOwner(sock, m.sender, contactosGuardados, metadata.subject);
     }
 
     m.react("✅");
     await m.reply(
-      `✅ *ᴘᴜsʜ sᴇʟᴇsᴀɪ*\n\n` +
-        `╭┈┈⬡「 📊 *ʜᴀsɪʟ* 」\n` +
-        `┃ ✅ ʙᴇʀʜᴀsɪʟ: \`${successCount}\`\n` +
-        `┃ ❌ ɢᴀɢᴀʟ: \`${failedCount}\`\n` +
-        `┃ 📊 ᴛᴏᴛᴀʟ: \`${participants.length}\`\n` +
-        `┃ 💾 ᴋᴏɴᴛᴀᴋ: \`${savedContacts.length} disimpan\`\n` +
+      `✅ *ᴘᴜsʜ ғɪɴᴀʟɪᴢᴀᴅᴏ*\n\n` +
+        `╭┈┈⬡「 📊 *ʀᴇsᴜʟᴛᴀᴅᴏs* 」\n` +
+        `┃ ✅ ᴇxɪᴛᴏsᴏs: \`${successCount}\`\n` +
+        `┃ ❌ ғᴀʟʟɪᴅᴏs: \`${failedCount}\`\n` +
+        `┃ 📊 ᴛᴏᴛᴀʟ: \`${participantes.length}\`\n` +
+        `┃ 💾 ᴄᴏɴᴛᴀᴄᴛᴏs: \`${contactosGuardados.length} guardados\`\n` +
         `╰┈┈⬡`,
     );
   } catch (error) {
@@ -174,20 +175,20 @@ async function handler(m, { sock }) {
   }
 }
 
-async function sendVcfToOwner(sock, ownerJid, contacts, groupName) {
+async function enviarVcfAlOwner(sock, ownerJid, contactos, nombreGrupo) {
   try {
     const vcfDir = path.join(process.cwd(), "tmp");
     if (!fs.existsSync(vcfDir)) fs.mkdirSync(vcfDir, { recursive: true });
 
-    const vcfPath = path.join(vcfDir, `pushkontak_${Date.now()}.vcf`);
-    const vcfContent = buildVcf(contacts);
+    const vcfPath = path.join(vcfDir, `pushcontacto_${Date.now()}.vcf`);
+    const vcfContent = construirVcf(contactos);
     fs.writeFileSync(vcfPath, vcfContent, "utf8");
 
     await sock.sendMessage(ownerJid, {
       document: fs.readFileSync(vcfPath),
-      fileName: `Kontak_${groupName || "Group"}_${contacts.length}.vcf`,
+      fileName: `Contactos_${nombreGrupo || "Grupo"}_${contactos.length}.vcf`,
       mimetype: "text/vcard",
-      caption: `💾 *ᴀᴜᴛᴏ-sᴀᴠᴇ ᴋᴏɴᴛᴀᴋ*\n\n> Total: \`${contacts.length}\` kontak\n> Grup: \`${groupName || "Unknown"}\`\n\n> _Import file ini ke HP untuk menyimpan semua kontak._`,
+      caption: `💾 *ᴀᴜᴛᴏ-ɢᴜᴀʀᴅᴀᴅᴏ ᴅᴇ ᴄᴏɴᴛᴀᴄᴛᴏs*\n\n> Total: \`${contactos.length}\` contactos\n> Grupo: \`${nombreGrupo || "Desconocido"}\`\n\n> _Importa este archivo en tu teléfono para guardar todos los contactos._`,
     });
 
     try {
