@@ -1,11 +1,12 @@
 import { spawn } from 'child_process'
 import path from 'path'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'restart',
-    alias: ['reset', 'reboot', 'restartbot'],
+    alias: ['reiniciar', 'reboot', 'restartbot'],
     category: 'owner',
-    description: 'Restart bot process (real restart)',
+    description: 'Reinicia el proceso del bot (reinicio real)',
     usage: '.restart',
     example: '.restart',
     isOwner: true,
@@ -24,18 +25,18 @@ async function handler(m, { sock }) {
         const startTime = Date.now()
         
         await sock.sendMessage(m.chat, {
-            text: `🔄 *ʀᴇsᴛᴀʀᴛɪɴɢ ʙᴏᴛ...*\n\n` +
-                  `╭┈┈⬡「 📊 *ɪɴꜰᴏ* 」\n` +
-                  `┃ ⏰ Time: ${new Date().toLocaleTimeString('id-ID')}\n` +
-                  `┃ 🔧 Method: Process Spawn\n` +
+            text: `🔄 *ʀᴇɪɴɪᴄɪᴀɴᴅᴏ ʙᴏᴛ...*\n\n` +
+                  `╭┈┈⬡「 📊 *ɪɴғᴏ* 」\n` +
+                  `┃ ⏰ Hora: ${new Date().toLocaleTimeString('es-ES')}\n` +
+                  `┃ 🔧 Método: Process Spawn\n` +
                   `┃ 📦 PID: ${process.pid}\n` +
                   `╰┈┈⬡\n\n` +
-                  `> Bot akan restart dalam 2 detik...\n` +
-                  `> Proses mungkin memakan waktu 10-30 detik`
+                  `> El bot se reiniciará en 2 segundos...\n` +
+                  `> El proceso puede tardar entre 10 y 30 segundos.`
         }, { quoted: m })
         
-        console.log('[Restart] Command triggered by:', m.sender)
-        console.log('[Restart] Initiating graceful restart...')
+        console.log('[Reiniciar] Comando activado por:', m.sender)
+        console.log('[Reiniciar] Iniciando reinicio seguro...')
         
         setTimeout(() => {
             const cwd = process.cwd()
@@ -61,7 +62,7 @@ async function handler(m, { sock }) {
             
             child.unref()
             
-            console.log('[Restart] New process spawned, exiting current process...')
+            console.log('[Reiniciar] Nuevo proceso generado, cerrando proceso actual...')
             
             setTimeout(() => {
                 process.exit(0)
