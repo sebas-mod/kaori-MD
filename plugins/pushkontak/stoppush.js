@@ -1,12 +1,13 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { getGroupMode } from '../group/botmode.js'
+
 const pluginConfig = {
-    name: 'stoppush',
-    alias: ['stoppushkontak', 'stoppus'],
-    category: 'pushkontak',
-    description: 'Hentikan proses pushkontak',
-    usage: '.stoppush',
-    example: '.stoppush',
+    name: 'detenerpush',
+    alias: ['stoppush', 'stoppushkontak', 'detenerdifusion'],
+    category: 'pushkontak', // Categoría original preservada
+    description: 'Detiene el proceso de pushkontak que esté en curso',
+    usage: '.detenerpush',
+    example: '.detenerpush',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -18,13 +19,13 @@ const pluginConfig = {
 
 async function handler(m, { sock }) {
     if (!global.statuspush) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak ada pushkontak yang sedang berjalan`)
+        return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> No hay ningún proceso de pushkontak activo actualmente.`)
     }
     
     global.stoppush = true
     
     m.react('⏹️')
-    await m.reply(`⏹️ *sᴛᴏᴘ ᴘᴜsʜ*\n\n> Menghentikan proses pushkontak...`)
+    await m.reply(`⏹️ *ᴅᴇᴛᴇɴᴇʀ ᴘᴜsʜ*\n\n> Solicitando la detención del proceso...`)
 }
 
 export { pluginConfig as config, handler }
