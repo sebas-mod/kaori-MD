@@ -2,11 +2,12 @@ import config from '../../config.js'
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import pkg from 'ourin'
 const { generateWAMessageFromContent, proto } = pkg
+
 const pluginConfig = {
     name: 'setallmenu',
-    alias: ['allmenuvariant', 'allmenustyle'],
+    alias: ['estilomenu', 'variantemenu', 'configmenu'],
     category: 'owner',
-    description: 'Mengatur variant tampilan allmenu',
+    description: 'Configura el estilo visual del menú principal (allmenu)',
     usage: '.setallmenu <v1-v5>',
     example: '.setallmenu v2',
     isOwner: true,
@@ -19,11 +20,11 @@ const pluginConfig = {
 }
 
 const VARIANTS = {
-    v1: { id: 1, name: 'Simple Text', desc: 'Text biasa tanpa image/contextInfo', emoji: '📝' },
-    v2: { id: 2, name: 'Image + Context', desc: 'Image + full contextInfo + forwardedNewsletter', emoji: '🖼️' },
-    v3: { id: 3, name: 'Document', desc: 'Document + jpegThumbnail + contextInfo + verified quoted', emoji: '📄' },
-    v4: { id: 4, name: 'Interactive Button', desc: 'Interactive message + single_select kategori + quick_reply', emoji: '🔘' },
-    v5: { id: 5, name: 'NativeFlow', desc: 'NativeFlow + limited_time_offer + interactive buttons', emoji: '✨' }
+    v1: { id: 1, name: 'Texto Simple', desc: 'Texto plano sin imágenes ni información de contexto', emoji: '📝' },
+    v2: { id: 2, name: 'Imagen + Contexto', desc: 'Imagen con información de contexto completa y boletín', emoji: '🖼️' },
+    v3: { id: 3, name: 'Documento', desc: 'Archivo con miniatura JPEG, contexto y citado verificado', emoji: '📄' },
+    v4: { id: 4, name: 'Botón Interactivo', desc: 'Mensaje interactivo con selección de categoría y respuesta rápida', emoji: '🔘' },
+    v5: { id: 5, name: 'Flujo Nativo', desc: 'NativeFlow con oferta por tiempo limitado y botones interactivos', emoji: '✨' }
 }
 
 async function handler(m, { sock, db }) {
@@ -33,7 +34,7 @@ async function handler(m, { sock, db }) {
     if (variant) {
         const selected = VARIANTS[variant]
         if (!selected) {
-            await m.reply(`❌ Variant tidak valid!\n\nGunakan: v1 s/d v5`)
+            await m.reply(`❌ ¡Variante no válida!\n\nUsa: v1 hasta v5`)
             return
         }
 
@@ -41,7 +42,7 @@ async function handler(m, { sock, db }) {
         await db.save()
 
         await m.reply(
-            `✅ *ᴀʟʟᴍᴇɴᴜ ᴠᴀʀɪᴀɴᴛ ᴅɪᴜʙᴀʜ*\n\n` +
+            `✅ *ᴠᴀʀɪᴀɴᴛᴇ ᴅᴇ ᴍᴇɴᴜ́ ᴀᴄᴛᴜᴀʟɪᴢᴀᴅᴀ*\n\n` +
             `> ${selected.emoji} *V${selected.id} — ${selected.name}*\n` +
             `> _${selected.desc}_`
         )
@@ -57,19 +58,19 @@ async function handler(m, { sock, db }) {
     }))
 
     const bodyText =
-        `📋 *sᴇᴛ ᴀʟʟᴍᴇɴᴜ ᴠᴀʀɪᴀɴᴛ*\n\n` +
-        `> Variant aktif: *V${current}*\n` +
-        `> _${VARIANTS[`v${current}`]?.name || 'Unknown'}_\n\n` +
-        `> Pilih variant dari daftar di bawah`
+        `📋 *ᴄᴏɴғɪɢᴜʀᴀʀ ᴇsᴛɪʟᴏ ᴅᴇ ᴍᴇɴᴜ́*\n\n` +
+        `> Variante activa: *V${current}*\n` +
+        `> _${VARIANTS[`v${current}`]?.name || 'Desconocido'}_\n\n` +
+        `> Selecciona una variante de la lista de abajo:`
 
     try {
         const interactiveButtons = [
             {
                 name: 'single_select',
                 buttonParamsJson: JSON.stringify({
-                    title: '📋 ᴘɪʟɪʜ ᴠᴀʀɪᴀɴᴛ',
+                    title: '📋 sᴇʟᴇᴄᴄɪᴏɴᴀʀ ᴇsᴛɪʟᴏ',
                     sections: [{
-                        title: 'ᴅᴀꜰᴛᴀʀ ᴠᴀʀɪᴀɴᴛ ᴀʟʟᴍᴇɴᴜ',
+                        title: 'ʟɪsᴛᴀ ᴅᴇ ᴠᴀʀɪᴀɴᴛᴇs ᴅɪsᴘᴏɴɪʙʟᴇs',
                         rows
                     }]
                 })
@@ -91,8 +92,8 @@ async function handler(m, { sock, db }) {
                             text: config.bot?.name || 'Ourin-AI'
                         }),
                         header: proto.Message.InteractiveMessage.Header.fromObject({
-                            title: '📋 AllMenu Variant',
-                            subtitle: `${Object.keys(VARIANTS).length} variant tersedia`,
+                            title: '📋 Variante AllMenu',
+                            subtitle: `${Object.keys(VARIANTS).length} variantes disponibles`,
                             hasMediaAttachment: false
                         }),
                         nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
@@ -115,13 +116,13 @@ async function handler(m, { sock, db }) {
 
         await sock.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
     } catch {
-        let txt = `📋 *sᴇᴛ ᴀʟʟᴍᴇɴᴜ ᴠᴀʀɪᴀɴᴛ*\n\n`
-        txt += `> Variant saat ini: *V${current}*\n\n`
+        let txt = `📋 *ᴄᴏɴғɪɢᴜʀᴀʀ ᴇsᴛɪʟᴏ ᴅᴇ ᴍᴇɴᴜ́*\n\n`
+        txt += `> Variante actual: *V${current}*\n\n`
         for (const [key, val] of Object.entries(VARIANTS)) {
             const mark = val.id === current ? ' ✓' : ''
             txt += `> ${val.emoji} *${key.toUpperCase()}*${mark} — _${val.desc}_\n`
         }
-        txt += `\n_Gunakan: \`.setallmenu v1\` s/d \`.setallmenu v5\`_`
+        txt += `\n_Usa: \`.setallmenu v1\` hasta \`.setallmenu v5\`_`
         await m.reply(txt)
     }
 }
