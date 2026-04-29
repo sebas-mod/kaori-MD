@@ -1,13 +1,14 @@
 import fs from 'fs'
 import path from 'path'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: 'ganti-pp-kosong.jpg',
-    alias: ['gantippkosong', 'setppkosong'],
+    name: 'cambiar-pp-kosong.jpg',
+    alias: ['cambiarppkosong', 'setppkosong'],
     category: 'owner',
-    description: 'Ganti gambar pp-kosong.jpg',
-    usage: '.ganti-pp-kosong.jpg (reply/kirim gambar)',
-    example: '.ganti-pp-kosong.jpg',
+    description: 'Cambiar la imagen pp-kosong.jpg',
+    usage: '.cambiar-pp-kosong.jpg (responder/enviar imagen)',
+    example: '.cambiar-pp-kosong.jpg',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -19,13 +20,13 @@ const pluginConfig = {
 
 async function handler(m, { sock }) {
     const isImage = m.isImage || (m.quoted && m.quoted.type === 'imageMessage')
-    if (!isImage) return m.reply(`🖼️ *ɢᴀɴᴛɪ PP-KOSONG.JPG*\n\n> Kirim/reply gambar untuk mengganti\n> File: assets/images/pp-kosong.jpg`)
+    if (!isImage) return m.reply(`🖼️ *ᴄᴀᴍʙɪᴀʀ PP-KOSONG.JPG*\n\n> Envía o responde a una imagen para cambiarla\n> Archivo: assets/images/pp-kosong.jpg`)
     try {
         let buffer = m.quoted && m.quoted.isMedia ? await m.quoted.download() : await m.download()
-        if (!buffer) return m.reply('❌ Gagal mendownload gambar')
+        if (!buffer) return m.reply('❌ Error al descargar la imagen')
         const targetPath = path.join(process.cwd(), 'assets', 'images', 'pp-kosong.jpg')
         fs.writeFileSync(targetPath, buffer)
-        m.reply(`✅ *ʙᴇʀʜᴀsɪʟ*\n\n> Gambar pp-kosong.jpg telah diganti`)
+        m.reply(`✅ *ᴇ́xɪᴛᴏ*\n\n> La imagen pp-kosong.jpg ha sido reemplazada`)
     } catch (error) {
         await m.reply(te(m.prefix, m.command, m.pushName))
     }
