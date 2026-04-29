@@ -3,14 +3,15 @@ import axios from "axios";
 import fs from "fs";
 import path from "path";
 import te from "../../src/lib/ourin-error.js";
+
 const pluginConfig = {
   name: "get",
   alias: ["fetch", "http", "request", "curl"],
   category: "owner",
-  description: "Advanced HTTP request tool (Owner Only)",
-  usage: ".get <url> [options]",
+  description: "Herramienta avanzada de peticiones HTTP (Solo Owner)",
+  usage: ".get <url> [opciones]",
   example:
-    '.get https://api.example.com --method POST --json {"key":"value"} --header "Authorization: Bearer token"',
+    '.get https://api.ejemplo.com --method POST --json {"key":"value"} --header "Authorization: Bearer token"',
   isOwner: true,
   isPremium: false,
   isGroup: false,
@@ -95,28 +96,28 @@ function parseHeaders(headerArgs) {
 
 async function handler(m, { sock }) {
   if (!config.isOwner(m.sender)) {
-    return m.reply("❌ *Owner Only!*");
+    return m.reply("❌ *¡Solo el Propietario (Owner)!*");
   }
 
   let input = m.fullArgs?.trim() || m.text?.trim();
   if (!input) {
     return m.reply(
-      `🌐 *HTTP REQUEST TOOL*\n\n` +
-        `╭┈┈⬡「 📋 OPTIONS 」\n` +
+      `🌐 *HERRAMIENTA DE PETICIÓN HTTP*\n\n` +
+        `╭┈┈⬡「 📋 OPCIONES 」\n` +
         `┃ ◦ \`--method <GET|POST|PUT|PATCH|DELETE>\`\n` +
-        `┃ ◦ \`--json <body>\` — JSON body\n` +
-        `┃ ◦ \`--header \"Key: Value\"\` — Custom header\n` +
-        `┃ ◦ \`--auth user:pass\` — Basic auth\n` +
-        `┃ ◦ \`--verbose\` / \`-v\` — Show response headers\n` +
-        `┃ ◦ \`--timeout <ms>\` — Request timeout\n` +
-        `┃ ◦ \`--post\` — Shortcut for --method POST\n` +
+        `┃ ◦ \`--json <body>\` — Cuerpo JSON\n` +
+        `┃ ◦ \`--header \"Key: Value\"\` — Cabecera personalizada\n` +
+        `┃ ◦ \`--auth user:pass\` — Autenticación básica\n` +
+        `┃ ◦ \`--verbose\` / \`-v\` — Mostrar cabeceras de respuesta\n` +
+        `┃ ◦ \`--timeout <ms>\` — Tiempo de espera de petición\n` +
+        `┃ ◦ \`--post\` — Atajo para --method POST\n` +
         `╰┈┈⬡\n\n` +
-        `\`Examples:\`\n` +
-        `> .get https://api.example.com\n` +
-        `> .get https://api.example.com --post --json {\"key\":\"val\"}\n` +
-        `> .get https://api.example.com --method PUT --json {\"id\":1}\n` +
-        `> .get https://api.example.com --header \"Authorization: Bearer token\"\n` +
-        `> .get https://api.example.com --auth user:pass -v`,
+        `\`Ejemplos:\`\n` +
+        `> .get https://api.ejemplo.com\n` +
+        `> .get https://api.ejemplo.com --post --json {\"key\":\"val\"}\n` +
+        `> .get https://api.ejemplo.com --method PUT --json {\"id\":1}\n` +
+        `> .get https://api.ejemplo.com --header \"Authorization: Bearer token\"\n` +
+        `> .get https://api.ejemplo.com --auth user:pass -v`,
     );
   }
 
@@ -146,7 +147,7 @@ async function handler(m, { sock }) {
   ];
   if (!validMethods.includes(method)) {
     return m.reply(
-      `❌ Invalid method: ${method}. Valid: ${validMethods.join(", ")}`,
+      `❌ Método inválido: ${method}. Válidos: ${validMethods.join(", ")}`,
     );
   }
 
@@ -157,7 +158,7 @@ async function handler(m, { sock }) {
       jsonBody = JSON.parse(jsonMatch[1]);
       input = input.replace(/--json\s+\{[\s\S]*?\}/i, "").trim();
     } catch (e) {
-      return m.reply(`❌ Invalid JSON body: ${e.message}`);
+      return m.reply(`❌ Cuerpo JSON inválido: ${e.message}`);
     }
   }
 
@@ -185,13 +186,13 @@ async function handler(m, { sock }) {
   }
 
   if (isBlockedUrl(url)) {
-    return m.reply("❌ Localhost / internal / metadata address blocked");
+    return m.reply("❌ Dirección de localhost / interna / metadatos bloqueada");
   }
 
   try {
     new URL(url);
   } catch {
-    return m.reply("❌ Invalid URL");
+    return m.reply("❌ URL inválida");
   }
 
   await m.reply(`🕕 ${method} ${url} ...`);
@@ -238,21 +239,21 @@ async function handler(m, { sock }) {
     const statusEmoji =
       response.status >= 200 && response.status < 300 ? "✅" : "⚠️";
 
-    let header = `🌐 *HTTP RESPONSE*
+    let header = `🌐 *RESPUESTA HTTP*
 
 ╭┈┈⬡「 📋 INFO 」
-┃ ${statusEmoji} Status: ${response.status} ${response.statusText}
-┃ 📨 Method: ${method}
-┃ ⏱️ Time: ${elapsed}ms
-┃ 📦 Size: ${formatSize(size)}
-┃ 📄 Type: ${mimeType || "unknown"}
+┃ ${statusEmoji} Estado: ${response.status} ${response.statusText}
+┃ 📨 Método: ${method}
+┃ ⏱️ Tiempo: ${elapsed}ms
+┃ 📦 Tamaño: ${formatSize(size)}
+┃ 📄 Tipo: ${mimeType || "desconocido"}
 ╰┈┈⬡`;
 
     if (isVerbose) {
       const respHeaders = Object.entries(response.headers)
         .map(([k, v]) => `┃ ${k}: ${v}`)
         .join("\n");
-      header += `\n\n╭┈┈⬡「 📨 RESPONSE HEADERS 」\n${respHeaders}\n╰┈┈⬡`;
+      header += `\n\n╭┈┈⬡「 📨 CABECERAS DE RESPUESTA 」\n${respHeaders}\n╰┈┈⬡`;
     }
 
     if (category === "gif") {
@@ -305,7 +306,7 @@ async function handler(m, { sock }) {
           if (text.length > MAX_JSON_PREVIEW) {
             text =
               text.slice(0, MAX_JSON_PREVIEW) +
-              "\n\n... (truncated, full size: " +
+              "\n\n... (truncado, tamaño total: " +
               formatSize(size) +
               ")";
           }
@@ -317,8 +318,7 @@ async function handler(m, { sock }) {
         try {
           const parsed = JSON.parse(buffer.toString());
           const pretty = JSON.stringify(parsed, null, 2);
-          const preview = pretty.slice(0, MAX_CHAT_LENGTH);
-          const fileName = `response_${Date.now()}.json`;
+          const fileName = `respuesta_${Date.now()}.json`;
           await sock.sendMessage(
             m.chat,
             {
@@ -327,51 +327,51 @@ async function handler(m, { sock }) {
               mimetype: "application/json",
               caption:
                 header +
-                `\n\n📄 Pretty JSON dikirim sebagai file (${formatSize(pretty.length)})`,
+                `\n\n📄 JSON formateado enviado como archivo (${formatSize(pretty.length)})`,
             },
             { quoted: m },
           );
         } catch {
-          const fileName = `response_${Date.now()}.${ext}`;
+          const fileName = `respuesta_${Date.now()}.${ext}`;
           await sock.sendMessage(
             m.chat,
             {
               document: buffer,
               fileName,
               mimetype: mimeType || "application/octet-stream",
-              caption: header + "\n\n📎 Full response dikirim sebagai file",
+              caption: header + "\n\n📎 Respuesta completa enviada como archivo",
             },
             { quoted: m },
           );
         }
       } else {
-        const fileName = `response_${Date.now()}.${ext}`;
+        const fileName = `respuesta_${Date.now()}.${ext}`;
         await sock.sendMessage(
           m.chat,
           {
             document: buffer,
             fileName,
             mimetype: mimeType || "application/octet-stream",
-            caption: header + "\n\n📎 Full response dikirim sebagai file",
+            caption: header + "\n\n📎 Respuesta completa enviada como archivo",
           },
           { quoted: m },
         );
       }
     } else {
-      const fileName = `response_${Date.now()}.${ext}`;
+      const fileName = `respuesta_${Date.now()}.${ext}`;
       await sock.sendMessage(
         m.chat,
         {
           document: buffer,
           fileName,
           mimetype: mimeType || "application/octet-stream",
-          caption: header + "\n\n📎 Full response dikirim sebagai file",
+          caption: header + "\n\n📎 Respuesta completa enviada como archivo",
         },
         { quoted: m },
       );
     }
   } catch (e) {
-    await m.reply(`❌ *REQUEST FAILED*\n\n> ${e.message}`);
+    await m.reply(`❌ *PETICIÓN FALLIDA*\n\n> ${e.message}`);
   }
 }
 
