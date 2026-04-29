@@ -12,7 +12,7 @@ import te from "../../src/lib/ourin-error.js";
 const pluginConfig = {
   name: "pushcontacto",
   alias: ["puskontak", "push", "difusion"],
-  category: "herramientas",
+  category: "pushkontak",
   description: "Envía mensajes a todos los miembros del grupo + guarda contactos en VCF",
   usage: ".pushcontacto <mensaje>",
   example: ".pushcontacto ¡Hola a todos!",
