@@ -1,11 +1,12 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
-    name: 'hapusdata',
+    name: 'borrardatos',
     alias: ['resetdata', 'cleardata', 'wipedata'],
     category: 'owner',
-    description: 'Reset semua data database ke default',
-    usage: '.hapusdata',
-    example: '.hapusdata',
+    description: 'Restablecer todos los datos de la base de datos por defecto',
+    usage: '.borrardatos',
+    example: '.borrardatos',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -20,11 +21,11 @@ const pendingReset = new Map()
 async function handler(m, { sock }) {
     const args = m.text
 
-    if (args === 'ya' || args === 'yes' || args === 'confirm') {
+    if (args === 'si' || args === 'yes' || args === 'confirm' || args === 'ya') {
         const pending = pendingReset.get(m.sender)
         if (!pending || Date.now() - pending > 60000) {
             pendingReset.delete(m.sender)
-            return m.reply(`❌ Tidak ada permintaan reset yang aktif.\n\n> Ketik \`${m.prefix}hapusdata\` terlebih dahulu`)
+            return m.reply(`❌ No hay ninguna solicitud de restablecimiento activa.\n\n> Escribe \`${m.prefix}borrardatos\` primero.`)
         }
 
         pendingReset.delete(m.sender)
@@ -37,26 +38,25 @@ async function handler(m, { sock }) {
 
         await sock.sendMessage(m.chat, {
             text:
-                `🗑️ *ᴅᴀᴛᴀ ᴅɪʀᴇsᴇᴛ*\n\n` +
-                `> 📁 File direset: *${result.resetCount}/${result.total}*\n` +
-                `> 💾 Backup: \`${result.backupFolder}/\`\n\n` +
-                `Semua data telah dikembalikan ke default.\n\n` +
-                `> ⚠️ Restart bot untuk memastikan data tersinkronisasi`
+                `🗑️ *ᴅᴀᴛᴏs ʀᴇsᴛᴀʙʟᴇᴄɪᴅᴏs*\n\n` +
+                `> 📁 Archivos restablecidos: *${result.resetCount}/${result.total}*\n` +
+                `> 💾 Respaldo: \`${result.backupFolder}/\`\n\n` +
+                `Todos los datos han vuelto a sus valores por defecto.\n\n` +
+                `> ⚠️ Reinicia el bot para asegurar la sincronización de los datos.`
         }, { quoted: m })
         return
     }
 
     const db = getDatabase()
-    const dbPath = db.dbPath
     const fileMap = [
-        { key: 'users', label: '👥 Users' },
-        { key: 'groups', label: '👥 Groups' },
-        { key: 'settings', label: '⚙️ Settings' },
-        { key: 'stats', label: '📊 Stats' },
-        { key: 'sewa', label: '🏪 Sewa' },
+        { key: 'users', label: '👥 Usuarios' },
+        { key: 'groups', label: '👥 Grupos' },
+        { key: 'settings', label: '⚙️ Ajustes' },
+        { key: 'stats', label: '📊 Estadísticas' },
+        { key: 'sewa', label: '🏪 Alquiler' },
         { key: 'premium', label: '⭐ Premium' },
         { key: 'owner', label: '👑 Owner' },
-        { key: 'partner', label: '🤝 Partner' },
+        { key: 'partner', label: '🤝 Socios' },
     ]
 
     const existing = []
@@ -72,21 +72,21 @@ async function handler(m, { sock }) {
     }
 
     if (existing.length === 0) {
-        return m.reply(`❌ Tidak ada data database yang ditemukan`)
+        return m.reply(`❌ No se encontraron datos en la base de datos.`)
     }
 
     pendingReset.set(m.sender, Date.now())
 
-    let txt = `⚠️ *ᴘᴇʀɪɴɢᴀᴛᴀɴ — ʜᴀᴘᴜs ᴅᴀᴛᴀ*\n\n`
-    txt += `Aksi ini akan menghapus *SEMUA* data berikut:\n\n`
+    let txt = `⚠️ *ᴀᴅᴠᴇʀᴛᴇɴᴄɪᴀ — ʙᴏʀʀᴀʀ ᴅᴀᴛᴏs*\n\n`
+    txt += `Esta acción eliminará *TODOS* los siguientes datos:\n\n`
 
     for (const { label, entries, size } of existing) {
-        txt += `> ${label}: *${entries}* data (${size})\n`
+        txt += `> ${label}: *${entries}* entradas (${size})\n`
     }
 
     txt += `\n> 📦 Total: *${(totalSize / 1024).toFixed(1)} KB*\n`
-    txt += `> 💾 Backup otomatis dibuat sebelum reset\n\n`
-    txt += `Ketik \`${m.prefix}hapusdata ya\` dalam 60 detik untuk melanjutkan.`
+    txt += `> 💾 Se creó un respaldo automático antes del reset.\n\n`
+    txt += `Escribe \`${m.prefix}borrardatos si\` en menos de 60 segundos para continuar.`
 
     await sock.sendMessage(m.chat, {
         text: txt,
@@ -94,14 +94,14 @@ async function handler(m, { sock }) {
             {
                 name: 'quick_reply',
                 buttonParamsJson: JSON.stringify({
-                    display_text: '✅ Ya, Hapus Semua',
-                    id: `${m.prefix}hapusdata ya`
+                    display_text: '✅ Sí, borrar todo',
+                    id: `${m.prefix}borrardatos si`
                 })
             },
             {
                 name: 'quick_reply',
                 buttonParamsJson: JSON.stringify({
-                    display_text: '❌ Batalkan',
+                    display_text: '❌ Cancelar',
                     id: `${m.prefix}menu`
                 })
             }
