@@ -1,12 +1,13 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { addExpWithLevelCheck } from '../../src/lib/ourin-level.js'
+
 const pluginConfig = {
-    name: 'alchemy',
-    alias: ['potion', 'brew', 'ramuan'],
+    name: 'alquimia',
+    alias: ['pocion', 'cocinar', 'brebaje'],
     category: 'rpg',
-    description: 'Buat potion dan ramuan dari herba',
-    usage: '.alchemy <potion>',
-    example: '.alchemy healthpotion',
+    description: 'Cociná unas pociones y brebajes con los yuyos que encontraste',
+    usage: '.alquimia <pocion>',
+    example: '.alquimia pocionvida',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -17,15 +18,15 @@ const pluginConfig = {
 }
 
 const POTIONS = {
-    healthpotion: { name: '❤️ Health Potion', materials: { herb: 3 }, effect: 'Pulihkan 50 HP', exp: 80, result: 'healthpotion' },
-    manapotion: { name: '💙 Mana Potion', materials: { herb: 2, flower: 1 }, effect: 'Pulihkan 50 Mana', exp: 90, result: 'manapotion' },
-    staminapotion: { name: '⚡ Stamina Potion', materials: { herb: 2, mushroom: 1 }, effect: 'Pulihkan 30 Stamina', exp: 100, result: 'staminapotion' },
-    strengthpotion: { name: '💪 Strength Potion', materials: { herb: 3, dragonscale: 1 }, effect: '+20 ATK (5 menit)', exp: 200, result: 'strengthpotion' },
-    defensepotion: { name: '🛡️ Defense Potion', materials: { herb: 3, iron: 2 }, effect: '+15 DEF (5 menit)', exp: 180, result: 'defensepotion' },
-    luckpotion: { name: '🍀 Luck Potion', materials: { herb: 5, diamond: 1 }, effect: '+30% Drop Rate (10 menit)', exp: 300, result: 'luckpotion' },
-    exppotion: { name: '✨ EXP Potion', materials: { herb: 4, gold: 2 }, effect: '+50% EXP (15 menit)', exp: 250, result: 'exppotion' },
-    antidote: { name: '💊 Antidote', materials: { herb: 2 }, effect: 'Sembuhkan racun', exp: 50, result: 'antidote' },
-    elixir: { name: '🧪 Elixir', materials: { herb: 10, diamond: 2, gold: 5 }, effect: 'Pulihkan semua stats', exp: 500, result: 'elixir' }
+    pocionvida: { name: '❤️ Pocion de Vida', materials: { yuyo: 3 }, effect: 'Te cura 50 de HP', exp: 80, result: 'healthpotion' },
+    pocionmana: { name: '💙 Pocion de Mana', materials: { yuyo: 2, flor: 1 }, effect: 'Te da 50 de Mana', exp: 90, result: 'manapotion' },
+    pocionaguante: { name: '⚡ Pocion de Aguante', materials: { yuyo: 2, hongo: 1 }, effect: 'Te da 30 de Stamina', exp: 100, result: 'staminapotion' },
+    pocionfuerza: { name: '💪 Pocion de Fuerza', materials: { yuyo: 3, escamadedragon: 1 }, effect: '+20 ATK (por 5 min)', exp: 200, result: 'strengthpotion' },
+    pociondefensa: { name: '🛡️ Pocion de Defensa', materials: { yuyo: 3, hierro: 2 }, effect: '+15 DEF (por 5 min)', exp: 180, result: 'defensepotion' },
+    pocionsuerte: { name: '🍀 Pocion de Suerte', materials: { yuyo: 5, diamante: 1 }, effect: '+30% Drop Rate (por 10 min)', exp: 300, result: 'luckpotion' },
+    pocionexp: { name: '✨ Pocion de EXP', materials: { yuyo: 4, oro: 2 }, effect: '+50% EXP (por 15 min)', exp: 250, result: 'exppotion' },
+    antidoto: { name: '💊 Antídoto', materials: { yuyo: 2 }, effect: 'Te saca el veneno', exp: 50, result: 'antidote' },
+    elixir: { name: '🧪 Elixir Supremo', materials: { yuyo: 10, diamante: 2, oro: 5 }, effect: 'Te deja como nuevo (Full Stats)', exp: 500, result: 'elixir' }
 }
 
 async function handler(m, { sock }) {
@@ -39,25 +40,25 @@ async function handler(m, { sock }) {
     const potionName = args[0]?.toLowerCase()
     
     if (!potionName) {
-        let txt = `🧪 *ᴀʟᴄʜᴇᴍʏ - ʙᴜᴀᴛ ᴘᴏᴛɪᴏɴ*\n\n`
-        txt += `╭┈┈⬡「 📜 *ʀᴇsᴇᴘ* 」\n`
+        let txt = `🧪 *ALQUIMIA - COCINANDO BREBAJES*\n\n`
+        txt += `╭┈┈⬡「 📜 *EL CUADERNO DE RECETAS* 」\n`
         
         for (const [key, pot] of Object.entries(POTIONS)) {
             const mats = Object.entries(pot.materials).map(([m, qty]) => `${qty}x ${m}`).join(', ')
             txt += `┃ ${pot.name}\n`
-            txt += `┃ 📦 Bahan: ${mats}\n`
-            txt += `┃ 💫 Efek: ${pot.effect}\n`
-            txt += `┃ → \`${key}\`\n┃\n`
+            txt += `┃ 📦 Necesitás: ${mats}\n`
+            txt += `┃ 💫 Qué hace: ${pot.effect}\n`
+            txt += `┃ → Escribí: \`${key}\`\n┃\n`
         }
         txt += `╰┈┈┈┈┈┈┈┈⬡\n\n`
-        txt += `💡 *Tips:* Dapatkan herb dari garden atau dungeon`
+        txt += `💡 *Datazo:* Los yuyos los sacás del jardín o pateando calabozos.`
         
         return m.reply(txt)
     }
     
     const potion = POTIONS[potionName]
     if (!potion) {
-        return m.reply(`❌ Resep tidak ditemukan!\n\n> Ketik \`${m.prefix}alchemy\` untuk melihat daftar.`)
+        return m.reply(`❌ ¡Esa receta no existe, che!\n\n> Mandá \`${m.prefix}alquimia\` para ver qué podés cocinar.`)
     }
     
     const missingMaterials = []
@@ -70,14 +71,15 @@ async function handler(m, { sock }) {
     
     if (missingMaterials.length > 0) {
         return m.reply(
-            `❌ *ʙᴀʜᴀɴ ᴋᴜʀᴀɴɢ*\n\n` +
-            `> Untuk membuat ${potion.name}:\n\n` +
-            missingMaterials.map(m => `> ❌ ${m}`).join('\n')
+            `❌ *TE FALTAN CINCO PARA EL PESO*\n\n` +
+            `> Para armar la ${potion.name} necesitás:\n\n` +
+            missingMaterials.map(m => `> ❌ ${m}`).join('\n') +
+            `\n\n_Andá a buscar lo que falta y volvé._`
         )
     }
     
     await m.react('🧪')
-    await m.reply(`🧪 *ᴍᴇʀᴀᴄɪᴋ ${potion.name.toUpperCase()}...*`)
+    await m.reply(`🧪 *PREPARANDO ${potion.name.toUpperCase()}... BANCAME UN CACHO.*`)
     await new Promise(r => setTimeout(r, 2000))
     
     for (const [material, needed] of Object.entries(potion.materials)) {
@@ -92,11 +94,11 @@ async function handler(m, { sock }) {
     
     await m.react('✅')
     return m.reply(
-        `✅ *ᴀʟᴄʜᴇᴍʏ ʙᴇʀʜᴀsɪʟ*\n\n` +
-        `╭┈┈⬡「 🧪 *ʜᴀsɪʟ* 」\n` +
-        `┃ 📦 Item: *${potion.name}*\n` +
-        `┃ 💫 Efek: *${potion.effect}*\n` +
-        `┃ ✨ EXP: *+${potion.exp}*\n` +
+        `✅ *¡LISTO EL POLLO!*\n\n` +
+        `╭┈┈⬡「 🧪 *BOTÍN COCINADO* 」\n` +
+        `┃ 📦 Te salió: *${potion.name}*\n` +
+        `┃ 💫 Efecto: *${potion.effect}*\n` +
+        `┃ ✨ Ganaste: *+${potion.exp} de EXP*\n` +
         `╰┈┈┈┈┈┈┈┈⬡`
     )
 }
