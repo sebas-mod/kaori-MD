@@ -1,17 +1,18 @@
 import config from '../../config.js'
 /**
  * @file plugins/owner/public.js
- * @description Plugin untuk mengaktifkan mode public (semua bisa akses)
+ * @description Plugin para activar el modo público (todos pueden acceder)
  */
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: 'public',
-    alias: ['publicmode', 'open'],
+    name: 'publico',
+    alias: ['publicmode', 'abrir', 'modopublico'],
     category: 'owner',
-    description: 'Mengaktifkan mode public (semua user bisa akses)',
-    usage: '.public',
-    example: '.public',
+    description: 'Activa el modo público (todos los usuarios pueden acceder)',
+    usage: '.publico',
+    example: '.publico',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -22,35 +23,38 @@ const pluginConfig = {
 };
 
 /**
- * Handler untuk command public
+ * Handler para el comando publico
  */
 async function handler(m, { sock }) {
     try {
         const isRealOwner = validateOwner(m);
         if (!isRealOwner) {
-            return await m.reply('🚫 *ᴀᴋsᴇs ᴅɪᴛᴏʟᴀᴋ*\n\n> Hanya owner yang bisa mengubah mode bot!');
+            return await m.reply('🚫 *ᴀᴄᴄᴇsᴏ ᴅᴇɴᴇɢᴀᴅᴏ*\n\n> ¡Solo el propietario puede cambiar el modo del bot!');
         }
+
         const currentMode = config.mode;
         if (currentMode === 'public') {
-            return await m.reply('ℹ️ Bot sudah dalam mode *public*');
+            return await m.reply('ℹ️ El bot ya se encuentra en modo *público*');
         }
+
         config.mode = 'public';
         const db = getDatabase();
         db.setting('botMode', 'public');
         
-        const responseText = `🌐 *ᴍᴏᴅᴇ ᴘᴜʙʟɪᴄ ᴀᴋᴛɪꜰ*\n\n` +
-            `> Bot sekarang merespon semua user!\n\n` +
-            `_Gunakan .self untuk menutup akses_`;
+        const responseText = `🌐 *ᴍᴏᴅᴏ ᴘᴜ́ʙʟɪᴄᴏ ᴀᴄᴛɪᴠᴀᴅᴏ*\n\n` +
+            `> ¡El bot ahora responderá a todos los usuarios!\n\n` +
+            `_Usa .self para restringir el acceso nuevamente_`;
+
         await m.reply(responseText);
-        console.log(`[Mode] Changed to PUBLIC by ${m.pushName} (${m.sender})`);
+        console.log(`[Modo] Cambiado a PUBLICO por ${m.pushName} (${m.sender})`);
     } catch (error) {
-        console.error('[Public Command Error]', error);
+        console.error('[Error en Comando Publico]', error);
         await m.reply(te(m.prefix, m.command, m.pushName));
     }
 }
 
 /**
- * Validasi owner dengan multiple checks
+ * Validación de propietario con múltiples comprobaciones
  */
 function validateOwner(m) {
     if (!m.isOwner) return false;
@@ -62,6 +66,7 @@ function validateOwner(m) {
         const cleanOwner = owner.replace(/[^0-9]/g, '');
         return senderNumber.includes(cleanOwner) || cleanOwner.includes(senderNumber);
     });
+
     if (!isInOwnerList) return false;
     if (!m.sender || !m.sender.includes('@')) return false;
     return true;
