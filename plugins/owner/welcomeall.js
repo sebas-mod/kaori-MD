@@ -1,10 +1,11 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'welcomeall',
-    alias: ['wcall', 'globalwelcome'],
+    alias: ['bienvenidaall', 'bienvenidaglobal', 'wcall'],
     category: 'owner',
-    description: 'Aktifkan/nonaktifkan welcome di semua grup',
+    description: 'Activa o desactiva la bienvenida en todos los grupos',
     usage: '.welcomeall <on/off>',
     example: '.welcomeall on',
     isOwner: true,
@@ -23,9 +24,9 @@ async function handler(m, { sock }) {
     
     if (!action || !['on', 'off'].includes(action)) {
         return m.reply(
-            `👋 *ᴡᴇʟᴄᴏᴍᴇ ɢʟᴏʙᴀʟ*\n\n` +
-            `> Aktifkan/nonaktifkan welcome di SEMUA grup sekaligus\n\n` +
-            `╭┈┈⬡「 📋 *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ* 」\n` +
+            `👋 *ʙɪᴇɴᴠᴇɴɪᴅᴀ ɢʟᴏʙᴀʟ*\n\n` +
+            `> Activa o desactiva el mensaje de bienvenida en TODOS los grupos a la vez.\n\n` +
+            `╭┈┈⬡「 📋 *ᴍᴏᴅᴏ ᴅᴇ ᴜsᴏ* 」\n` +
             `┃ ${m.prefix}welcomeall on\n` +
             `┃ ${m.prefix}welcomeall off\n` +
             `╰┈┈┈┈┈┈┈┈⬡`
@@ -49,21 +50,21 @@ async function handler(m, { sock }) {
         
         if (status) {
             return m.reply(
-                `✅ *ᴡᴇʟᴄᴏᴍᴇ ɢʟᴏʙᴀʟ ᴏɴ*\n\n` +
-                `╭┈┈⬡「 📊 *ʀᴇsᴜʟᴛ* 」\n` +
-                `┃ 🌐 Total Grup: *${count}*\n` +
-                `┃ ✅ Welcome: *AKTIF*\n` +
+                `✅ *ʙɪᴇɴᴠᴇɴɪᴅᴀ ɢʟᴏʙᴀʟ ᴏɴ*\n\n` +
+                `╭┈┈⬡「 📊 *ʀᴇsᴜʟᴛᴀᴅᴏ* 」\n` +
+                `┃ 🌐 Total Grupos: *${count}*\n` +
+                `┃ ✅ Bienvenida: *ACTIVADA*\n` +
                 `╰┈┈┈┈┈┈┈┈⬡\n\n` +
-                `> Semua member baru akan disambut otomatis!`
+                `> ¡Todos los miembros nuevos serán saludados automáticamente!`
             )
         } else {
             return m.reply(
-                `❌ *ᴡᴇʟᴄᴏᴍᴇ ɢʟᴏʙᴀʟ ᴏꜰꜰ*\n\n` +
-                `╭┈┈⬡「 📊 *ʀᴇsᴜʟᴛ* 」\n` +
-                `┃ 🌐 Total Grup: *${count}*\n` +
-                `┃ ❌ Welcome: *NONAKTIF*\n` +
+                `❌ *ʙɪᴇɴᴠᴇɴɪᴅᴀ ɢʟᴏʙᴀʟ ᴏꜰꜰ*\n\n` +
+                `╭┈┈⬡「 📊 *ʀᴇsᴜʟᴛᴀᴅᴏ* 」\n` +
+                `┃ 🌐 Total Grupos: *${count}*\n` +
+                `┃ ❌ Bienvenida: *DESACTIVADA*\n` +
                 `╰┈┈┈┈┈┈┈┈⬡\n\n` +
-                `> Welcome dinonaktifkan di semua grup.`
+                `> Se ha desactivado la bienvenida en todos los grupos.`
             )
         }
     } catch (error) {
