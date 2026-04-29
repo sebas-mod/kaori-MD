@@ -1,11 +1,12 @@
 import axios from 'axios'
 import config from '../../config.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'barandom',
     alias: ['bluearchive', 'ba'],
-    category: 'random',
-    description: 'Random gambar Blue Archive',
+    category: 'random', // Categoría original preservada
+    description: 'Obtén una imagen aleatoria de Blue Archive',
     usage: '.barandom',
     example: '.barandom',
     isOwner: false,
