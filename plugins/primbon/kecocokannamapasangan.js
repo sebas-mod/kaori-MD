@@ -1,12 +1,13 @@
 import axios from 'axios'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: 'kecocokannamapasangan',
-    alias: ['cocoknama', 'matchname'],
-    category: 'primbon',
-    description: 'Cek kecocokan nama pasangan',
-    usage: '.kecocokannamapasangan <nama1> <nama2>',
-    example: '.kecocokannamapasangan putu keyla',
+    name: 'compatibilidadnombres',
+    alias: ['pareja', 'matchnombres', 'compatibilidad'],
+    category: 'diversion',
+    description: 'Verifica la compatibilidad entre dos nombres de pareja',
+    usage: '.compatibilidadnombres <nombre1> <nombre2>',
+    example: '.compatibilidadnombres juan carla',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -18,29 +19,29 @@ const pluginConfig = {
 
 async function handler(m, { sock }) {
     if (m.args.length < 2) {
-        return m.reply(`💕 *ᴋᴇᴄᴏᴄᴏᴋᴀɴ ɴᴀᴍᴀ*\n\n> Format: nama1 nama2\n\n\`Contoh: ${m.prefix}kecocokannamapasangan putu keyla\``)
+        return m.reply(`💕 *ᴄᴏᴍᴘᴀᴛɪʙɪʟɪᴅᴀᴅ ᴅᴇ ɴᴏᴍʙʀᴇs*\n\n> Formato: nombre1 nombre2\n\n\`Ejemplo: ${m.prefix}compatibilidadnombres juan carla\``)
     }
     
-    const [nama1, nama2] = m.args
+    const [nombre1, nombre2] = m.args
     
     m.react('💕')
     
     try {
-        const url = `https://api.siputzx.my.id/api/primbon/kecocokan_nama_pasangan?nama1=${encodeURIComponent(nama1)}&nama2=${encodeURIComponent(nama2)}`
+        const url = `https://api.siputzx.my.id/api/primbon/kecocokan_nama_pasangan?nama1=${encodeURIComponent(nombre1)}&nama2=${encodeURIComponent(nombre2)}`
         const { data } = await axios.get(url, { timeout: 30000 })
         
         if (!data?.status || !data?.data) {
             m.react('❌')
-            return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Gagal menganalisa`)
+            return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> No se pudo realizar el análisis.`)
         }
         
         const result = data.data
-        const response = `💕 *ᴋᴇᴄᴏᴄᴏᴋᴀɴ ɴᴀᴍᴀ ᴘᴀsᴀɴɢᴀɴ*\n\n` +
-            `> 👤 ${result.nama_anda}\n` +
-            `> 💑 ${result.nama_pasangan}\n\n` +
-            `✅ *ꜱɪꜱɪ ᴘᴏꜱɪᴛɪꜰ:*\n${result.sisi_positif}\n\n` +
-            `❌ *ꜱɪꜱɪ ɴᴇɢᴀᴛɪꜰ:*\n${result.sisi_negatif}\n\n` +
-            `> _${result.catatan}_`
+        const response = `💕 *ᴄᴏᴍᴘᴀᴛɪʙɪʟɪᴅᴀᴅ ᴅᴇ ᴘᴀʀᴇᴊᴀ*\n\n` +
+            `> 👤 Tu: *${result.nama_anda}*\n` +
+            `> 💑 Pareja: *${result.nama_pasangan}*\n\n` +
+            `✅ *ᴘᴜɴᴛᴏs ᴘᴏsɪᴛɪᴠᴏs:*\n${result.sisi_positif}\n\n` +
+            `❌ *ᴘᴜɴᴛᴏs ɴᴇɢᴀᴛɪᴠᴏs:*\n${result.sisi_negatif}\n\n` +
+            `> _${result.catatan || 'Sin notas adicionales.'}_`
         
         m.react('✅')
         await m.reply(response)
