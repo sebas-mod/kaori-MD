@@ -1,13 +1,14 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { addExpWithLevelCheck } from '../../src/lib/ourin-level.js'
 import { getRpgContextInfo } from '../../src/lib/ourin-context.js'
+
 const pluginConfig = {
-    name: 'beg',
-    alias: ['ngemis', 'minta'],
+    name: 'manguear',
+    alias: ['beg', 'pedir', 'mendigage'],
     category: 'rpg',
-    description: 'Mengemis untuk mendapatkan uang receh',
-    usage: '.beg',
-    example: '.beg',
+    description: 'Andá a pedir unas monedas a la calle para ver si ligás algo',
+    usage: '.manguear',
+    example: '.manguear',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -23,17 +24,17 @@ async function handler(m, { sock }) {
     
     if (!user.rpg) user.rpg = {}
     
-    await m.reply('🙏 *sᴇᴅᴀɴɢ ᴍᴇɴɢᴇᴍɪs...*')
+    await m.reply('🙏 *MANGUEANDO UNOS MANGOS...*')
     await new Promise(r => setTimeout(r, 2000))
     
     const responses = [
-        { success: true, money: 500, exp: 10, msg: 'Seorang dermawan memberikanmu uang!' },
-        { success: true, money: 1000, exp: 20, msg: 'Kamu dapat tips dari orang baik!' },
-        { success: true, money: 2000, exp: 50, msg: 'WOW! Ada sultan yang kasihan!' },
-        { success: false, money: 0, exp: 0, msg: 'Tidak ada yang peduli...' },
-        { success: false, money: 0, exp: 0, msg: 'Orang-orang mengabaikanmu...' },
-        { success: true, money: 100, exp: 5, msg: 'Dapat receh dari kantong orang!' },
-        { success: false, money: -500, exp: 0, msg: 'Kamu malah dirampok pengemis lain!' }
+        { success: true, money: 500, exp: 10, msg: '¡Un tipazo te tiró unos manguitos para el bondi!' },
+        { success: true, money: 1000, exp: 20, msg: '¡Te dieron propina por cuidar un coche!' },
+        { success: true, money: 2000, exp: 50, msg: '¡A la flauta! ¡Un cheto se apiadó y te dio un billete grande!' },
+        { success: false, money: 0, exp: 0, msg: 'No te dio bola ni el loro...' },
+        { success: false, money: 0, exp: 0, msg: 'Te miraron con cara de pocos amigos y siguieron de largo.' },
+        { success: true, money: 100, exp: 5, msg: '¡Encontraste unas monedas tiradas en la vereda!' },
+        { success: false, money: -500, exp: 0, msg: '¡Te quiso primerear otro y te terminó afanando lo poco que tenías!' }
     ]
     
     const result = responses[Math.floor(Math.random() * responses.length)]
@@ -51,12 +52,12 @@ async function handler(m, { sock }) {
     
     let txt = ''
     if (result.success && result.money > 0) {
-        txt = `🙏 *ɴɢᴇᴍɪs sᴜᴋsᴇs*\n\n> ${result.msg}\n> 💰 Dapat: *+Rp ${result.money.toLocaleString('id-ID')}*`
-        if (result.exp > 0) txt += `\n> 🚄 Exp: *+${result.exp}*`
+        txt = `🙏 *MANGUEO CON SUERTE*\n\n> ${result.msg}\n> 💰 Juntaste: *+$${result.money.toLocaleString('es-AR')}*`
+        if (result.exp > 0) txt += `\n> ✨ Exp: *+${result.exp}*`
     } else if (result.money < 0) {
-        txt = `😭 *ɴɢᴇᴍɪs ɢᴀɢᴀʟ*\n\n> ${result.msg}\n> 💸 Lost: *Rp ${Math.abs(result.money).toLocaleString('id-ID')}*`
+        txt = `😭 *TE SALIÓ EL TIRO POR LA CULATA*\n\n> ${result.msg}\n> 💸 Perdiste: *-$${Math.abs(result.money).toLocaleString('es-AR')}*`
     } else {
-        txt = `😢 *ɴɢᴇᴍɪs ɢᴀɢᴀʟ*\n\n> ${result.msg}`
+        txt = `😢 *NI UNA MONEDA*\n\n> ${result.msg}`
     }
     
     await m.reply(txt)
