@@ -1,12 +1,13 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { getRpgContextInfo } from '../../src/lib/ourin-context.js'
+
 const pluginConfig = {
-    name: 'cook',
-    alias: ['masak', 'cooking'],
+    name: 'cocinar',
+    alias: ['cook', 'masak', 'cooking', 'comida'],
     category: 'rpg',
-    description: 'Memasak makanan untuk menambah health',
-    usage: '.cook',
-    example: '.cook',
+    description: 'Cociná alimentos para recuperar vida (HP)',
+    usage: '.cocinar',
+    example: '.cocinar',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -17,10 +18,10 @@ const pluginConfig = {
 }
 
 const RECIPES = {
-    fish_soup: { name: '🍲 Sup Ikan', materials: { fish: 2 }, heal: 30 },
-    grilled_meat: { name: '🍖 Daging Panggang', materials: { rabbit: 1, wood: 1 }, heal: 40 },
-    apple_pie: { name: '🥧 Pie Apel', materials: { apple: 3 }, heal: 25 },
-    steak: { name: '🥩 Steak', materials: { boar: 1, coal: 1 }, heal: 60 }
+    fish_soup: { name: '🍲 Sopa de Pescado', materials: { pescado: 2 }, heal: 30 },
+    grilled_meat: { name: '🍖 Carne Asada', materials: { conejo: 1, madera: 1 }, heal: 40 },
+    apple_pie: { name: '🥧 Tarta de Manzana', materials: { manzana: 3 }, heal: 25 },
+    steak: { name: '🥩 Churrasco', materials: { jabali: 1, Carbon: 1 }, heal: 60 }
 }
 
 async function handler(m, { sock }) {
@@ -34,7 +35,7 @@ async function handler(m, { sock }) {
     user.rpg.maxHealth = user.rpg.maxHealth || 100
     
     if (user.rpg.health >= user.rpg.maxHealth) {
-        return m.reply(`❤️ Health sudah penuh!`)
+        return m.reply(`❤️ ¡Ya tenés la vida al máximo! No desperdicies comida.`)
     }
     
     let cooked = null
@@ -53,11 +54,12 @@ async function handler(m, { sock }) {
     }
     
     if (!cooked) {
-        let txt = `🍳 *ᴄᴏᴏᴋ - ʀᴇsᴇᴘ*\n\n`
+        let txt = `🍳 *MENU DE COCINA - 𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃*\n\n`
+        txt += `> No tenés ingredientes suficientes para cocinar nada automático. Revisá tus recetas:\n\n`
         for (const [key, recipe] of Object.entries(RECIPES)) {
             txt += `╭┈┈⬡「 ${recipe.name} 」\n`
-            txt += `┃ ❤️ Heal: +${recipe.heal}\n`
-            txt += `┃ 📦 Bahan:\n`
+            txt += `┃ ❤️ Cura: +${recipe.heal} HP\n`
+            txt += `┃ 📦 Ingredientes:\n`
             for (const [mat, qty] of Object.entries(recipe.materials)) {
                 const has = user.inventory[mat] || 0
                 txt += `┃   ${has >= qty ? '✅' : '❌'} ${mat}: ${has}/${qty}\n`
@@ -67,6 +69,7 @@ async function handler(m, { sock }) {
         return m.reply(txt)
     }
     
+    // Consumir ingredientes
     for (const [mat, qty] of Object.entries(cooked.materials)) {
         user.inventory[mat] -= qty
     }
@@ -76,9 +79,9 @@ async function handler(m, { sock }) {
     
     db.save()
     
-    let txt = `🍳 *ᴄᴏᴏᴋ sᴜᴋsᴇs*\n\n`
-    txt += `> 🍽️ Membuat: ${cooked.name}\n`
-    txt += `> ❤️ Health: ${oldHealth} → *${user.rpg.health}*`
+    let txt = `🍳 *¡COCINASTE ALGO RICO!*\n\n`
+    txt += `> 🍽️ Preparaste: *${cooked.name}*\n`
+    txt += `> ❤️ Tu vida: ${oldHealth} → *${user.rpg.health}*`
     
     await m.reply(txt)
 }
