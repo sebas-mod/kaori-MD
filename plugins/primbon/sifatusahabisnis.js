@@ -1,12 +1,13 @@
 import axios from 'axios'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: 'sifatusahabisnis',
-    alias: ['usahabisnis', 'sifatbisnis'],
-    category: 'primbon',
-    description: 'Cek sifat usaha/bisnis berdasarkan tanggal lahir',
-    usage: '.sifatusahabisnis <tgl> <bln> <thn>',
-    example: '.sifatusahabisnis 1 1 2000',
+    name: 'perfilnegocio',
+    alias: ['sifatbisnis', 'suertenegocio', 'negocio'],
+    category: 'diversion',
+    description: 'Analiza tu perfil para los negocios según tu fecha de nacimiento',
+    usage: '.perfilnegocio <día> <mes> <año>',
+    example: '.perfilnegocio 1 1 2000',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -18,7 +19,7 @@ const pluginConfig = {
 
 async function handler(m, { sock }) {
     if (m.args.length < 3) {
-        return m.reply(`💼 *sɪꜰᴀᴛ ᴜsᴀʜᴀ/ʙɪsɴɪs*\n\n> Format: tgl bln thn\n\n\`Contoh: ${m.prefix}sifatusahabisnis 1 1 2000\``)
+        return m.reply(`💼 *ᴘᴇʀꜰɪʟ ᴅᴇ ɴᴇɢᴏᴄɪᴏs*\n\n> Formato: día mes año\n\n\`Ejemplo: ${m.prefix}perfilnegocio 1 1 2000\``)
     }
     
     const [tgl, bln, thn] = m.args
@@ -31,14 +32,14 @@ async function handler(m, { sock }) {
         
         if (!data?.status || !data?.data) {
             m.react('❌')
-            return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Gagal menganalisa`)
+            return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> No se pudo realizar el análisis de negocio.`)
         }
         
         const r = data.data
-        const response = `💼 *sɪꜰᴀᴛ ᴜsᴀʜᴀ/ʙɪsɴɪs*\n\n` +
-            `> Lahir: *${r.hari_lahir}*\n\n` +
-            `📊 *ᴀɴᴀʟɪsᴀ:*\n${r.usaha}\n\n` +
-            `> _${r.catatan}_`
+        const response = `💼 *ᴘᴇʀꜰɪʟ ᴅᴇ ɴᴇɢᴏᴄɪᴏs*\n\n` +
+            `> Nacimiento: *${r.hari_lahir}*\n\n` +
+            `📊 *ᴀɴáʟɪsɪs ᴅᴇ ᴇᴍᴘʀᴇɴᴅɪᴍɪᴇɴᴛᴏ:*\n${r.usaha}\n\n` +
+            `> _${r.catatan || 'Análisis basado en numerología.'}_`
         
         m.react('✅')
         await m.reply(response)
