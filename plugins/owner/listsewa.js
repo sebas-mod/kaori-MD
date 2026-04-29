@@ -1,12 +1,13 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import * as timeHelper from '../../src/lib/ourin-time.js'
+
 const pluginConfig = {
-    name: 'listsewa',
-    alias: ['sewalist', 'daftarsewa'],
+    name: 'listalquiler',
+    alias: ['sewalist', 'daftarsewa', 'listaquiler'],
     category: 'owner',
-    description: 'Lihat daftar grup yang terdaftar sewa',
-    usage: '.listsewa',
-    example: '.listsewa',
+    description: 'Ver la lista de grupos con alquiler registrado',
+    usage: '.listalquiler',
+    example: '.listalquiler',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -17,10 +18,10 @@ const pluginConfig = {
 }
 
 function formatCountdown(data) {
-    if (data.status === 'expired') return '🚫 EXPIRED (left)'
-    if (data.isLifetime) return '♾️ Permanent'
+    if (data.status === 'expired') return '🚫 EXPIRADO (Bot salió)'
+    if (data.isLifetime) return '♾️ Permanente'
     const diff = data.expiredAt - Date.now()
-    if (diff <= 0) return '❌ EXPIRED'
+    if (diff <= 0) return '❌ EXPIRADO'
     const days = Math.floor(diff / 86400000)
     const hours = Math.floor((diff % 86400000) / 3600000)
     const minutes = Math.floor((diff % 3600000) / 60000)
@@ -34,7 +35,7 @@ function getStatusEmoji(data) {
     if (data.isLifetime) return '♾️'
     const diff = data.expiredAt - Date.now()
     if (diff <= 0) return '❌'
-    if (diff <= 259200000) return '⚠️'
+    if (diff <= 259200000) return '⚠️' // Menos de 3 días
     return '✅'
 }
 
@@ -50,10 +51,10 @@ function handler(m) {
 
     if (groupIds.length === 0) {
         return m.reply(
-            `📋 *DAFTAR SEWA*\n\n` +
-            `Status: *${db.db.data.sewa.enabled ? '✅ AKTIF' : '❌ NONAKTIF'}*\n` +
-            `Belum ada grup terdaftar\n\n` +
-            `Tambah dengan: *${m.prefix}addsewa <link> <durasi>*`
+            `📋 *ʟɪsᴛᴀ ᴅᴇ ᴀʟǫᴜɪʟᴇʀ*\n\n` +
+            `Estado: *${db.db.data.sewa.enabled ? '✅ ACTIVO' : '❌ INACTIVO'}*\n` +
+            `Aún no hay grupos registrados\n\n` +
+            `Añade uno con: *${m.prefix}addsewa <link> <duración>*`
         )
     }
 
@@ -68,9 +69,9 @@ function handler(m) {
     const active = sorted.filter(id => sewaGroups[id].isLifetime || sewaGroups[id].expiredAt > Date.now())
     const expired = sorted.filter(id => !sewaGroups[id].isLifetime && sewaGroups[id].expiredAt <= Date.now())
 
-    let text = `📋 *DAFTAR SEWA*\n\n`
-    text += `Status sistem: *${db.db.data.sewa.enabled ? '✅ AKTIF' : '❌ NONAKTIF'}*\n`
-    text += `Total: *${groupIds.length}* grup (${active.length} aktif, ${expired.length} expired)\n\n`
+    let text = `📋 *ʟɪsᴛᴀ ᴅᴇ ᴀʟǫᴜɪʟᴇʀ*\n\n`
+    text += `Estado del sistema: *${db.db.data.sewa.enabled ? '✅ ACTIVO' : '❌ INACTIVO'}*\n`
+    text += `Total: *${groupIds.length}* grupos (${active.length} activos, ${expired.length} expirados)\n\n`
 
     for (let i = 0; i < sorted.length; i++) {
         const gid = sorted[i]
@@ -79,15 +80,15 @@ function handler(m) {
         const countdown = formatCountdown(data)
         const addedDate = data.addedAt ? timeHelper.fromTimestamp(data.addedAt, 'DD/MM/YYYY') : '-'
 
-        text += `${status} *${i + 1}. ${data.name || 'Unknown'}*\n`
+        text += `${status} *${i + 1}. ${data.name || 'Desconocido'}*\n`
         text += `   ID: ${gid.split('@')[0]}\n`
-        text += `   Sisa: ${countdown}\n`
-        text += `   Ditambah: ${addedDate}\n\n`
+        text += `   Restante: ${countdown}\n`
+        text += `   Agregado: ${addedDate}\n\n`
     }
 
-    text += `*AKSI:*\n`
-    text += `• *${m.prefix}renewsewa <id> <durasi>* — Perpanjang\n`
-    text += `• *${m.prefix}delsewa <id>* — Hapus dari whitelist`
+    text += `*ACCIONES:*\n`
+    text += `• *${m.prefix}renewsewa <id> <duración>* — Renovar\n`
+    text += `• *${m.prefix}delsewa <id>* — Eliminar de la lista`
 
     return m.reply(text)
 }
