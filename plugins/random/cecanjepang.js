@@ -1,11 +1,12 @@
 import axios from 'axios'
 import config from '../../config.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
     name: 'cecanjepang',
-    alias: ['cewekjepang', 'cewekjpn'],
-    category: 'cecan',
-    description: 'Random gambar cewek cantik Jepang',
+    alias: ['cewekjepang', 'cewekjpn', 'japanchica'],
+    category: 'cecan', // Categoría original preservada
+    description: 'Obtén una imagen aleatoria de chicas de Japón',
     usage: '.cecanjepang',
     example: '.cecanjepang',
     isOwner: false,
