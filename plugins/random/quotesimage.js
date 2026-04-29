@@ -2,15 +2,16 @@ import axios from 'axios'
 import config from '../../config.js'
 import { f } from '../../src/lib/ourin-http.js'
 import te from '../../src/lib/ourin-error.js'
+
 const NEOXR_APIKEY = config.APIkey?.neoxr || 'Milik-Bot-OurinMD'
 
 const pluginConfig = {
-    name: 'quotesimage',
-    alias: ['quoteimg', 'quotes-image', 'qimg'],
-    category: 'random',
-    description: 'Random quotes image',
-    usage: '.quotesimage',
-    example: '.quotesimage',
+    name: 'imagenfrases',
+    alias: ['quoteimg', 'quotes-image', 'qimg', 'fraseimg'],
+    category: 'random', // Categoría original preservada
+    description: 'Obtén una imagen con frases aleatorias',
+    usage: '.imagenfrases',
+    example: '.imagenfrases',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -28,7 +29,7 @@ async function handler(m, { sock }) {
         
         if (!res.status || !res.data?.url) {
             m.react('❌')
-            return m.reply(`❌ Gagal mengambil quotes image`)
+            return m.reply(`❌ No se pudo obtener la imagen de la frase`)
         }
         
         await sock.sendMedia(m.chat, res.data.url, null, m, {
