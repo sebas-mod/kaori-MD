@@ -7,13 +7,14 @@ import {
   getCachedJid,
 } from "../../src/lib/ourin-lid.js";
 import te from "../../src/lib/ourin-error.js";
+
 const pluginConfig = {
-  name: "savekontak",
-  alias: ["svkontak", "savecontact"],
-  category: "pushkontak",
-  description: "Simpan semua kontak grup ke file VCF",
-  usage: ".savekontak <namakontak>",
-  example: ".savekontak CustomerList",
+  name: "guardarcontacto",
+  alias: ["svcontacto", "savecontact", "guardar"],
+  category: "herramientas",
+  description: "Exporta todos los contactos del grupo a formato VCF",
+  usage: ".guardarcontacto <nombre_contacto>",
+  example: ".guardarcontacto ListaClientes",
   isOwner: true,
   isPremium: false,
   isGroup: true,
@@ -25,18 +26,18 @@ const pluginConfig = {
 
 async function handler(m, { sock }) {
   const db = getDatabase();
-  const groupMode = getGroupMode(m.chat, db);
+  const modoGrupo = getGroupMode(m.chat, db);
 
-  if (groupMode !== "pushkontak" && groupMode !== "all") {
+  if (modoGrupo !== "pushkontak" && modoGrupo !== "all") {
     return m.reply(
-      `❌ *ᴍᴏᴅᴇ ᴛɪᴅᴀᴋ sᴇsᴜᴀɪ*\n\n> Aktifkan mode pushkontak terlebih dahulu\n\n\`${m.prefix}botmode pushkontak\``,
+      `❌ *ᴍᴏᴅᴏ ɴᴏ ᴀᴄᴛɪᴠᴀᴅᴏ*\n\n> Activa el modo pushkontak primero para usar esta función\n\n\`${m.prefix}botmode pushkontak\``,
     );
   }
 
-  const namaKontak = m.text?.trim();
-  if (!namaKontak) {
+  const nombreKontak = m.text?.trim();
+  if (!nombreKontak) {
     return m.reply(
-      `📥 *sᴀᴠᴇ ᴋᴏɴᴛᴀᴋ*\n\n> Masukkan nama untuk kontak\n\n\`Contoh: ${m.prefix}savekontak CustomerList\``,
+      `📥 *ɢᴜᴀʀᴅᴀʀ ᴄᴏɴᴛᴀᴄᴛᴏs*\n\n> Ingresa un nombre para identificar los contactos\n\n\`Ejemplo: ${m.prefix}guardarcontacto ListaClientes\``,
     );
   }
 
@@ -45,7 +46,7 @@ async function handler(m, { sock }) {
   try {
     const metadata = m.groupMetadata;
     const botJid = sock.user.id.split(":")[0] + "@s.whatsapp.net";
-    const participants = metadata.participants
+    const participantes = metadata.participants
       .map((p) => {
         if (p.phoneNumber) return p.phoneNumber;
         if (p.jid && !p.jid.endsWith("@lid")) return p.jid;
@@ -63,38 +64,37 @@ async function handler(m, { sock }) {
       })
       .filter((id) => id && id !== botJid);
 
-    if (participants.length === 0) {
+    if (participantes.length === 0) {
       m.react("❌");
-      return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak ada kontak untuk disimpan`);
+      return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> No se encontraron contactos para guardar.`);
     }
 
-    const vcards = participants.map((contact, index) => {
+    const vcards = participantes.map((contact, index) => {
       const phone = contact.split("@")[0];
       return [
         "BEGIN:VCARD",
         "VERSION:3.0",
-        `FN:${namaKontak} - ${index + 1}`,
+        `FN:${nombreKontak} - ${index + 1}`,
         `TEL;type=CELL;type=VOICE;waid=${phone}:+${phone}`,
         "END:VCARD",
       ].join("\n");
     });
 
     const BATCH = 100;
-    const totalBatches = Math.ceil(vcards.length / BATCH);
+    const totalLotes = Math.ceil(vcards.length / BATCH);
 
-    for (let i = 0; i < totalBatches; i++) {
+    for (let i = 0; i < totalLotes; i++) {
       const batch = vcards.slice(i * BATCH, (i + 1) * BATCH);
       const contacts = batch.map((vcard) => ({ vcard }));
 
       await sock.sendMessage(m.chat, {
-        // kalau mau ke private tinggal m.sender
         contacts: {
-          displayName: `${namaKontak} (${batch.length})`,
+          displayName: `${nombreKontak} (${batch.length})`,
           contacts,
         },
       });
 
-      if (totalBatches > 1 && i < totalBatches - 1) {
+      if (totalLotes > 1 && i < totalLotes - 1) {
         await new Promise((r) => setTimeout(r, 1500));
       }
     }
@@ -103,7 +103,7 @@ async function handler(m, { sock }) {
 
     if (m.chat !== m.sender) {
       await m.reply(
-        `✅ *ᴋᴏɴᴛᴀᴋ ᴅɪsɪᴍᴘᴀɴ*\n\n> ${participants.length} kontak berhasil di dapetyn\ndari Grup: \`${metadata.subject}\``,
+        `✅ *ᴄᴏɴᴛᴀᴄᴛᴏs ᴇxᴘᴏʀᴛᴀᴅᴏs*\n\n> Se han obtenido ${participantes.length} contactos\ndel Grupo: \`${metadata.subject}\``,
       );
     }
   } catch (error) {
