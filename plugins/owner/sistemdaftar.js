@@ -1,10 +1,11 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import config from '../../config.js'
+
 const pluginConfig = {
     name: 'sistemdaftar',
-    alias: ['regmode', 'wajibdaftar', 'togglereg'],
+    alias: ['modoregistro', 'registrowajib', 'togglereg', 'sistemaregistro'],
     category: 'owner',
-    description: 'Toggle sistem wajib daftar on/off',
+    description: 'Activa o desactiva el sistema de registro obligatorio',
     usage: '.sistemdaftar <on/off>',
     example: '.sistemdaftar on',
     isOwner: true,
@@ -27,12 +28,12 @@ async function handler(m, { sock }) {
     
     if (!args) {
         return m.reply(
-            `⚙️ *sɪsᴛᴇᴍ ᴅᴀꜰᴛᴀʀ*\n\n` +
-            `Status: ${currentStatus ? '✅ ON (Wajib Daftar)' : '❌ OFF'}\n\n` +
-            `*Usage:*\n` +
-            `> \`${m.prefix}sistemdaftar on\` - Wajibkan daftar\n` +
-            `> \`${m.prefix}sistemdaftar off\` - Matikan wajib daftar\n\n` +
-            `> Jika ON, user harus \`${m.prefix}daftar\` sebelum pakai command`
+            `⚙️ *sɪsᴛᴇᴍᴀ ᴅᴇ ʀᴇɢɪsᴛʀᴏ*\n\n` +
+            `Estado: ${currentStatus ? '✅ ON (Registro Obligatorio)' : '❌ OFF'}\n\n` +
+            `*Uso:*\n` +
+            `> \`${m.prefix}sistemdaftar on\` - Activar obligación de registro\n` +
+            `> \`${m.prefix}sistemdaftar off\` - Desactivar obligación de registro\n\n` +
+            `> Si está en ON, el usuario debe usar \`${m.prefix}registrar\` antes de usar comandos.`
         )
     }
     
@@ -41,9 +42,9 @@ async function handler(m, { sock }) {
         await db.save()
         
         await sock.sendMessage(m.chat, {
-            text: `✅ *sɪsᴛᴇᴍ ᴅᴀꜰᴛᴀʀ ᴅɪᴀᴋᴛɪꜰᴋᴀɴ!*\n\n` +
-                `User sekarang wajib daftar sebelum menggunakan command!\n\n` +
-                `> Command: \`${m.prefix}daftar <nama>\``,
+            text: `✅ *¡sɪsᴛᴇᴍᴀ ᴅᴇ ʀᴇɢɪsᴛʀᴏ ᴀᴄᴛɪᴠᴀᴅᴏ!*\n\n` +
+                `¡Los usuarios ahora deben registrarse antes de usar los comandos!\n\n` +
+                `> Comando: \`${m.prefix}registrar <nombre>\``,
             contextInfo: {
                 forwardingScore: 9999,
                 isForwarded: true,
@@ -64,8 +65,8 @@ async function handler(m, { sock }) {
         await db.save()
         
         await sock.sendMessage(m.chat, {
-            text: `❌ *sɪsᴛᴇᴍ ᴅᴀꜰᴛᴀʀ ᴅɪɴᴏɴᴀᴋᴛɪꜰᴋᴀɴ!*\n\n` +
-                `User tidak perlu daftar untuk menggunakan command.`,
+            text: `❌ *¡sɪsᴛᴇᴍᴀ ᴅᴇ ʀᴇɢɪsᴛʀᴏ ᴅᴇsᴀᴄᴛɪᴠᴀᴅᴏ!*\n\n` +
+                `Los usuarios no necesitan registrarse para usar los comandos.`,
             contextInfo: {
                 forwardingScore: 9999,
                 isForwarded: true,
@@ -81,7 +82,7 @@ async function handler(m, { sock }) {
         return
     }
     
-    return m.reply(`❌ Option tidak valid!\n\n> Gunakan: \`on\` atau \`off\``)
+    return m.reply(`❌ ¡Opción no válida!\n\n> Usa: \`on\` u \`off\``)
 }
 
 export { pluginConfig as config, handler }
