@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import config from '../../config.js'
+
 const PREF_DB_PATH = path.join(process.cwd(), 'database', 'prefix.json')
 
 function loadPrefixes() {
@@ -33,11 +34,11 @@ function isNoPrefix() {
 }
 
 const pluginConfig = {
-    name: ['addprefix', 'gantiprefix', 'setprefix', 'delprefix', 'listprefix', 'resetprefix'],
-    alias: [],
+    name: ['addprefix', 'cambiarprefix', 'setprefix', 'delprefix', 'listprefix', 'resetprefix'],
+    alias: ['añadirprefix', 'quitarprefix', 'listaprefix'],
     category: 'owner',
-    description: 'Manajemen prefix bot',
-    usage: '.addprefix <prefix1> <prefix2>...',
+    description: 'Gestión de prefijos del bot',
+    usage: '.addprefix <prefijo1> <prefijo2>...',
     example: '.addprefix ! # $',
     isOwner: true,
     isPremium: false,
@@ -57,17 +58,18 @@ function handler(m, { sock }) {
     if (data.noprefix === undefined) data.noprefix = false
     
     switch (cmd) {
-        case 'addprefix': {
+        case 'addprefix':
+        case 'añadirprefix': {
             if (args.length === 0) {
                 return m.reply(
-                    `✏️ *ᴀᴅᴅ ᴘʀᴇғɪx*\n\n` +
-                    `> Tambah prefix baru untuk bot\n\n` +
-                    `*Format:*\n` +
-                    `> \`${m.prefix}addprefix <prefix1> <prefix2> ...\`\n\n` +
-                    `*Contoh:*\n` +
+                    `✏️ *ᴀɴ̃ᴀᴅɪʀ ᴘʀᴇғɪx*\n\n` +
+                    `> Añade nuevos prefijos para el bot\n\n` +
+                    `*Formato:*\n` +
+                    `> \`${m.prefix}addprefix <prefijo1> <prefijo2> ...\`\n\n` +
+                    `*Ejemplo:*\n` +
                     `> \`${m.prefix}addprefix ! # $ 😚\`\n\n` +
-                    `*Special:*\n` +
-                    `> \`${m.prefix}addprefix <noprefix>\` - Tanpa prefix`
+                    `*Especial:*\n` +
+                    `> \`${m.prefix}addprefix <noprefix>\` - Sin prefijo`
                 )
             }
             
@@ -75,9 +77,9 @@ function handler(m, { sock }) {
                 data.noprefix = true
                 savePrefixes(data)
                 return m.reply(
-                    `✅ *ɴᴏᴘʀᴇғɪx ᴅɪᴀᴋᴛɪғᴋᴀɴ*\n\n` +
-                    `> Bot sekarang bisa dijalankan tanpa prefix\n` +
-                    `> Ketik langsung nama command (misal: \`menu\`)`
+                    `✅ *ɴᴏᴘʀᴇғɪx ᴀᴄᴛɪᴠᴀᴅᴏ*\n\n` +
+                    `> El bot ahora puede ejecutarse sin prefijo\n` +
+                    `> Escribe directamente el comando (ej: \`menu\`)`
                 )
             }
             
@@ -88,36 +90,36 @@ function handler(m, { sock }) {
             })
             
             if (newPrefixes.length === 0) {
-                return m.reply(`❌ Tidak ada prefix baru yang valid!`)
+                return m.reply(`❌ ¡No hay prefijos nuevos válidos!`)
             }
             
             data.prefixes = [...new Set([...data.prefixes, ...newPrefixes])]
             savePrefixes(data)
             
             m.reply(
-                `✅ *ᴘʀᴇғɪx ᴅɪᴛᴀᴍʙᴀʜᴋᴀɴ*\n\n` +
-                `> Added: \`${newPrefixes.join('` `')}\`\n\n` +
-                `*Semua prefix aktif:*\n` +
+                `✅ *ᴘʀᴇғɪx ᴀɴ̃ᴀᴅɪᴅᴏ*\n\n` +
+                `> Agregado: \`${newPrefixes.join('` `')}\`\n\n` +
+                `*Todos los prefijos activos:*\n` +
                 `> \`${getAllPrefixes().join('` `')}\`` +
-                `${data.noprefix ? '\n> + *noprefix* aktif' : ''}`
+                `${data.noprefix ? '\n> + *noprefix* activo' : ''}`
             )
             break
         }
         
         case 'setprefix':
-        case 'gantiprefix': {
+        case 'cambiarprefix': {
             if (args.length === 0) {
                 return m.reply(
-                    `🔄 *ɢᴀɴᴛɪ/sᴇᴛ ᴘʀᴇғɪx*\n\n` +
-                    `> Ganti semua prefix dengan yang baru\n\n` +
-                    `*Format:*\n` +
-                    `> \`${m.prefix}${cmd} <prefix1> <prefix2> ...\`\n\n` +
-                    `*Contoh:*\n` +
+                    `🔄 *ᴄᴀᴍʙɪᴀʀ/sᴇᴛ ᴘʀᴇғɪx*\n\n` +
+                    `> Reemplaza todos los prefijos por unos nuevos\n\n` +
+                    `*Formato:*\n` +
+                    `> \`${m.prefix}${cmd} <prefijo1> <prefijo2> ...\`\n\n` +
+                    `*Ejemplo:*\n` +
                     `> \`${m.prefix}${cmd} ! G #\`\n\n` +
-                    `*Special:*\n` +
-                    `> \`${m.prefix}${cmd} <noprefix>\` - Tanpa prefix saja\n` +
-                    `> \`${m.prefix}${cmd} . <noprefix>\` - Prefix . + noprefix\n\n` +
-                    `⚠️ Ini akan menghapus semua prefix lama di database!`
+                    `*Especial:*\n` +
+                    `> \`${m.prefix}${cmd} <noprefix>\` - Solo sin prefijo\n` +
+                    `> \`${m.prefix}${cmd} . <noprefix>\` - Prefijo . + noprefix\n\n` +
+                    `⚠️ ¡Esto eliminará todos los prefijos antiguos de la base de datos!`
                 )
             }
             
@@ -132,41 +134,42 @@ function handler(m, { sock }) {
             data.noprefix = hasNoprefix
             savePrefixes(data)
             
-            let replyText = `✅ *ᴘʀᴇғɪx ᴅɪɢᴀɴᴛɪ*\n\n`
+            let replyText = `✅ *ᴘʀᴇғɪx ᴄᴀᴍʙɪᴀᴅᴏ*\n\n`
             
             if (newPrefixes.length > 0) {
-                replyText += `> New prefixes: \`${newPrefixes.join('` `')}\`\n`
+                replyText += `> Nuevos prefijos: \`${newPrefixes.join('` `')}\`\n`
             }
             
             if (hasNoprefix) {
-                replyText += `> *Noprefix: Aktif* (bisa ketik command langsung)\n`
+                replyText += `> *Noprefix: Activo* (puedes usar comandos directamente)\n`
             }
             
-            replyText += `\n*Semua prefix aktif:*\n`
+            replyText += `\n*Todos los prefijos activos:*\n`
             replyText += `> \`${getAllPrefixes().join('` `')}\``
-            if (data.noprefix) replyText += `\n> + *noprefix* aktif`
+            if (data.noprefix) replyText += `\n> + *noprefix* activo`
             
             m.reply(replyText)
             break
         }
         
-        case 'delprefix': {
+        case 'delprefix':
+        case 'quitarprefix': {
             if (args.length === 0) {
                 return m.reply(
-                    `🗑️ *ᴅᴇʟᴇᴛᴇ ᴘʀᴇғɪx*\n\n` +
-                    `> Hapus prefix dari database\n\n` +
-                    `*Format:*\n` +
-                    `> \`${m.prefix}delprefix <prefix1> <prefix2> ...\`\n\n` +
-                    `*Contoh:*\n` +
+                    `🗑️ *ᴇʟɪᴍɪɴᴀʀ ᴘʀᴇғɪx*\n\n` +
+                    `> Elimina prefijos de la base de datos\n\n` +
+                    `*Formato:*\n` +
+                    `> \`${m.prefix}delprefix <prefijo1> <prefijo2> ...\`\n\n` +
+                    `*Ejemplo:*\n` +
                     `> \`${m.prefix}delprefix ! $\`\n` +
-                    `> \`${m.prefix}delprefix <noprefix>\` - Nonaktifkan noprefix`
+                    `> \`${m.prefix}delprefix <noprefix>\` - Desactivar noprefix`
                 )
             }
             
             if (args.includes('<noprefix>') || args.includes('noprefix')) {
                 data.noprefix = false
                 savePrefixes(data)
-                return m.reply(`✅ *ɴᴏᴘʀᴇғɪx ᴅɪɴᴏɴᴀᴋᴛɪғᴋᴀɴ*`)
+                return m.reply(`✅ *ɴᴏᴘʀᴇғɪx ᴅᴇsᴀᴄᴛɪᴠᴀᴅᴏ*`)
             }
             
             const toDelete = args
@@ -183,23 +186,24 @@ function handler(m, { sock }) {
             savePrefixes(data)
             
             m.reply(
-                `✅ *ᴘʀᴇғɪx ᴅɪʜᴀᴘᴜs*\n\n` +
-                `> Deleted: \`${deleted.length > 0 ? deleted.join('` `') : 'None'}\`\n\n` +
-                `*Semua prefix aktif:*\n` +
+                `✅ *ᴘʀᴇғɪx ᴇʟɪᴍɪɴᴀᴅᴏ*\n\n` +
+                `> Eliminado: \`${deleted.length > 0 ? deleted.join('` `') : 'Ninguno'}\`\n\n` +
+                `*Todos los prefijos activos:*\n` +
                 `> \`${getAllPrefixes().join('` `')}\`` +
-                `${data.noprefix ? '\n> + *noprefix* aktif' : ''}`
+                `${data.noprefix ? '\n> + *noprefix* activo' : ''}`
             )
             break
         }
         
-        case 'listprefix': {
+        case 'listprefix':
+        case 'listaprefix': {
             const all = getAllPrefixes()
             const configPref = config.command?.prefix || '.'
             
-            let text = `📋 *ʟɪsᴛ ᴘʀᴇғɪx*\n\n`
+            let text = `📋 *ʟɪsᴛᴀ ᴅᴇ ᴘʀᴇғɪx*\n\n`
             text += `╭┈┈⬡「 ⚙️ *ᴄᴏɴғɪɢ* 」\n`
-            text += `┃ Default: \`${configPref}\`\n`
-            text += `┃ Noprefix: ${data.noprefix ? '✅ Aktif' : '❌ Nonaktif'}\n`
+            text += `┃ Por defecto: \`${configPref}\`\n`
+            text += `┃ Noprefix: ${data.noprefix ? '✅ Activo' : '❌ Inactivo'}\n`
             text += `╰┈┈┈┈┈┈┈┈⬡\n\n`
             
             if (data.prefixes.length > 0) {
@@ -210,7 +214,7 @@ function handler(m, { sock }) {
                 text += `╰┈┈┈┈┈┈┈┈⬡\n\n`
             }
             
-            text += `*Total prefix aktif:* ${all.length}`
+            text += `*Total prefijos activos:* ${all.length}`
             if (data.noprefix) text += ` + noprefix`
             text += `\n> \`${all.join('` `')}\``
             
@@ -224,11 +228,11 @@ function handler(m, { sock }) {
             savePrefixes(data)
             
             m.reply(
-                `✅ *ᴘʀᴇғɪx ᴅɪʀᴇsᴇᴛ*\n\n` +
-                `> Semua prefix di database dihapus!\n` +
-                `> Noprefix dinonaktifkan!\n` +
-                `> Hanya tersisa prefix dari config.js\n\n` +
-                `*Prefix aktif:* \`${config.command?.prefix || '.'}\``
+                `✅ *ᴘʀᴇғɪx ʀᴇsᴛᴀʙʟᴇᴄɪᴅᴏ*\n\n` +
+                `> ¡Todos los prefijos de la base de datos han sido eliminados!\n` +
+                `> ¡Noprefix desactivado!\n` +
+                `> Solo queda el prefijo de config.js\n\n` +
+                `*Prefijo activo:* \`${config.command?.prefix || '.'}\``
             )
             break
         }
