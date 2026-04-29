@@ -3,13 +3,14 @@ import { getRpgContextInfo } from '../../src/lib/ourin-context.js'
 import config from '../../config.js'
 import path from 'path'
 import fs from 'fs'
+
 const pluginConfig = {
-    name: 'buykoin',
-    alias: ['belikoin', 'belicoin', 'exptokoin', 'exptocoin'],
+    name: 'comprarmonedas',
+    alias: ['buykoin', 'comprarcoins', 'canjear', 'exptokoin'],
     category: 'rpg',
-    description: 'Tukar EXP menjadi Koin',
-    usage: '.buykoin <jumlah>',
-    example: '.buykoin 10000',
+    description: 'Cambia tu EXP acumulada por Monedas',
+    usage: '.comprarmonedas <cantidad>',
+    example: '.comprarmonedas 10000',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -27,9 +28,9 @@ try {
     if (fs.existsSync(thumbPath)) thumbRpg = fs.readFileSync(thumbPath)
 } catch (e) {}
 
-function getContextInfo(title = '💱 *ʙᴜʏ ᴋᴏɪɴ*', body = 'Tukar EXP') {
+function getContextInfo(title = '💱 *CASA DE CAMBIO*', body = 'Cambio de EXP por Monedas') {
     const saluranId = config.saluran?.id || '120363208449943317@newsletter'
-    const saluranName = config.saluran?.name || config.bot?.name || 'Ourin-AI'
+    const saluranName = config.saluran?.name || '𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃'
     
     const contextInfo = {
         forwardingScore: 9999,
@@ -65,17 +66,17 @@ async function handler(m, { sock }) {
     const amountStr = args[0]
     
     if (!amountStr) {
-        let txt = `💱 *ʙᴜʏ ᴋᴏɪɴ*\n\n`
-        txt += `> Tukar EXP menjadi Koin!\n\n`
-        txt += `╭┈┈⬡「 📊 *ᴋᴜʀs* 」\n`
-        txt += `┃ 💎 ${EXP_PER_KOIN} EXP = 1 Koin\n`
+        let txt = `💱 *INTERCAMBIO DE EXP*\n\n`
+        txt += `> ¡Cambiá tu experiencia por monedas para el juego!\n\n`
+        txt += `╭┈┈⬡「 📊 *COTIZACIÓN* 」\n`
+        txt += `┃ 💎 ${EXP_PER_KOIN} EXP = 1 Moneda\n`
         txt += `╰┈┈⬡\n\n`
-        txt += `╭┈┈⬡「 📋 *sᴀʟᴅᴏᴍᴜ* 」\n`
-        txt += `┃ 🚄 EXP: *${(user.exp || 0).toLocaleString('id-ID')}*\n`
-        txt += `┃ 💰 Koin: * ${(user.koin || 0).toLocaleString('id-ID')}*\n`
+        txt += `╭┈┈⬡「 📋 *TU SALDO* 」\n`
+        txt += `┃ ✨ EXP: *${(user.exp || 0).toLocaleString('es-AR')}*\n`
+        txt += `┃ 💰 Monedas: *${(user.koin || 0).toLocaleString('es-AR')}*\n`
         txt += `╰┈┈⬡\n\n`
-        txt += `> Contoh: \`.buykoin 10000\`\n`
-        txt += `> Akan menggunakan ${10000 * EXP_PER_KOIN} EXP untuk 10.000 Koin`
+        txt += `> Ejemplo: \`.comprarmonedas 10000\`\n`
+        txt += `> Costará ${ (10000 * EXP_PER_KOIN).toLocaleString('es-AR') } de EXP.`
         
         return m.reply(txt)
     }
@@ -88,7 +89,7 @@ async function handler(m, { sock }) {
     }
     
     if (!koinAmount || koinAmount <= 0) {
-        return m.reply(`❌ Masukkan jumlah koin yang valid!`)
+        return m.reply(`❌ ¡Mandame un número válido de monedas para comprar!`)
     }
     
     const expNeeded = koinAmount * EXP_PER_KOIN
@@ -96,15 +97,13 @@ async function handler(m, { sock }) {
     if ((user.exp || 0) < expNeeded) {
         const maxPossible = Math.floor((user.exp || 0) / EXP_PER_KOIN)
         return m.reply(
-            `❌ *EXP tidak cukup!*\n\n` +
-            `> Dibutuhkan: *${expNeeded.toLocaleString('id-ID')} EXP*\n` +
-            `> EXP kamu: *${(user.exp || 0).toLocaleString('id-ID')} EXP*\n\n` +
-            `> Maksimal: *${maxPossible.toLocaleString('id-ID')} Koin*`
+            `❌ *NO TE ALCANZA LA EXP*\n\n` +
+            `> Necesitás: *${expNeeded.toLocaleString('es-AR')} EXP*\n` +
+            `> Tenés: *${(user.exp || 0).toLocaleString('es-AR')} EXP*\n\n` +
+            `> Lo máximo que podés comprar son: *${maxPossible.toLocaleString('es-AR')} Monedas*`
         )
     }
     
-    // Use manual user update instead of updateKoin/updateExp to do batch update
-    // But since logic was db.setUser, let's stick to update logic here
     const newExp = (user.exp || 0) - expNeeded
     const newKoin = (user.koin || 0) + koinAmount
     
@@ -115,19 +114,19 @@ async function handler(m, { sock }) {
     
     await m.react('💱')
     
-    let txt = `💱 *ᴛᴜᴋᴀʀ ʙᴇʀʜᴀsɪʟ!*\n\n`
-    txt += `╭┈┈⬡「 📋 *ᴅᴇᴛᴀɪʟ* 」\n`
-    txt += `┃ 🚄 EXP: *-${expNeeded.toLocaleString('id-ID')}*\n`
-    txt += `┃ 💰 Koin: *+${koinAmount.toLocaleString('id-ID')}*\n`
+    let txt = `💱 *¡CAMBIO EXITOSO!*\n\n`
+    txt += `╭┈┈⬡「 📋 *DETALLE* 」\n`
+    txt += `┃ ✨ EXP usada: *-${expNeeded.toLocaleString('es-AR')}*\n`
+    txt += `┃ 💰 Monedas: *+${koinAmount.toLocaleString('es-AR')}*\n`
     txt += `╰┈┈⬡\n\n`
-    txt += `╭┈┈⬡「 📊 *sᴀʟᴅᴏ sᴇᴋᴀʀᴀɴɢ* 」\n`
-    txt += `┃ 🚄 EXP: *${newExp.toLocaleString('id-ID')}*\n`
-    txt += `┃ 💰 Koin: *${newKoin.toLocaleString('id-ID')}*\n`
+    txt += `╭┈┈⬡「 📊 *NUEVO SALDO* 」\n`
+    txt += `┃ ✨ EXP: *${newExp.toLocaleString('es-AR')}*\n`
+    txt += `┃ 💰 Monedas: *${newKoin.toLocaleString('es-AR')}*\n`
     txt += `╰┈┈⬡`
     
     await sock.sendMessage(m.chat, {
         text: txt,
-        contextInfo: getContextInfo()
+        contextInfo: getContextInfo('💱 CAMBIO REALIZADO', 'Transacción de 𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃')
     }, { quoted: m })
 }
 
