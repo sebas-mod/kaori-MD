@@ -1,12 +1,13 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { addExpWithLevelCheck } from '../../src/lib/ourin-level.js'
+
 const pluginConfig = {
-    name: 'lottery',
-    alias: ['gacha', 'spin', 'undian'],
+    name: 'loteria',
+    alias: ['gacha', 'spin', 'suerte', 'undian'],
     category: 'rpg',
-    description: 'Gacha/lottery untuk hadiah random',
-    usage: '.lottery <1/10>',
-    example: '.lottery 10',
+    description: 'Probá tu suerte en la lotería para ganar premios únicos',
+    usage: '.loteria <1/10>',
+    example: '.loteria 10',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -17,18 +18,18 @@ const pluginConfig = {
 }
 
 const GACHA_POOL = [
-    { item: 'trash', name: '🗑️ Sampah', chance: 30, rarity: 'common' },
-    { item: 'wood', name: '🪵 Kayu', chance: 20, qty: [3, 8], rarity: 'common' },
-    { item: 'iron', name: '🔩 Besi', chance: 15, qty: [2, 5], rarity: 'common' },
-    { item: 'gold', name: '🪙 Emas', chance: 10, qty: [1, 3], rarity: 'uncommon' },
-    { item: 'potion', name: '🧪 Potion', chance: 8, qty: [1, 3], rarity: 'uncommon' },
-    { item: 'diamond', name: '💎 Berlian', chance: 5, qty: [1, 2], rarity: 'rare' },
-    { item: 'goldchest', name: '🎁 Gold Chest', chance: 3, qty: [1, 1], rarity: 'rare' },
-    { item: 'diamondchest', name: '💎 Diamond Chest', chance: 1.5, qty: [1, 1], rarity: 'epic' },
-    { item: 'mysterybox', name: '🎲 Mystery Box', chance: 0.8, qty: [1, 1], rarity: 'epic' },
-    { item: 'goldsword', name: '🗡️ Pedang Emas', chance: 0.3, qty: [1, 1], rarity: 'legendary' },
-    { item: 'diamondarmor', name: '💎 Armor Berlian', chance: 0.2, qty: [1, 1], rarity: 'legendary' },
-    { item: 'divinecore', name: '⚡ Divine Core', chance: 0.1, qty: [1, 1], rarity: 'mythic' }
+    { item: 'trash', name: '🗑️ Basura', chance: 30, rarity: 'common' },
+    { item: 'wood', name: '🪵 Madera', chance: 20, qty: [3, 8], rarity: 'common' },
+    { item: 'iron', name: '🔩 Hierro', chance: 15, qty: [2, 5], rarity: 'common' },
+    { item: 'gold', name: '🪙 Oro', chance: 10, qty: [1, 3], rarity: 'uncommon' },
+    { item: 'potion', name: '🧪 Poción', chance: 8, qty: [1, 3], rarity: 'uncommon' },
+    { item: 'diamond', name: '💎 Diamante', chance: 5, qty: [1, 2], rarity: 'rare' },
+    { item: 'goldchest', name: '🎁 Cofre de Oro', chance: 3, qty: [1, 1], rarity: 'rare' },
+    { item: 'diamondchest', name: '💎 Cofre de Diamante', chance: 1.5, qty: [1, 1], rarity: 'epic' },
+    { item: 'mysterybox', name: '🎲 Caja Misteriosa', chance: 0.8, qty: [1, 1], rarity: 'epic' },
+    { item: 'goldsword', name: '🗡️ Espada de Oro', chance: 0.3, qty: [1, 1], rarity: 'legendary' },
+    { item: 'diamondarmor', name: '💎 Armadura de Diamante', chance: 0.2, qty: [1, 1], rarity: 'legendary' },
+    { item: 'divinecore', name: '⚡ Núcleo Divino', chance: 0.1, qty: [1, 1], rarity: 'mythic' }
 ]
 
 const RARITY_COLORS = {
@@ -55,17 +56,17 @@ async function handler(m, { sock }) {
     
     if ((user.koin || 0) < totalCost) {
         return m.reply(
-            `🎰 *ʟᴏᴛᴛᴇʀʏ ɢᴀᴄʜᴀ*\n\n` +
-            `> Harga: ${GACHA_COST.toLocaleString()}/pull\n` +
-            `> Total: ${totalCost.toLocaleString()} (${pulls}x)\n\n` +
-            `❌ Balance kurang! Kamu punya: ${(user.koin || 0).toLocaleString()}`
+            `🎰 *𝐋𝐎𝐓𝐄𝐑𝐈́𝐀 𝐆𝐀𝐂𝐇𝐀*\n\n` +
+            `> Precio: $${GACHA_COST.toLocaleString('es-AR')}/tiro\n` +
+            `> Total: $${totalCost.toLocaleString('es-AR')} (${pulls}x)\n\n` +
+            `❌ ¡No tenés suficiente guita! Tu saldo: $${(user.koin || 0).toLocaleString('es-AR')}`
         )
     }
     
     user.koin -= totalCost
     
     await m.react('🎰')
-    await m.reply(`🎰 *sᴘɪɴɴɪɴɢ ${pulls}x...*`)
+    await m.reply(`🎰 *Girando la suerte ${pulls} veces...*`)
     await new Promise(r => setTimeout(r, 1500))
     
     const results = []
@@ -108,22 +109,23 @@ async function handler(m, { sock }) {
         grouped[r.item].totalQty += r.finalQty
     }
     
-    let txt = `🎰 *ɢᴀᴄʜᴀ ʀᴇsᴜʟᴛ*\n\n`
-    txt += `> Pulls: ${pulls}x | Cost: ${totalCost.toLocaleString()}\n\n`
-    txt += `╭┈┈⬡「 🎁 *ʀᴇsᴜʟᴛ* 」\n`
+    let txt = `🎰 *𝐑𝐄𝐒𝐔𝐋𝐓𝐀𝐃𝐎𝐒 𝐃𝐄 𝐋𝐀 𝐒𝐔𝐄𝐑𝐓𝐄*\n\n`
+    txt += `> Giros: ${pulls}x | Costo: $${totalCost.toLocaleString('es-AR')}\n\n`
+    txt += `╭┈┈⬡「 🎁 *𝐁𝐎𝐓𝐈́𝐍* 」\n`
     
     for (const [key, item] of Object.entries(grouped)) {
         const rarityIcon = RARITY_COLORS[item.rarity] || '⚪'
         if (item.item === 'trash') {
             txt += `┃ ${rarityIcon} ${item.name} x${item.count}\n`
         } else {
-            txt += `┃ ${rarityIcon} ${item.name} x${item.totalQty} (${item.count} pull)\n`
+            txt += `┃ ${rarityIcon} ${item.name} x${item.totalQty} (${item.count} acierto/s)\n`
         }
     }
     
     txt += `┃\n`
-    txt += `┃ ✨ EXP: +${totalExp}\n`
-    txt += `╰┈┈┈┈┈┈┈┈⬡`
+    txt += `┃ ✨ EXP total: +${totalExp}\n`
+    txt += `╰┈┈┈┈┈┈┈┈⬡\n\n`
+    txt += `> ¡Seguí probando suerte con **𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃**!`
     
     const hasRare = results.some(r => ['epic', 'legendary', 'mythic'].includes(r.rarity))
     await m.react(hasRare ? '🎉' : '✅')
