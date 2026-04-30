@@ -1,11 +1,12 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
-    name: 'merchant',
-    alias: ['npc', 'toko', 'tokoku'],
+    name: 'mercado',
+    alias: ['merchant', 'npc', 'toko', 'shop', 'comprar', 'vender'],
     category: 'rpg',
-    description: 'Jual beli item ke NPC merchant',
-    usage: '.merchant <buy/sell> <item> <qty>',
-    example: '.merchant buy potion 5',
+    description: 'Comprá o vendé ítems al mercader local',
+    usage: '.mercado <buy/sell> <item> <cantidad>',
+    example: '.mercado buy potion 5',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -16,20 +17,20 @@ const pluginConfig = {
 }
 
 const SHOP_ITEMS = {
-    potion: { name: '🧪 Potion', buyPrice: 100, sellPrice: 50, desc: 'Pulihkan 50 HP' },
-    manapotion: { name: '💙 Mana Potion', buyPrice: 150, sellPrice: 75, desc: 'Pulihkan 50 Mana' },
-    antidote: { name: '💊 Antidote', buyPrice: 80, sellPrice: 40, desc: 'Sembuhkan racun' },
-    bread: { name: '🍞 Roti', buyPrice: 30, sellPrice: 15, desc: 'Pulihkan 10 stamina' },
-    energydrink: { name: '⚡ Energy Drink', buyPrice: 200, sellPrice: 100, desc: 'Pulihkan 50 stamina' },
-    pickaxe: { name: '⛏️ Beliung', buyPrice: 500, sellPrice: 250, desc: 'Untuk mining' },
-    fishingrod: { name: '🎣 Joran', buyPrice: 400, sellPrice: 200, desc: 'Untuk memancing' },
-    wood: { name: '🪵 Kayu', buyPrice: 50, sellPrice: 25, desc: 'Material dasar' },
-    iron: { name: '🔩 Besi', buyPrice: 80, sellPrice: 40, desc: 'Material logam' },
-    leather: { name: '🧶 Kulit', buyPrice: 60, sellPrice: 30, desc: 'Material armor' },
-    string: { name: '🧵 Benang', buyPrice: 40, sellPrice: 20, desc: 'Material busur' },
-    herb: { name: '🌿 Herba', buyPrice: 70, sellPrice: 35, desc: 'Bahan alchemy' },
-    gold: { name: '🪙 Emas', buyPrice: 500, sellPrice: 250, desc: 'Material langka' },
-    diamond: { name: '💎 Berlian', buyPrice: 2000, sellPrice: 1000, desc: 'Material mewah' }
+    potion: { name: '🧪 Poción', buyPrice: 100, sellPrice: 50, desc: 'Recupera 50 HP' },
+    manapotion: { name: '💙 Poción de Maná', buyPrice: 150, sellPrice: 75, desc: 'Recupera 50 de Maná' },
+    antidote: { name: '💊 Antídoto', buyPrice: 80, sellPrice: 40, desc: 'Cura el veneno' },
+    bread: { name: '🍞 Pan', buyPrice: 30, sellPrice: 15, desc: 'Recupera 10 de stamina' },
+    energydrink: { name: '⚡ Energizante', buyPrice: 200, sellPrice: 100, desc: 'Recupera 50 de stamina' },
+    pickaxe: { name: '⛏️ Pico', buyPrice: 500, sellPrice: 250, desc: 'Para minar minerales' },
+    fishingrod: { name: '🎣 Caña de pescar', buyPrice: 400, sellPrice: 200, desc: 'Para pescar en el lago' },
+    wood: { name: '🪵 Madera', buyPrice: 50, sellPrice: 25, desc: 'Material básico' },
+    iron: { name: '🔩 Hierro', buyPrice: 80, sellPrice: 40, desc: 'Material de metal' },
+    leather: { name: '🧶 Cuero', buyPrice: 60, sellPrice: 30, desc: 'Material para armaduras' },
+    string: { name: '🧵 Hilo', buyPrice: 40, sellPrice: 20, desc: 'Material para arcos' },
+    herb: { name: '🌿 Hierba', buyPrice: 70, sellPrice: 35, desc: 'Ingrediente de alquimia' },
+    gold: { name: '🪙 Oro', buyPrice: 500, sellPrice: 250, desc: 'Material valioso' },
+    diamond: { name: '💎 Diamante', buyPrice: 2000, sellPrice: 1000, desc: 'Material de lujo' }
 }
 
 function handler(m) {
@@ -43,26 +44,26 @@ function handler(m) {
     const itemKey = args[1]?.toLowerCase()
     const qty = Math.max(1, parseInt(args[2]) || 1)
     
-    if (!action || !['buy', 'sell', 'list'].includes(action)) {
-        let txt = `🏪 *ᴍᴇʀᴄʜᴀɴᴛ sʜᴏᴘ*\n\n`
-        txt += `> Selamat datang di toko!\n\n`
-        txt += `╭┈┈⬡「 📋 *ᴄᴏᴍᴍᴀɴᴅ* 」\n`
-        txt += `┃ ${m.prefix}merchant list\n`
-        txt += `┃ ${m.prefix}merchant buy <item> <qty>\n`
-        txt += `┃ ${m.prefix}merchant sell <item> <qty>\n`
+    if (!action || !['buy', 'sell', 'list', 'comprar', 'vender', 'lista'].includes(action)) {
+        let txt = `🏪 *𝐌𝐄𝐑𝐂𝐀𝐃𝐎 𝐃𝐄 𝐊𝐄𝐈*\n\n`
+        txt += `> ¡Bienvenido a la tienda! ¿Qué vas a llevar hoy?\n\n`
+        txt += `╭┈┈⬡「 📋 *𝐂𝐎𝐌𝐀𝐍𝐃𝐎𝐒* 」\n`
+        txt += `┃ ${m.prefix}mercado lista\n`
+        txt += `┃ ${m.prefix}mercado comprar <item> <cantidad>\n`
+        txt += `┃ ${m.prefix}mercado vender <item> <cantidad>\n`
         txt += `╰┈┈┈┈┈┈┈┈⬡\n\n`
-        txt += `💰 *Balance:* ${(user.koin || 0).toLocaleString()}`
+        txt += `💰 *Tu Saldo:* $${(user.koin || 0).toLocaleString('es-AR')}`
         return m.reply(txt)
     }
     
-    if (action === 'list') {
-        let txt = `🏪 *ᴅᴀꜰᴛᴀʀ ɪᴛᴇᴍ*\n\n`
-        txt += `╭┈┈⬡「 📦 *sʜᴏᴘ* 」\n`
+    if (action === 'list' || action === 'lista') {
+        let txt = `🏪 *𝐈́𝐓𝐄𝐌𝐒 𝐃𝐈𝐒𝐏𝐎𝐍𝐈𝐁𝐋𝐄𝐒*\n\n`
+        txt += `╭┈┈⬡「 📦 *𝐒𝐇𝐎𝐏* 」\n`
         
         for (const [key, item] of Object.entries(SHOP_ITEMS)) {
             txt += `┃ ${item.name}\n`
-            txt += `┃ 💵 Beli: ${item.buyPrice.toLocaleString()}\n`
-            txt += `┃ 💰 Jual: ${item.sellPrice.toLocaleString()}\n`
+            txt += `┃ 💵 Compra: $${item.buyPrice.toLocaleString('es-AR')}\n`
+            txt += `┃ 💰 Venta: $${item.sellPrice.toLocaleString('es-AR')}\n`
             txt += `┃ 📝 ${item.desc}\n`
             txt += `┃ → \`${key}\`\n`
             txt += `┃\n`
@@ -72,22 +73,22 @@ function handler(m) {
         return m.reply(txt)
     }
     
-    if (action === 'buy') {
+    if (action === 'buy' || action === 'comprar') {
         if (!itemKey) {
-            return m.reply(`❌ Tentukan item!\n\n> Contoh: \`${m.prefix}merchant buy potion 5\``)
+            return m.reply(`❌ ¡Decime qué querés comprar!\n\n> Ejemplo: \`${m.prefix}mercado comprar potion 5\``)
         }
         
         const item = SHOP_ITEMS[itemKey]
         if (!item) {
-            return m.reply(`❌ Item tidak ditemukan!\n\n> Ketik \`${m.prefix}merchant list\` untuk melihat daftar.`)
+            return m.reply(`❌ ¡Ese ítem no existe en mis estanterías!\n\n> Poné \`${m.prefix}mercado lista\` para ver qué tengo.`)
         }
         
         const totalCost = item.buyPrice * qty
         if ((user.koin || 0) < totalCost) {
             return m.reply(
-                `❌ *ʙᴀʟᴀɴᴄᴇ ᴋᴜʀᴀɴɢ*\n\n` +
-                `> Harga: ${totalCost.toLocaleString()}\n` +
-                `> Balance: ${(user.koin || 0).toLocaleString()}`
+                `❌ *𝐆𝐔𝐈𝐓𝐀 𝐈𝐍𝐒𝐔𝐅𝐈𝐂𝐈𝐄𝐍𝐓𝐄*\n\n` +
+                `> Costo total: $${totalCost.toLocaleString('es-AR')}\n` +
+                `> Tu saldo: $${(user.koin || 0).toLocaleString('es-AR')}`
             )
         }
         
@@ -96,32 +97,32 @@ function handler(m) {
         db.save()
         
         return m.reply(
-            `✅ *ᴘᴇᴍʙᴇʟɪᴀɴ ʙᴇʀʜᴀsɪʟ*\n\n` +
-            `╭┈┈⬡「 🛒 *ᴅᴇᴛᴀɪʟ* 」\n` +
-            `┃ 📦 Item: *${item.name}*\n` +
-            `┃ 📊 Qty: *${qty}*\n` +
-            `┃ 💵 Total: *-${totalCost.toLocaleString()}*\n` +
-            `┃ 💰 Sisa: *${user.koin.toLocaleString()}*\n` +
+            `✅ *𝐂𝐎𝐌𝐏𝐑𝐀 𝐄𝐗𝐈𝐓𝐎𝐒𝐀*\n\n` +
+            `╭┈┈⬡「 🛒 *𝐃𝐄𝐓𝐀𝐋𝐋𝐄* 」\n` +
+            `┃ 📦 Ítem: *${item.name}*\n` +
+            `┃ 📊 Cantidad: *${qty}*\n` +
+            `┃ 💵 Total pagado: *-$${totalCost.toLocaleString('es-AR')}*\n` +
+            `┃ 💰 Saldo restante: *$${user.koin.toLocaleString('es-AR')}*\n` +
             `╰┈┈┈┈┈┈┈┈⬡`
         )
     }
     
-    if (action === 'sell') {
+    if (action === 'sell' || action === 'vender') {
         if (!itemKey) {
-            return m.reply(`❌ Tentukan item!\n\n> Contoh: \`${m.prefix}merchant sell iron 10\``)
+            return m.reply(`❌ ¡Decime qué querés vender!\n\n> Ejemplo: \`${m.prefix}mercado vender iron 10\``)
         }
         
         const item = SHOP_ITEMS[itemKey]
         if (!item) {
-            return m.reply(`❌ Item tidak bisa dijual ke merchant!`)
+            return m.reply(`❌ ¡No me interesa comprar ese ítem!`)
         }
         
         const have = user.inventory[itemKey] || 0
         if (have < qty) {
             return m.reply(
-                `❌ *ɪᴛᴇᴍ ᴋᴜʀᴀɴɢ*\n\n` +
-                `> Punya: ${have}\n` +
-                `> Mau jual: ${qty}`
+                `❌ *𝐍𝐎 𝐓𝐄𝐍𝐄́𝐒 𝐒𝐔𝐅𝐈𝐂𝐈𝐄𝐍𝐓𝐄*\n\n` +
+                `> En inventario: ${have}\n` +
+                `> Querés vender: ${qty}`
             )
         }
         
@@ -132,12 +133,12 @@ function handler(m) {
         db.save()
         
         return m.reply(
-            `✅ *ᴘᴇɴᴊᴜᴀʟᴀɴ ʙᴇʀʜᴀsɪʟ*\n\n` +
-            `╭┈┈⬡「 💰 *ᴅᴇᴛᴀɪʟ* 」\n` +
-            `┃ 📦 Item: *${item.name}*\n` +
-            `┃ 📊 Qty: *${qty}*\n` +
-            `┃ 💵 Total: *+${totalEarn.toLocaleString()}*\n` +
-            `┃ 💰 Balance: *${user.koin.toLocaleString()}*\n` +
+            `✅ *𝐕𝐄𝐍𝐓𝐀 𝐄𝐗𝐈𝐓𝐎𝐒𝐀*\n\n` +
+            `╭┈┈⬡「 💰 *𝐃𝐄𝐓𝐀𝐋𝐋𝐄* 」\n` +
+            `┃ 📦 Ítem: *${item.name}*\n` +
+            `┃ 📊 Cantidad: *${qty}*\n` +
+            `┃ 💵 Ganancia: *+$${totalEarn.toLocaleString('es-AR')}*\n` +
+            `┃ 💰 Saldo actual: *$${user.koin.toLocaleString('es-AR')}*\n` +
             `╰┈┈┈┈┈┈┈┈⬡`
         )
     }
