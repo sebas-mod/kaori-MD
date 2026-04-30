@@ -2,12 +2,13 @@ import { getDatabase } from '../../src/lib/ourin-database.js'
 import config from '../../config.js'
 import path from 'path'
 import fs from 'fs'
+
 const pluginConfig = {
     name: 'stamina',
-    alias: ['energy', 'cekstamina'],
+    alias: ['energia', 'energy', 'cekstamina', 'st'],
     category: 'rpg',
-    description: 'Cek dan pulihkan stamina',
-    usage: '.stamina / .stamina isi',
+    description: 'Revisá y recuperá tu stamina para seguir jugando',
+    usage: '.stamina / .stamina recuperar',
     example: '.stamina',
     isOwner: false,
     isPremium: false,
@@ -24,9 +25,9 @@ try {
     if (fs.existsSync(thumbPath)) thumbRpg = fs.readFileSync(thumbPath)
 } catch (e) {}
 
-function getContextInfo(title = '⚡ *sᴛᴀᴍɪɴᴀ*', body = 'Energi') {
+function getContextInfo(title = '⚡ *𝐄𝐍𝐄𝐑𝐆𝐈́𝐀*', body = 'Sistema RPG') {
     const saluranId = config.saluran?.id || '120363208449943317@newsletter'
-    const saluranName = config.saluran?.name || config.bot?.name || 'Ourin-AI'
+    const saluranName = config.saluran?.name || config.bot?.name || '𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈Ɀ𝐀𝐖𝐀 𝐌𝐃'
     
     const contextInfo = {
         forwardingScore: 9999,
@@ -69,21 +70,23 @@ async function handler(m, { sock }) {
     
     const subCmd = args[0]?.toLowerCase()
     
-    if (subCmd === 'isi' || subCmd === 'restore' || subCmd === 'heal') {
+    // Acción: Recuperar energía comprando una recarga
+    if (subCmd === 'isi' || subCmd === 'recuperar' || subCmd === 'heal' || subCmd === 'llenar') {
         const potionCost = 5000
         
         if (user.rpg.stamina >= user.rpg.maxStamina) {
-            return m.reply(`⚡ *sᴛᴀᴍɪɴᴀ ᴘᴇɴᴜʜ*\n\n> Stamina kamu sudah penuh!`)
+            return m.reply(`⚡ *𝐒𝐓𝐀𝐌𝐈𝐍𝐀 𝐋𝐋𝐄𝐍𝐀*\n\n> ¡Tu energía ya está al máximo! No necesitás recargar ahora.`)
         }
         
         if ((user.koin || 0) < potionCost) {
             return m.reply(
-                `❌ *sᴀʟᴅᴏ ᴛɪᴅᴀᴋ ᴄᴜᴋᴜᴘ*\n\n` +
-                `> Biaya: Rp ${potionCost.toLocaleString('id-ID')}\n` +
-                `> Saldo: Rp ${(user.koin || 0).toLocaleString('id-ID')}`
+                `❌ *𝐒𝐀𝐋𝐃𝐎 𝐈𝐍𝐒𝐔𝐅𝐈𝐂𝐈𝐄𝐍𝐓𝐄*\n\n` +
+                `> Costo: $${potionCost.toLocaleString('es-AR')}\n` +
+                `> Tenés: $${(user.koin || 0).toLocaleString('es-AR')}`
             )
         }
         
+        // Proceso de restauración
         user.koin -= potionCost
         const restored = user.rpg.maxStamina - user.rpg.stamina
         user.rpg.stamina = user.rpg.maxStamina
@@ -92,25 +95,26 @@ async function handler(m, { sock }) {
         
         await m.react('⚡')
         return sock.sendMessage(m.chat, {
-            text: `⚡ *sᴛᴀᴍɪɴᴀ ᴅɪɪsɪ*\n\n` +
-                `╭┈┈⬡「 💊 *ʀᴇsᴛᴏʀᴇ* 」\n` +
-                `┃ ⚡ Stamina: *+${restored}*\n` +
-                `┃ 💵 Biaya: *-Rp ${potionCost.toLocaleString('id-ID')}*\n` +
-                `┃ 📊 Sekarang: *${user.rpg.stamina}/${user.rpg.maxStamina}*\n` +
+            text: `⚡ *𝐒𝐓𝐀𝐌𝐈𝐍𝐀 𝐑𝐄𝐂𝐔𝐏𝐄𝐑𝐀𝐃𝐀*\n\n` +
+                `╭┈┈⬡「 💊 *𝐑𝐄𝐒𝐓𝐎𝐑𝐄* 」\n` +
+                `┃ ⚡ Energía: *+${restored}*\n` +
+                `┃ 💵 Costo: *-$${potionCost.toLocaleString('es-AR')}*\n` +
+                `┃ 📊 Estado: *${user.rpg.stamina}/${user.rpg.maxStamina}*\n` +
                 `╰┈┈┈┈┈┈┈┈⬡`,
-            contextInfo: getContextInfo()
+            contextInfo: getContextInfo('⚡ 𝐒𝐓𝐀𝐌𝐈𝐍𝐀 𝐑𝐄𝐂𝐀𝐑𝐆𝐀𝐃𝐀', '¡Listo para la acción!')
         }, { quoted: m })
     }
     
+    // Mostrar estado actual de la energía
     const staminaBar = createStaminaBar(user.rpg.stamina, user.rpg.maxStamina)
     
-    let txt = `⚡ *sᴛᴀᴍɪɴᴀ sᴛᴀᴛᴜs*\n\n`
-    txt += `╭┈┈⬡「 📊 *ɪɴꜰᴏ* 」\n`
-    txt += `┃ ⚡ Stamina: *${user.rpg.stamina}/${user.rpg.maxStamina}*\n`
+    let txt = `⚡ *𝐄𝐒𝐓𝐀𝐃𝐎 𝐃𝐄 𝐒𝐓𝐀𝐌𝐈𝐍𝐀*\n\n`
+    txt += `╭┈┈⬡「 📊 *𝐈𝐍𝐅𝐎* 」\n`
+    txt += `┃ ⚡ Energía: *${user.rpg.stamina}/${user.rpg.maxStamina}*\n`
     txt += `┃ 📊 [${staminaBar}]\n`
     txt += `╰┈┈┈┈┈┈┈┈⬡\n\n`
-    txt += `> Isi stamina: \`${m.prefix}stamina isi\` (Rp 5.000)\n`
-    txt += `> Stamina pulih otomatis setiap jam`
+    txt += `> Recargar: \`${m.prefix}stamina recuperar\` ($5.000)\n`
+    txt += `> Tip: La energía se recupera sola con el paso del tiempo.`
     
     await sock.sendMessage(m.chat, {
         text: txt,
