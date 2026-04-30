@@ -1,12 +1,13 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { getRpgContextInfo } from '../../src/lib/ourin-context.js'
+
 const pluginConfig = {
-    name: 'slot',
-    alias: ['slots', 'mesin'],
+    name: 'slots',
+    alias: ['slot', 'mesin', 'maquinita', 'casino'],
     category: 'rpg',
-    description: 'Main slot machine gambling',
-    usage: '.slot <bet>',
-    example: '.slot 5000',
+    description: 'Probá tu suerte en la máquina tragamonedas',
+    usage: '.slots <apuesta>',
+    example: '.slots 5000',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -25,24 +26,25 @@ async function handler(m, { sock }) {
     
     if (!bet || bet < 1000) {
         return m.reply(
-            `❌ *ɪɴᴠᴀʟɪᴅ ʙᴇᴛ*\n\n` +
-            `> Minimal bet Rp 1.000!\n` +
-            `> Contoh: \`.slot 5000\``
+            `❌ *𝐀𝐏𝐔𝐄𝐒𝐓𝐀 𝐈𝐍𝐕𝐀́𝐋𝐈𝐃𝐀*\n\n` +
+            `> La apuesta mínima es de $1.000!\n` +
+            `> Ejemplo: \`.slots 5000\``
         )
     }
     
     if ((user.koin || 0) < bet) {
         return m.reply(
-            `❌ *sᴀʟᴅᴏ ᴛɪᴅᴀᴋ ᴄᴜᴋᴜᴘ*\n\n` +
-            `> Koin kamu: Rp ${(user.koin || 0).toLocaleString('id-ID')}\n` +
-            `> Butuh: Rp ${bet.toLocaleString('id-ID')}`
+            `❌ *𝐒𝐀𝐋𝐃𝐎 𝐈𝐍𝐒𝐔𝐅𝐈𝐂𝐈𝐄𝐍𝐓𝐄*\n\n` +
+            `> Tu saldo: $${(user.koin || 0).toLocaleString('es-AR')}\n` +
+            `> Necesitás: $${bet.toLocaleString('es-AR')}`
         )
     }
     
+    // Cobrar la apuesta por adelantado
     user.koin -= bet
     
     const symbols = ['🍒', '🍋', '🍊', '🍇', '💎', '7️⃣']
-    const weights = [30, 25, 20, 15, 7, 3]
+    const weights = [30, 25, 20, 15, 7, 3] // Probabilidades en %
     
     function spin() {
         const rand = Math.random() * 100
@@ -56,46 +58,56 @@ async function handler(m, { sock }) {
     
     const result = [spin(), spin(), spin()]
     
-    await sock.sendMessage(m.chat, { text: `🎰 *sᴘɪɴɴɪɴɢ...*`, contextInfo: getRpgContextInfo('🎰 SLOT', 'Spin!') }, { quoted: m })
+    await sock.sendMessage(m.chat, { 
+        text: `🎰 *𝐆𝐈𝐑𝐀𝐍𝐃𝐎...*`, 
+        contextInfo: getRpgContextInfo('🎰 𝐒𝐋𝐎𝐓𝐒', '¡Mucha suerte!') 
+    }, { quoted: m })
+    
     await new Promise(r => setTimeout(r, 1500))
     
     let multiplier = 0
     let winText = ''
     
+    // Lógica de premios
     if (result[0] === result[1] && result[1] === result[2]) {
         if (result[0] === '7️⃣') {
             multiplier = 10
-            winText = '🎉 JACKPOT!!!'
+            winText = '🎉 ¡¡¡JACKPOT TOTAL!!!'
         } else if (result[0] === '💎') {
             multiplier = 5
-            winText = '💎 DIAMOND!'
+            winText = '💎 ¡DIAMANTES!'
         } else {
             multiplier = 3
-            winText = '✨ TRIPLE!'
+            winText = '✨ ¡TRIPLE!'
         }
     } else if (result[0] === result[1] || result[1] === result[2] || result[0] === result[2]) {
         multiplier = 1.5
-        winText = '👍 DOUBLE!'
+        winText = '👍 ¡DOBLE!'
     }
     
     const winnings = Math.floor(bet * multiplier)
     user.koin = (user.koin || 0) + winnings
     
-    let txt = `🎰 *sʟᴏᴛ ᴍᴀᴄʜɪɴᴇ*\n\n`
+    let txt = `🎰 *𝐌𝐀́𝐐𝐔𝐈𝐍𝐀 𝐓𝐑𝐀𝐆𝐀𝐌𝐎𝐍𝐄𝐃𝐀𝐒*\n\n`
     txt += `╔═══════════╗\n`
     txt += `║ ${result[0]} │ ${result[1]} │ ${result[2]} ║\n`
     txt += `╚═══════════╝\n\n`
     
     if (multiplier > 0) {
         txt += `> ${winText}\n`
-        txt += `> 💰 Win: *+Rp ${winnings.toLocaleString('id-ID')}*`
+        txt += `> 💰 Ganaste: *+$${winnings.toLocaleString('es-AR')}*`
     } else {
-        txt += `> 😢 Kalah!\n`
-        txt += `> 💸 Lost: *-Rp ${bet.toLocaleString('id-ID')}*`
+        txt += `> 😢 ¡Perdiste!\n`
+        txt += `> 💸 Perdiste: *-$${bet.toLocaleString('es-AR')}*`
     }
     
+    txt += `\n\n> Seguí jugando en **𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈Ɀ𝐀𝐖𝐀 𝐌𝐃**`
+    
     db.save()
-    await sock.sendMessage(m.chat, { text: txt, contextInfo: getRpgContextInfo('🎰 SLOT', 'Result!') }, { quoted: m })
+    await sock.sendMessage(m.chat, { 
+        text: txt, 
+        contextInfo: getRpgContextInfo('🎰 𝐒𝐋𝐎𝐓𝐒', '¡Resultado!') 
+    }, { quoted: m })
 }
 
 export { pluginConfig as config, handler }
