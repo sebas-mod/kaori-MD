@@ -3,18 +3,19 @@ import { addExpWithLevelCheck } from '../../src/lib/ourin-level.js'
 import config from '../../config.js'
 import path from 'path'
 import fs from 'fs'
+
 const pluginConfig = {
-    name: 'mulung',
-    alias: ['scavenge', 'kumpulsampah'],
+    name: 'cirujear',
+    alias: ['scavenge', 'mulung', 'recolectar', 'juntar'],
     category: 'rpg',
-    description: 'Memulung untuk mengumpulkan barang',
-    usage: '.mulung',
-    example: '.mulung',
+    description: 'Buscá entre la basura para encontrar cosas y ganar unos mangos',
+    usage: '.cirujear',
+    example: '.cirujear',
     isOwner: false,
     isPremium: false,
     isGroup: false,
     isPrivate: false,
-    cooldown: 300,
+    cooldown: 300, // 5 minutos
     energi: 1,
     isEnabled: true
 }
@@ -25,9 +26,9 @@ try {
     if (fs.existsSync(thumbPath)) thumbRpg = fs.readFileSync(thumbPath)
 } catch (e) {}
 
-function getContextInfo(title = '🗑️ *ᴍᴜʟᴜɴɢ*', body = 'Mengumpulkan barang') {
+function getContextInfo(title = '🗑️ *𝐂𝐈𝐑𝐔𝐉𝐄𝐎*', body = 'Buscando algo de valor...') {
     const saluranId = config.saluran?.id || '120363208449943317@newsletter'
-    const saluranName = config.saluran?.name || config.bot?.name || 'Ourin-AI'
+    const saluranName = config.saluran?.name || '𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈Ɀ𝐀𝐖𝐀 𝐌𝐃'
     
     const contextInfo = {
         forwardingScore: 9999,
@@ -65,24 +66,24 @@ async function handler(m, { sock }) {
     
     if (user.rpg.stamina < staminaCost) {
         return m.reply(
-            `⚡ *sᴛᴀᴍɪɴᴀ ʜᴀʙɪs*\n\n` +
-            `> Butuh ${staminaCost} stamina untuk memulung\n` +
-            `> Stamina kamu: ${user.rpg.stamina}`
+            `⚡ *𝐒𝐈𝐍 𝐒𝐓𝐀𝐌𝐈𝐍𝐀*\n\n` +
+            `> Necesitás ${staminaCost} de energía para ir a cirujear.\n` +
+            `> Tu stamina: ${user.rpg.stamina}`
         )
     }
     
     user.rpg.stamina -= staminaCost
     
     await m.react('🕕')
-    await m.reply(`🗑️ *sᴇᴅᴀɴɢ ᴍᴇᴍᴜʟᴜɴɢ...*`)
+    await m.reply(`🗑️ *𝐑𝐄𝐂𝐎𝐋𝐄𝐂𝐓𝐀𝐍𝐃𝐎...*\n\n> Revisando los tachos de la zona...`)
     await new Promise(r => setTimeout(r, 2000))
     
     const drops = [
-        { item: 'botol', name: '🍶 Botol', min: 1, max: 10 },
-        { item: 'kaleng', name: '🥫 Kaleng', min: 1, max: 8 },
-        { item: 'kardus', name: '📦 Kardus', min: 1, max: 5 },
-        { item: 'sampah', name: '🗑️ Sampah', min: 1, max: 15 },
-        { item: 'koran', name: '📰 Koran', min: 0, max: 3 }
+        { item: 'botella', name: '🍶 Botella', min: 1, max: 10 },
+        { item: 'lata', name: '🥫 Lata', min: 1, max: 8 },
+        { item: 'carton', name: '📦 Cartón', min: 1, max: 5 },
+        { item: 'basura', name: '🗑️ Chatarra', min: 1, max: 15 },
+        { item: 'diario', name: '📰 Diario viejo', min: 0, max: 3 }
     ]
     
     let results = []
@@ -93,6 +94,7 @@ async function handler(m, { sock }) {
         if (qty > 0) {
             user.inventory[drop.item] = (user.inventory[drop.item] || 0) + qty
             results.push({ name: drop.name, qty })
+            // Pago por lo recolectado
             moneyEarned += qty * Math.floor(Math.random() * 50 + 10)
         }
     }
@@ -100,22 +102,23 @@ async function handler(m, { sock }) {
     user.koin = (user.koin || 0) + moneyEarned
     
     const expGain = Math.floor(Math.random() * 200) + 50
-    const levelResult = await addExpWithLevelCheck(sock, m, db, user, expGain)
+    await addExpWithLevelCheck(sock, m, db, user, expGain)
     
     db.save()
     
     await m.react('✅')
     
-    let txt = `🗑️ *ᴍᴜʟᴜɴɢ sᴇʟᴇsᴀɪ*\n\n`
-    txt += `╭┈┈⬡「 📦 *ʜᴀsɪʟ* 」\n`
+    let txt = `🗑️ *𝐑𝐄𝐂𝐎𝐋𝐄𝐂𝐓𝐀 𝐅𝐈𝐍𝐀𝐋𝐈Ɀ𝐀𝐃𝐀*\n\n`
+    txt += `╭┈┈⬡「 📦 *𝐎𝐁𝐓𝐄𝐍𝐈𝐃𝐎* 」\n`
     for (const r of results) {
         txt += `┃ ${r.name}: *+${r.qty}*\n`
     }
     txt += `┃ ─────────\n`
-    txt += `┃ 💵 Jual: *+Rp ${moneyEarned.toLocaleString('id-ID')}*\n`
+    txt += `┃ 💵 Venta: *+$${moneyEarned.toLocaleString('es-AR')}*\n`
     txt += `┃ 🚄 Exp: *+${expGain}*\n`
     txt += `┃ ⚡ Stamina: *-${staminaCost}*\n`
-    txt += `╰┈┈┈┈┈┈┈┈⬡`
+    txt += `╰┈┈┈┈┈┈┈┈⬡\n\n`
+    txt += `> ¡Todo suma en **𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈Ɀ𝐀𝐖𝐀 𝐌𝐃**!`
     
     await sock.sendMessage(m.chat, {
         text: txt,
