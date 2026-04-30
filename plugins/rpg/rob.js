@@ -1,18 +1,19 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { addExpWithLevelCheck } from '../../src/lib/ourin-level.js'
 import { getRpgContextInfo } from '../../src/lib/ourin-context.js'
+
 const pluginConfig = {
-    name: 'rob',
-    alias: ['rampok', 'mug'],
+    name: 'robar',
+    alias: ['rob', 'chorear', 'afanar', 'mug'],
     category: 'rpg',
-    description: 'Rampok uang player lain (berisiko)',
-    usage: '.rob @user',
-    example: '.rob @user',
+    description: 'Robale guita a otro usuario (con riesgo)',
+    usage: '.robar @user',
+    example: '.robar @user',
     isOwner: false,
     isPremium: false,
     isGroup: true,
     isPrivate: false,
-    cooldown: 600,
+    cooldown: 600, // 10 minutos
     energi: 1,
     isEnabled: true
 }
@@ -24,27 +25,27 @@ async function handler(m, { sock }) {
     
     if (!target) {
         return m.reply(
-            `🦹 *ʀᴏʙ*\n\n` +
-            `╭┈┈⬡「 📋 *ᴜsᴀɢᴇ* 」\n` +
-            `┃ > Tag target yang mau dirampok!\n` +
-            `┃ > \`.rob @user\`\n` +
+            `🦹 *𝐀𝐓𝐑𝐀𝐂𝐎*\n\n` +
+            `╭┈┈⬡「 📋 *𝐔𝐒𝐎* 」\n` +
+            `┃ > ¡Mencioná a quién le querés robar!\n` +
+            `┃ > \`.robar @user\`\n` +
             `╰┈┈┈┈┈┈┈┈⬡`
         )
     }
     
     if (target === m.sender) {
-        return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> Tidak bisa rampok diri sendiri!`)
+        return m.reply(`❌ *𝐄𝐑𝐑𝐎𝐑*\n\n> No seas boludo, ¡no te podés robar a vos mismo!`)
     }
     
     const robber = db.getUser(m.sender)
     const victim = db.getUser(target)
     
     if (!victim) {
-        return m.reply(`❌ *ᴛᴀʀɢᴇᴛ ɴᴏᴛ ꜰᴏᴜɴᴅ*\n\n> Target tidak ditemukan di database!`)
+        return m.reply(`❌ *𝐒𝐈𝐍 𝐑𝐄𝐆𝐈𝐒𝐓𝐑𝐎*\n\n> El objetivo no está en mi base de datos.`)
     }
     
     if ((victim.koin || 0) < 1000) {
-        return m.reply(`❌ *ᴛᴀʀɢᴇᴛ ᴍɪsᴋɪɴ*\n\n> Target terlalu miskin untuk dirampok!`)
+        return m.reply(`❌ *𝐎𝐁𝐉𝐄𝐓𝐈𝐕𝐎 𝐒𝐄𝐂𝐎*\n\n> La víctima es demasiado pobre, no vale la pena.`)
     }
     
     if (!robber.rpg) robber.rpg = {}
@@ -52,13 +53,17 @@ async function handler(m, { sock }) {
     
     if (robber.rpg.health < 30) {
         return m.reply(
-            `❌ *ʜᴇᴀʟᴛʜ ᴛᴇʀʟᴀʟᴜ ʀᴇɴᴅᴀʜ*\n\n` +
-            `> Minimal 30 HP untuk merampok!\n` +
-            `> Health kamu: ${robber.rpg.health} HP`
+            `❌ *𝐄𝐒𝐓𝐀́𝐒 𝐌𝐔𝐘 𝐌𝐀𝐋*\n\n` +
+            `> Necesitás al menos 30 HP para salir a afanar.\n` +
+            `> Tu salud: ${robber.rpg.health} HP`
         )
     }
     
-    await sock.sendMessage(m.chat, { text: `🦹 *sᴇᴅᴀɴɢ ᴍᴇʀᴀᴍᴘᴏᴋ...*`, contextInfo: getRpgContextInfo('🦹 ROB', 'Robbing!') }, { quoted: m })
+    await sock.sendMessage(m.chat, { 
+        text: `🦹 *𝐀𝐒𝐀𝐋𝐓𝐀𝐍𝐃𝐎...*`, 
+        contextInfo: getRpgContextInfo('🦹 𝐀𝐓𝐑𝐀𝐂𝐎', '¡Manos arriba!') 
+    }, { quoted: m })
+    
     await new Promise(r => setTimeout(r, 2500))
     
     const successRate = 0.4
@@ -76,9 +81,9 @@ async function handler(m, { sock }) {
         
         db.save()
         
-        let txt = `✅ *ʀᴏʙ sᴜᴋsᴇs*\n\n`
-        txt += `> 🦹 Kamu berhasil merampok @${target.split('@')[0]}!\n`
-        txt += `> 💰 Curian: *+Rp ${stolen.toLocaleString('id-ID')}*\n`
+        let txt = `✅ *𝐀𝐓𝐑𝐀𝐂𝐎 𝐄𝐗𝐈𝐓𝐎𝐒𝐎*\n\n`
+        txt += `> 🦹 ¡Le choreaste de lo lindo a @${target.split('@')[0]}!\n`
+        txt += `> 💰 Botín: *+$${stolen.toLocaleString('es-AR')}*\n`
         txt += `> 🚄 Exp: *+${expGain}*`
         
         await m.reply(txt, { mentions: [target] })
@@ -92,10 +97,10 @@ async function handler(m, { sock }) {
         
         db.save()
         
-        let txt = `❌ *ʀᴏʙ ɢᴀɢᴀʟ*\n\n`
-        txt += `> 🚨 Kamu ketahuan dan dipukuli!\n`
-        txt += `> 💸 Denda: *-Rp ${actualFine.toLocaleString('id-ID')}*\n`
-        txt += `> ❤️ Health: *-${healthLoss}*`
+        let txt = `❌ *𝐀𝐓𝐑𝐀𝐂𝐎 𝐅𝐀𝐋𝐋𝐈𝐃𝐎*\n\n`
+        txt += `> 🚨 ¡Te vio la cana y te molieron a palos!\n`
+        txt += `> 💸 Multa: *-$${actualFine.toLocaleString('es-AR')}*\n`
+        txt += `> ❤️ Salud: *-${healthLoss} HP*`
         
         await m.reply(txt)
     }
