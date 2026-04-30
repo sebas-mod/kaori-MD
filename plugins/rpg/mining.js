@@ -1,13 +1,14 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { addExpWithLevelCheck } from '../../src/lib/ourin-level.js'
 import { getRpgContextInfo } from '../../src/lib/ourin-context.js'
+
 const pluginConfig = {
-    name: 'mining',
-    alias: ['mine', 'tambang'],
+    name: 'minar',
+    alias: ['mining', 'mine', 'tambang'],
     category: 'rpg',
-    description: 'Menambang untuk mendapatkan ores dan gems',
-    usage: '.mining',
-    example: '.mining',
+    description: 'Trabajá en la mina para conseguir minerales y gemas',
+    usage: '.minar',
+    example: '.minar',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -29,24 +30,24 @@ async function handler(m, { sock }) {
     
     if (user.rpg.stamina < staminaCost) {
         return m.reply(
-            `⚡ *sᴛᴀᴍɪɴᴀ ʜᴀʙɪs*\n\n` +
-            `> Butuh ${staminaCost} stamina untuk mining.\n` +
-            `> Stamina kamu: ${user.rpg.stamina}`
+            `⚡ *𝐒𝐈𝐍 𝐄𝐍𝐄𝐑𝐆𝐈́𝐀*\n\n` +
+            `> Necesitás ${staminaCost} de stamina para laburar en la mina.\n` +
+            `> Tu stamina: ${user.rpg.stamina}`
         )
     }
     
     user.rpg.stamina -= staminaCost
     
-    await m.reply('⛏️ *sᴇᴅᴀɴɢ ᴍᴇɴᴀᴍʙᴀɴɢ...*')
+    await m.reply('⛏️ *Picando piedra...*')
     await new Promise(r => setTimeout(r, 2000))
     
     const drops = [
-        { item: 'rock', chance: 80, name: '🪨 Batu', min: 2, max: 5 },
-        { item: 'coal', chance: 50, name: '⚫ Batubara', min: 1, max: 3 },
-        { item: 'iron', chance: 30, name: '⛓️ Besi', min: 1, max: 2 },
-        { item: 'gold', chance: 15, name: '🥇 Emas', min: 1, max: 1 },
-        { item: 'diamond', chance: 5, name: '💠 Berlian', min: 1, max: 1 },
-        { item: 'emerald', chance: 2, name: '💚 Emerald', min: 1, max: 1 }
+        { item: 'rock', chance: 80, name: '🪨 Piedra', min: 2, max: 5 },
+        { item: 'coal', chance: 50, name: '⚫ Carbón', min: 1, max: 3 },
+        { item: 'iron', chance: 30, name: '⛓️ Hierro', min: 1, max: 2 },
+        { item: 'gold', chance: 15, name: '🥇 Oro', min: 1, max: 1 },
+        { item: 'diamond', chance: 5, name: '💠 Diamante', min: 1, max: 1 },
+        { item: 'emerald', chance: 2, name: '💚 Esmeralda', min: 1, max: 1 }
     ]
     
     let results = []
@@ -60,22 +61,23 @@ async function handler(m, { sock }) {
     
     if (results.length === 0) {
         user.inventory['rock'] = (user.inventory['rock'] || 0) + 1
-        results.push({ name: '🪨 Batu', qty: 1 })
+        results.push({ name: '🪨 Piedra', qty: 1 })
     }
     
     const expGain = Math.floor(Math.random() * 500) + 100
-    const levelResult = await addExpWithLevelCheck(sock, m, db, user, expGain)
+    await addExpWithLevelCheck(sock, m, db, user, expGain)
     
     db.save()
     
-    let txt = `⛏️ *ᴍɪɴɪɴɢ sᴇʟᴇsᴀɪ*\n\n`
-    txt += `╭┈┈⬡「 📦 *ʜᴀsɪʟ* 」\n`
+    let txt = `⛏️ *𝐌𝐈𝐍𝐄𝐑𝐈́𝐀 𝐅𝐈𝐍𝐀𝐋𝐈𝐙𝐀𝐃𝐀*\n\n`
+    txt += `╭┈┈⬡「 📦 *𝐁𝐎𝐓𝐈́𝐍* 」\n`
     for (const r of results) {
         txt += `┃ ${r.name}: *+${r.qty}*\n`
     }
     txt += `┃ 🚄 Exp: *+${expGain}*\n`
     txt += `┃ ⚡ Stamina: *-${staminaCost}*\n`
-    txt += `╰┈┈┈┈┈┈┈┈⬡`
+    txt += `╰┈┈┈┈┈┈┈┈⬡\n\n`
+    txt += `> ¡Seguí minando con **𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃**!`
     
     await m.reply(txt)
 }
