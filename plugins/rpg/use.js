@@ -1,12 +1,13 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { getRpgContextInfo } from '../../src/lib/ourin-context.js'
+
 const pluginConfig = {
-    name: 'use',
-    alias: ['pake', 'makan', 'open'],
+    name: 'usar',
+    alias: ['use', 'pake', 'makan', 'open', 'consumir'],
     category: 'rpg',
-    description: 'Menggunakan item consumable atau membuka crate',
-    usage: '.use <item>',
-    example: '.use potion',
+    description: 'Usá ítems consumibles o abrí cajas de suministros',
+    usage: '.usar <ítem>',
+    example: '.usar pocion',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -21,17 +22,17 @@ async function handler(m, { sock }) {
     const user = db.getUser(m.sender)
     const args = m.args || []
     const itemKey = args[0]?.toLowerCase()
-    
+
     if (!itemKey) {
         return m.reply(
-            `🎒 *ᴜsᴇ ɪᴛᴇᴍ*\n\n` +
-            `╭┈┈⬡「 📋 *ᴜsᴀɢᴇ* 」\n` +
-            `┃ > \`.use <nama_item>\`\n` +
-            `┃ > Cek inventory: \`.inventory\`\n` +
+            `🎒 *𝐔𝐒𝐀𝐑 𝐈́𝐓𝐄𝐌*\n\n` +
+            `╭┈┈⬡「 📋 *𝐔𝐒𝐎* 」\n` +
+            `┃ > \`.usar <nombre_item>\`\n` +
+            `┃ > Ver mochila: \`.inventory\`\n` +
             `╰┈┈┈┈┈┈┈┈⬡`
         )
     }
-    
+
     user.inventory = user.inventory || {}
     user.rpg = user.rpg || {}
     user.rpg.health = user.rpg.health || 100
@@ -40,47 +41,50 @@ async function handler(m, { sock }) {
     user.rpg.maxMana = user.rpg.maxMana || 100
     user.rpg.stamina = user.rpg.stamina || 100
     user.rpg.maxStamina = user.rpg.maxStamina || 100
-    
+
     const count = user.inventory[itemKey] || 0
-    
+
     if (count <= 0) {
         return m.reply(
-            `❌ *ɪᴛᴇᴍ ᴛɪᴅᴀᴋ ᴀᴅᴀ*\n\n` +
-            `> Kamu tidak memiliki item *${itemKey}*!\n` +
-            `> Cek inventory: \`.inventory\``
+            `❌ *𝐍𝐎 𝐓𝐄𝐍𝐄́𝐒 𝐄𝐒𝐄 𝐈́𝐓𝐄𝐌*\n\n` +
+            `> ¡No tenés *${itemKey}* en tu mochila!\n` +
+            `> Revisá tus cosas con: \`.inventory\``
         )
     }
-    
+
     let msg = ''
-    
+
     switch(itemKey) {
+        case 'pocion':
         case 'potion':
             if (user.rpg.health >= user.rpg.maxHealth) {
-                return m.reply(`❤️ *ʜᴇᴀʟᴛʜ ᴘᴇɴᴜʜ*\n\n> Nyawa kamu sudah penuh!`)
+                return m.reply(`❤️ *𝐕𝐈𝐃𝐀 𝐋𝐋𝐄𝐍𝐀*\n\n> ¡Tu salud ya está al máximo!`)
             }
             user.rpg.health = Math.min(user.rpg.health + 50, user.rpg.maxHealth)
             user.inventory[itemKey]--
-            msg = `🥤 *ɪᴛᴇᴍ ᴅɪɢᴜɴᴀᴋᴀɴ*\n\n> Kamu meminum *Health Potion*.\n> ❤️ Health sekarang: ${user.rpg.health}/${user.rpg.maxHealth}`
+            msg = `🥤 *𝐈́𝐓𝐄𝐌 𝐔𝐒𝐀𝐃𝐎*\n\n> Te tomaste una *Poción de Vida*.\n> ❤️ Salud actual: ${user.rpg.health}/${user.rpg.maxHealth}`
             break
-            
+
+        case 'pocion_mana':
         case 'mpotion':
             if (user.rpg.mana >= user.rpg.maxMana) {
-                return m.reply(`💧 *ᴍᴀɴᴀ ᴘᴇɴᴜʜ*\n\n> Mana kamu sudah penuh!`)
+                return m.reply(`💧 *𝐌𝐀𝐍𝐀 𝐋𝐋𝐄𝐍𝐎*\n\n> ¡Tu energía mágica ya está al máximo!`)
             }
             user.rpg.mana = Math.min(user.rpg.mana + 50, user.rpg.maxMana)
             user.inventory[itemKey]--
-            msg = `🧪 *ɪᴛᴇᴍ ᴅɪɢᴜɴᴀᴋᴀɴ*\n\n> Kamu meminum *Mana Potion*.\n> 💧 Mana sekarang: ${user.rpg.mana}/${user.rpg.maxMana}`
+            msg = `🧪 *𝐈́𝐓𝐄𝐌 𝐔𝐒𝐀𝐃𝐎*\n\n> Usaste una *Poción de Maná*.\n> 💧 Maná actual: ${user.rpg.mana}/${user.rpg.maxMana}`
             break
-            
+
         case 'stamina':
+        case 'pocion_stamina':
             if (user.rpg.stamina >= user.rpg.maxStamina) {
-                return m.reply(`⚡ *sᴛᴀᴍɪɴᴀ ᴘᴇɴᴜʜ*\n\n> Stamina kamu sudah penuh!`)
+                return m.reply(`⚡ *𝐒𝐓𝐀𝐌𝐈𝐍𝐀 𝐋𝐋𝐄𝐍𝐀*\n\n> ¡Tu resistencia ya está al máximo!`)
             }
             user.rpg.stamina = Math.min(user.rpg.stamina + 20, user.rpg.maxStamina)
             user.inventory[itemKey]--
-            msg = `⚡ *ɪᴛᴇᴍ ᴅɪɢᴜɴᴀᴋᴀɴ*\n\n> Kamu meminum *Stamina Potion*.\n> ⚡ Stamina sekarang: ${user.rpg.stamina}/${user.rpg.maxStamina}`
+            msg = `⚡ *𝐈́𝐓𝐄𝐌 𝐔𝐒𝐀𝐃𝐎*\n\n> Consumiste una *Poción de Stamina*.\n> ⚡ Energía actual: ${user.rpg.stamina}/${user.rpg.maxStamina}`
             break
-            
+
         case 'common':
         case 'uncommon':
         case 'mythic':
@@ -88,20 +92,21 @@ async function handler(m, { sock }) {
             user.inventory[itemKey]--
             const rewardMoney = Math.floor(Math.random() * (itemKey === 'legendary' ? 100000 : 10000)) + 1000
             const rewardExp = Math.floor(Math.random() * (itemKey === 'legendary' ? 5000 : 500)) + 100
-            
+
             user.koin = (user.koin || 0) + rewardMoney
             user.rpg.exp = (user.rpg.exp || 0) + rewardExp
-            
-            msg = `🎁 *ᴄʀᴀᴛᴇ ᴅɪʙᴜᴋᴀ*\n\n` +
-                  `> Kamu membuka *${itemKey} Crate*!\n` +
-                  `> 💰 Money: +Rp ${rewardMoney.toLocaleString('id-ID')}\n` +
-                  `> 🚄 Exp: +${rewardExp}`
+
+            msg = `🎁 *𝐂𝐀𝐉𝐀 𝐀𝐁𝐈𝐄𝐑𝐓𝐀*\n\n` +
+                  `> ¡Abriste una caja de rareza *${itemKey.toUpperCase()}*!\n` +
+                  `> 💰 Guita: +$${rewardMoney.toLocaleString('es-AR')}\n` +
+                  `> 🚄 EXP: +${rewardExp}\n\n` +
+                  `> Seguí sumando en **𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈Ɀ𝐀𝐖𝐀 𝐌𝐃**`
             break
-            
+
         default:
-            return m.reply(`❌ *ɪᴛᴇᴍ ᴛɪᴅᴀᴋ ᴅᴀᴘᴀᴛ ᴅɪɢᴜɴᴀᴋᴀɴ*\n\n> Item *${itemKey}* tidak bisa digunakan langsung.`)
+            return m.reply(`❌ *𝐍𝐎 𝐒𝐄 𝐏𝐔𝐄𝐃𝐄 𝐔𝐒𝐀𝐑*\n\n> El ítem *${itemKey}* es un material o recurso, no se puede "usar" directamente desde acá.`)
     }
-    
+
     db.save()
     await m.reply(msg)
 }
