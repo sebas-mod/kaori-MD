@@ -1,12 +1,13 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { getRpgContextInfo } from '../../src/lib/ourin-context.js'
+
 const pluginConfig = {
-    name: 'inventory',
-    alias: ['inv', 'tas', 'bag'],
+    name: 'inventario',
+    alias: ['inv', 'mochila', 'bag', 'tas'],
     category: 'rpg',
-    description: 'Melihat isi inventory RPG',
-    usage: '.inventory',
-    example: '.inventory',
+    description: 'Mira qué tenés guardado en tu inventario RPG',
+    usage: '.inventario',
+    example: '.inventario',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -17,28 +18,36 @@ const pluginConfig = {
 }
 
 const ITEMS = {
-    common: { emote: '📦', name: 'Common Crate' },
-    uncommon: { emote: '🛍️', name: 'Uncommon Crate' },
-    mythic: { emote: '🎁', name: 'Mythic Crate' },
-    legendary: { emote: '💎', name: 'Legendary Crate' },
+    common: { emote: '📦', name: 'Caja Común' },
+    uncommon: { emote: '🛍️', name: 'Caja Poco Común' },
+    mythic: { emote: '🎁', name: 'Caja Mítica' },
+    legendary: { emote: '💎', name: 'Caja Legendaria' },
     
-    rock: { emote: '🪨', name: 'Batu' },
-    coal: { emote: '⚫', name: 'Batubara' },
-    iron: { emote: '⛓️', name: 'Besi' },
-    gold: { emote: '🥇', name: 'Emas' },
-    diamond: { emote: '💠', name: 'Berlian' },
-    emerald: { emote: '💚', name: 'Emerald' },
+    rock: { emote: '🪨', name: 'Piedra' },
+    coal: { emote: '⚫', name: 'Carbón' },
+    iron: { emote: '⛓️', name: 'Hierro' },
+    gold: { emote: '🥇', name: 'Oro' },
+    diamond: { emote: '💠', name: 'Diamante' },
+    emerald: { emote: '💚', name: 'Esmeralda' },
     
-    trash: { emote: '🗑️', name: 'Sampah' },
-    fish: { emote: '🐟', name: 'Ikan' },
-    prawn: { emote: '🦐', name: 'Udang' },
-    octopus: { emote: '🐙', name: 'Gurita' },
-    shark: { emote: '🦈', name: 'Hiu' },
-    whale: { emote: '🐳', name: 'Paus' },
+    trash: { emote: '🗑️', name: 'Basura' },
+    fish: { emote: '🐟', name: 'Pescado' },
+    prawn: { emote: '🦐', name: 'Camarón' },
+    octopus: { emote: '🐙', name: 'Pulpo' },
+    shark: { emote: '🦈', name: 'Tiburón' },
+    whale: { emote: '🐳', name: 'Ballena' },
     
-    potion: { emote: '🥤', name: 'Health Potion' },
-    mpotion: { emote: '🧪', name: 'Mana Potion' },
-    stamina: { emote: '⚡', name: 'Stamina Potion' }
+    potion: { emote: '🥤', name: 'Poción de Vida' },
+    mpotion: { emote: '🧪', name: 'Poción de Maná' },
+    stamina: { emote: '⚡', name: 'Poción de Stamina' },
+
+    // Agregados de la caza
+    conejo: { emote: '🐰', name: 'Conejo' },
+    ciervo: { emote: '🦌', name: 'Ciervo' },
+    jabali: { emote: '🐗', name: 'Jabalí' },
+    oso: { emote: '🐻', name: 'Oso' },
+    leon: { emote: '🦁', name: 'León' },
+    dragon: { emote: '🐉', name: 'Dragón' }
 }
 
 async function handler(m, { sock }) {
@@ -47,15 +56,16 @@ async function handler(m, { sock }) {
     if (!user.inventory) user.inventory = {}
     
     let invText = `╭━━━━━━━━━━━━━━━━━╮\n`
-    invText += `┃ 🎒 *ɪɴᴠᴇɴᴛᴏʀʏ ᴜsᴇʀ*\n`
+    invText += `┃ 🎒 *𝐈𝐍𝐕𝐄𝐍𝐓𝐀𝐑𝐈𝐎 𝐃𝐄 𝐔𝐒𝐔𝐀𝐑𝐈𝐎*\n`
     invText += `╰━━━━━━━━━━━━━━━━━╯\n\n`
     
     let hasItem = false
     const categories = {
-        '📦 *ᴄʀᴀᴛᴇs*': ['common', 'uncommon', 'mythic', 'legendary'],
-        '⛏️ *ᴍɪɴɪɴɢ*': ['rock', 'coal', 'iron', 'gold', 'diamond', 'emerald'],
-        '🎣 *ꜰɪsʜɪɴɢ*': ['trash', 'fish', 'prawn', 'octopus', 'shark', 'whale'],
-        '🧪 *ᴘᴏᴛɪᴏɴs*': ['potion', 'mpotion', 'stamina']
+        '📦 *𝐂𝐀𝐉𝐀𝐒*': ['common', 'uncommon', 'mythic', 'legendary'],
+        '⛏️ *𝐌𝐈𝐍𝐄𝐑𝐈́𝐀*': ['rock', 'coal', 'iron', 'gold', 'diamond', 'emerald'],
+        '🎣 *𝐏𝐄𝐒𝐂𝐀*': ['trash', 'fish', 'prawn', 'octopus', 'shark', 'whale'],
+        '🏹 *𝐂𝐀𝐙𝐀*': ['conejo', 'ciervo', 'jabali', 'oso', 'leon', 'dragon'],
+        '🧪 *𝐏𝐎𝐂𝐈𝐎𝐍𝐄𝐒*': ['potion', 'mpotion', 'stamina']
     }
     
     for (const [catName, items] of Object.entries(categories)) {
@@ -76,10 +86,10 @@ async function handler(m, { sock }) {
     }
     
     if (!hasItem) {
-        invText += `> *Inventory Kosong!*\n`
-        invText += `> Gunakan command RPG untuk mendapatkan item.`
+        invText += `> *¡Tu mochila está vacía! 💨*\n`
+        invText += `> Salí a trabajar o a cazar para conseguir items.`
     } else {
-        invText += `> Gunakan \`.use <item>\` untuk memakai item.`
+        invText += `> Usá \`.use <ítem>\` para utilizar algo del inventario.`
     }
     
     await m.reply(invText)
