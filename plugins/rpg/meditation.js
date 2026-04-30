@@ -1,16 +1,17 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
+
 const pluginConfig = {
-    name: 'meditation',
-    alias: ['rest', 'istirahat', 'tidur', 'sleep'],
+    name: 'meditar',
+    alias: ['rest', 'istirahat', 'tidur', 'sleep', 'descansar', 'dormir'],
     category: 'rpg',
-    description: 'Istirahat untuk pulihkan HP dan stamina',
-    usage: '.meditation',
-    example: '.meditation',
+    description: 'Descansá para recuperar HP, Stamina y Maná',
+    usage: '.meditar',
+    example: '.meditar',
     isOwner: false,
     isPremium: false,
     isGroup: false,
     isPrivate: false,
-    cooldown: 600,
+    cooldown: 600, // 10 minutos
     energi: 0,
     isEnabled: true
 }
@@ -31,16 +32,16 @@ async function handler(m) {
     
     if (currentStamina >= maxStamina && currentHealth >= maxHealth && currentMana >= maxMana) {
         return m.reply(
-            `💤 *sᴜᴅᴀʜ ꜰᴜʟʟ*\n\n` +
+            `💤 *𝐄𝐒𝐓𝐀́𝐒 𝐀 𝐅𝐔𝐋𝐋*\n\n` +
             `> ⚡ Stamina: ${currentStamina}/${maxStamina}\n` +
-            `> ❤️ Health: ${currentHealth}/${maxHealth}\n` +
-            `> 💙 Mana: ${currentMana}/${maxMana}\n\n` +
-            `💡 Kamu sudah dalam kondisi prima!`
+            `> ❤️ Vida: ${currentHealth}/${maxHealth}\n` +
+            `> 💙 Maná: ${currentMana}/${maxMana}\n\n` +
+            `💡 ¡Ya estás en condiciones óptimas, no necesitás dormir!`
         )
     }
     
     await m.react('💤')
-    await m.reply(`💤 *ʙᴇʀɪsᴛɪʀᴀʜᴀᴛ...*\n\n> Memulihkan energi...`)
+    await m.reply(`💤 *𝐃𝐄𝐒𝐂𝐀𝐍𝐒𝐀𝐍𝐃𝐎...*\n\n> Recuperando energías para seguir la aventura...`)
     await new Promise(r => setTimeout(r, 3000))
     
     const staminaRecovered = Math.min(maxStamina - currentStamina, 40 + Math.floor(Math.random() * 20))
@@ -55,13 +56,13 @@ async function handler(m) {
     
     await m.react('✨')
     return m.reply(
-        `✨ *ɪsᴛɪʀᴀʜᴀᴛ sᴇʟᴇsᴀɪ!*\n\n` +
-        `╭┈┈⬡「 💖 *ᴘᴜʟɪʜ* 」\n` +
+        `✨ *¡𝐃𝐄𝐒𝐂𝐀𝐍𝐒𝐎 𝐅𝐈𝐍𝐀𝐋𝐈𝐙𝐀𝐃𝐎!*\n\n` +
+        `╭┈┈⬡「 💖 *𝐑𝐄𝐂𝐔𝐏𝐄𝐑𝐀𝐂𝐈𝐎́𝐍* 」\n` +
         `┃ ⚡ Stamina: *+${staminaRecovered}* (${user.rpg.stamina}/${maxStamina})\n` +
-        `┃ ❤️ Health: *+${healthRecovered}* (${user.rpg.health}/${maxHealth})\n` +
-        `┃ 💙 Mana: *+${manaRecovered}* (${user.rpg.mana}/${maxMana})\n` +
+        `┃ ❤️ Vida: *+${healthRecovered}* (${user.rpg.health}/${maxHealth})\n` +
+        `┃ 💙 Maná: *+${manaRecovered}* (${user.rpg.mana}/${maxMana})\n` +
         `╰┈┈┈┈┈┈┈┈⬡\n\n` +
-        `> Kamu merasa lebih segar! 🌟`
+        `> ¡Te sentís como nuevo para seguir con **𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃**! 🌟`
     )
 }
 
