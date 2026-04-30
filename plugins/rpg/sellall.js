@@ -1,12 +1,13 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { getRpgContextInfo } from '../../src/lib/ourin-context.js'
+
 const pluginConfig = {
-    name: 'sellall',
-    alias: ['jualsemua', 'quicksell'],
+    name: 'venderatodo',
+    alias: ['sellall', 'jualsemua', 'quicksell'],
     category: 'rpg',
-    description: 'Jual semua item yang bisa dijual sekaligus',
-    usage: '.sellall',
-    example: '.sellall',
+    description: 'Vende todos tus ítems recolectados de una sola vez',
+    usage: '.venderatodo',
+    example: '.venderatodo',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -38,28 +39,34 @@ async function handler(m, { sock }) {
             const earned = qty * price
             totalEarned += earned
             soldItems.push({ item, qty, earned })
-            user.inventory[item] = 0
+            user.inventory[item] = 0 // Limpia el inventario del ítem vendido
         }
     }
     
     if (soldItems.length === 0) {
-        return m.reply(`❌ *ᴛɪᴅᴀᴋ ᴀᴅᴀ ɪᴛᴇᴍ*\n\n> Tidak ada item yang bisa dijual!`)
+        return m.reply(`❌ *𝐒𝐈𝐍 𝐈́𝐓𝐄𝐌𝐒*\n\n> ¡No tenés nada en el inventario que se pueda vender!`)
     }
     
+    // Sumar el total a la billetera del usuario
     user.koin = (user.koin || 0) + totalEarned
     
     db.save()
     
-    let txt = `💰 *sᴇʟʟ ᴀʟʟ sᴜᴋsᴇs*\n\n`
-    txt += `╭┈┈⬡「 📦 *ɪᴛᴇᴍ ᴛᴇʀᴊᴜᴀʟ* 」\n`
+    let txt = `💰 *𝐕𝐄𝐍𝐓𝐀 𝐌𝐀𝐒𝐈𝐕𝐀 𝐄𝐗𝐈𝐓𝐎𝐒𝐀*\n\n`
+    txt += `╭┈┈⬡「 📦 *𝐃𝐄𝐓𝐀𝐋𝐋𝐄* 」\n`
+    
+    // Mostrar los primeros 10 ítems para no saturar el mensaje
     for (const s of soldItems.slice(0, 10)) {
-        txt += `┃ ${s.item}: ${s.qty}x = Rp ${s.earned.toLocaleString('id-ID')}\n`
+        txt += `┃ ${s.item}: ${s.qty}x = $${s.earned.toLocaleString('es-AR')}\n`
     }
+    
     if (soldItems.length > 10) {
-        txt += `┃ ... dan ${soldItems.length - 10} item lainnya\n`
+        txt += `┃ ... y otros ${soldItems.length - 10} ítems más\n`
     }
+    
     txt += `╰┈┈┈┈┈┈┈┈⬡\n\n`
-    txt += `> 💵 Total: *Rp ${totalEarned.toLocaleString('id-ID')}*`
+    txt += `> 💵 Ganancia Total: *$${totalEarned.toLocaleString('es-AR')}*\n`
+    txt += `> ¡Gracias por comerciar con **𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈Ɀ𝐀𝐖𝐀 𝐌𝐃**!`
     
     await m.reply(txt)
 }
