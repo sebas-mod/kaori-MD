@@ -1,12 +1,13 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { getRpgContextInfo } from '../../src/lib/ourin-context.js'
+
 const pluginConfig = {
-    name: 'marry',
-    alias: ['nikah', 'wedding', 'propose'],
+    name: 'casarse',
+    alias: ['marry', 'nikah', 'wedding', 'proponer', 'casamiento'],
     category: 'rpg',
-    description: 'Menikahi player lain',
-    usage: '.marry @user',
-    example: '.marry @user',
+    description: 'Casate con otro usuario del bot',
+    usage: '.casarse @user',
+    example: '.casarse @user',
     isOwner: false,
     isPremium: false,
     isGroup: true,
@@ -26,17 +27,17 @@ async function handler(m, { sock }) {
     
     if (!target) {
         return m.reply(
-            `💒 *ᴍᴀʀʀʏ*\n\n` +
-            `╭┈┈⬡「 📋 *ᴜsᴀɢᴇ* 」\n` +
-            `┃ > Tag pasangan yang mau dinikahi\n` +
-            `┃ > \`.marry @user\`\n` +
-            `┃ > Biaya: Rp 50.000\n` +
+            `💒 *¡𝐂𝐀𝐒𝐀𝐌𝐈𝐄𝐍𝐓𝐎!*\n\n` +
+            `╭┈┈⬡「 📋 *𝐌𝐎𝐃𝐎 𝐃𝐄 𝐔𝐒𝐎* 」\n` +
+            `┃ > Etiquetá a tu pareja para casarte\n` +
+            `┃ > \`.casarse @user\`\n` +
+            `┃ > Costo: $50.000\n` +
             `╰┈┈┈┈┈┈┈┈⬡`
         )
     }
     
     if (target === m.sender) {
-        return m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> Tidak bisa menikahi diri sendiri!`)
+        return m.reply(`❌ *¡𝐄𝐑𝐑𝐎𝐑!*\n\n> No seas tan egocéntrico, ¡no podés casarte con vos mismo!`)
     }
     
     const partner = db.getUser(target) || db.setUser(target)
@@ -44,17 +45,17 @@ async function handler(m, { sock }) {
     
     if (user.rpg.spouse) {
         return m.reply(
-            `❌ *sᴜᴅᴀʜ ᴍᴇɴɪᴋᴀʜ*\n\n` +
-            `> Kamu sudah menikah dengan @${user.rpg.spouse.split('@')[0]}!\n` +
-            `> Cerai dulu dengan \`.divorce\``,
+            `❌ *𝐘𝐀 𝐄𝐒𝐓𝐀́𝐒 𝐂𝐀𝐒𝐀𝐃𝐎*\n\n` +
+            `> Ya estás en una relación con @${user.rpg.spouse.split('@')[0]}.\n` +
+            `> Divorciate primero con \`.divorcio\``,
             { mentions: [user.rpg.spouse] }
         )
     }
     
     if (partner.rpg.spouse) {
         return m.reply(
-            `❌ *ᴛᴀʀɢᴇᴛ sᴜᴅᴀʜ ᴍᴇɴɪᴋᴀʜ*\n\n` +
-            `> @${target.split('@')[0]} sudah menikah dengan orang lain!`,
+            `❌ *𝐎𝐁𝐉𝐄𝐓𝐈𝐕𝐎 𝐎𝐂𝐔𝐏𝐀𝐃𝐎*\n\n` +
+            `> ¡Ojo! @${target.split('@')[0]} ya tiene dueño/a en el bot.`,
             { mentions: [target] }
         )
     }
@@ -62,9 +63,9 @@ async function handler(m, { sock }) {
     const marriageCost = 50000
     if ((user.koin || 0) < marriageCost) {
         return m.reply(
-            `❌ *sᴀʟᴅᴏ ᴛɪᴅᴀᴋ ᴄᴜᴋᴜᴘ*\n\n` +
-            `> Koin kamu: Rp ${(user.koin || 0).toLocaleString('id-ID')}\n` +
-            `> Butuh: Rp ${marriageCost.toLocaleString('id-ID')}`
+            `❌ *𝐒𝐈𝐍 𝐆𝐔𝐈𝐓𝐀*\n\n` +
+            `> Tenés: $${(user.koin || 0).toLocaleString('es-AR')}\n` +
+            `> Para la boda necesitás: $${marriageCost.toLocaleString('es-AR')}`
         )
     }
     
@@ -76,11 +77,11 @@ async function handler(m, { sock }) {
     
     db.save()
     
-    let txt = `💒 *ᴘᴇʀɴɪᴋᴀʜᴀɴ*\n\n`
+    let txt = `💒 *¡𝐍𝐔𝐄𝐕𝐎 𝐌𝐀𝐓𝐑𝐈𝐌𝐎𝐍𝐈𝐎! - 𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃*\n\n`
     txt += `> 💑 @${m.sender.split('@')[0]} & @${target.split('@')[0]}\n`
-    txt += `> 💍 Resmi menikah!\n`
-    txt += `> 💸 Biaya: Rp ${marriageCost.toLocaleString('id-ID')}\n\n`
-    txt += `> _Semoga langgeng! 💕_`
+    txt += `> 💍 ¡Oficialmente casados!\n`
+    txt += `> 💸 Costo de la ceremonia: $${marriageCost.toLocaleString('es-AR')}\n\n`
+    txt += `> _¡Que vivan los novios! 💕_`
     
     await m.reply(txt, { mentions: [m.sender, target] })
 }
