@@ -1,12 +1,13 @@
 import { getDatabase } from '../../src/lib/ourin-database.js'
 import { getRpgContextInfo } from '../../src/lib/ourin-context.js'
+
 const pluginConfig = {
-    name: 'leveluprpg',
-    alias: ['lvluprpg', 'rpglevelup'],
+    name: 'notiflevelup',
+    alias: ['leveluprpg', 'lvluprpg', 'rpglevelup', 'notiflvl'],
     category: 'rpg',
-    description: 'Toggle notifikasi level up RPG',
-    usage: '.leveluprpg <on/off>',
-    example: '.leveluprpg on',
+    description: 'Activa o desactiva las notificaciones de subida de nivel RPG',
+    usage: '.notiflevelup <on/off>',
+    example: '.notiflevelup on',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -28,9 +29,9 @@ function handler(m, { sock }) {
         user.settings.rpgLevelupNotif = true
         db.save()
         return m.reply(
-            `✅ *ʀᴘɢ ʟᴇᴠᴇʟ ᴜᴘ ɴᴏᴛɪꜰ*\n\n` +
-            `> Status: *ON* ✅\n` +
-            `> Kamu akan menerima notifikasi RPG saat naik level!`
+            `✅ *𝐍𝐎𝐓𝐈𝐅. 𝐋𝐄𝐕𝐄𝐋 𝐔𝐏 𝐑𝐏𝐆*\n\n` +
+            `> Estado: *ACTIVO* ✅\n` +
+            `> ¡Te avisaré cada vez que subas de nivel en el RPG!`
         )
     }
     
@@ -38,20 +39,21 @@ function handler(m, { sock }) {
         user.settings.rpgLevelupNotif = false
         db.save()
         return m.reply(
-            `❌ *ʀᴘɢ ʟᴇᴠᴇʟ ᴜᴘ ɴᴏᴛɪꜰ*\n\n` +
-            `> Status: *OFF* ❌\n` +
-            `> Notifikasi RPG level up dinonaktifkan.`
+            `❌ *𝐍𝐎𝐓𝐈𝐅. 𝐋𝐄𝐕𝐄𝐋 𝐔𝐏 𝐑𝐏𝐆*\n\n` +
+            `> Estado: *DESACTIVADO* ❌\n` +
+            `> Ya no recibirás avisos cuando subas de nivel.`
         )
     }
     
-    const status = user.settings.rpgLevelupNotif !== false ? 'ON ✅' : 'OFF ❌'
+    const status = user.settings.rpgLevelupNotif !== false ? 'ACTIVO ✅' : 'DESACTIVADO ❌'
     return m.reply(
-        `🔔 *ʀᴘɢ ʟᴇᴠᴇʟ ᴜᴘ ɴᴏᴛɪꜰ*\n\n` +
-        `> Status saat ini: *${status}*\n\n` +
-        `╭┈┈⬡「 📋 *ᴜsᴀɢᴇ* 」\n` +
-        `┃ > \`.leveluprpg on\` - Aktifkan\n` +
-        `┃ > \`.leveluprpg off\` - Nonaktifkan\n` +
-        `╰┈┈┈┈┈┈┈┈⬡`
+        `🔔 *𝐀𝐉𝐔𝐒𝐓𝐄 𝐃𝐄 𝐍𝐎𝐓𝐈𝐅𝐈𝐂𝐀𝐂𝐈𝐎𝐍𝐄𝐒*\n\n` +
+        `> Estado actual: *${status}*\n\n` +
+        `╭┈┈⬡「 📋 *MODO DE USO* 」\n` +
+        `┃ > \`.notiflevelup on\` - Activar\n` +
+        `┃ > \`.notiflevelup off\` - Desactivar\n` +
+        `╰┈┈┈┈┈┈┈┈⬡\n\n` +
+        `> _Configuración de 𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃_`
     )
 }
 
