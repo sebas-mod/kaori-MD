@@ -3,13 +3,14 @@ import { addExpWithLevelCheck } from '../../src/lib/ourin-level.js'
 import config from '../../config.js'
 import path from 'path'
 import fs from 'fs'
+
 const pluginConfig = {
-    name: 'hourly',
-    alias: ['jam', 'perjam'],
+    name: 'horario',
+    alias: ['hourly', 'cada-hora', 'hora'],
     category: 'rpg',
-    description: 'Klaim hadiah per jam',
-    usage: '.hourly',
-    example: '.hourly',
+    description: 'Reclama tu recompensa horaria',
+    usage: '.horario',
+    example: '.horario',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -25,9 +26,9 @@ try {
     if (fs.existsSync(thumbPath)) thumbRpg = fs.readFileSync(thumbPath)
 } catch (e) {}
 
-function getContextInfo(title = '⏰ *ʜᴏᴜʀʟʏ*', body = 'Hadiah Per Jam') {
+function getContextInfo(title = '⏰ *𝐇𝐎𝐑𝐀𝐑𝐈𝐎*', body = 'Recompensa cada hora') {
     const saluranId = config.saluran?.id || '120363208449943317@newsletter'
-    const saluranName = config.saluran?.name || config.bot?.name || 'Ourin-AI'
+    const saluranName = config.saluran?.name || '𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 𝐌𝐃'
     
     const contextInfo = {
         forwardingScore: 9999,
@@ -56,7 +57,7 @@ function getContextInfo(title = '⏰ *ʜᴏᴜʀʟʏ*', body = 'Hadiah Per Jam')
 function msToTime(duration) {
     const minutes = Math.floor((duration / (1000 * 60)) % 60)
     const seconds = Math.floor((duration / 1000) % 60)
-    return `${minutes} menit ${seconds} detik`
+    return `${minutes} minutos y ${seconds} segundos`
 }
 
 async function handler(m, { sock }) {
@@ -66,36 +67,37 @@ async function handler(m, { sock }) {
     
     if (!user.rpg) user.rpg = {}
     
-    const COOLDOWN = 3600000
+    const COOLDOWN = 3600000 // 1 hora
     const lastClaim = user.rpg.lastHourly || 0
     const now = Date.now()
     
     if (now - lastClaim < COOLDOWN) {
         const remaining = COOLDOWN - (now - lastClaim)
         return m.reply(
-            `⏰ *sᴜᴅᴀʜ ᴋʟᴀɪᴍ*\n\n` +
-            `> Kamu sudah klaim hadiah jam ini\n` +
-            `> Kembali dalam: *${msToTime(remaining)}*`
+            `⏰ *𝐘𝐀 𝐑𝐄𝐂𝐋𝐀𝐌𝐀𝐃𝐎*\n\n` +
+            `> Ya retiraste tu recompensa de esta hora.\n` +
+            `> Volvé en: *${msToTime(remaining)}*`
         )
     }
     
+    // Recompensas: más para los usuarios Premium
     const expReward = isPremium ? 1000 : 200
     const moneyReward = isPremium ? 5000 : 1000
     
     user.rpg.lastHourly = now
     user.koin = (user.koin || 0) + moneyReward
     
-    const levelResult = await addExpWithLevelCheck(sock, m, db, user, expReward)
+    await addExpWithLevelCheck(sock, m, db, user, expReward)
     db.save()
     
     await m.react('⏰')
     
-    let txt = `⏰ *ʜᴏᴜʀʟʏ ʀᴇᴡᴀʀᴅ*\n\n`
-    txt += `╭┈┈⬡「 🎊 *ʜᴀᴅɪᴀʜ* 」\n`
-    txt += `┃ 💵 Money: *+Rp ${moneyReward.toLocaleString('id-ID')}*\n`
+    let txt = `⏰ *𝐑𝐄𝐂𝐎𝐌𝐏𝐄𝐍𝐒𝐀 𝐇𝐎𝐑𝐀𝐑𝐈𝐀*\n\n`
+    txt += `╭┈┈⬡「 🎊 *𝐁𝐎𝐍𝐎* 」\n`
+    txt += `┃ 💵 Plata: *+$${moneyReward.toLocaleString('es-AR')}*\n`
     txt += `┃ 🚄 Exp: *+${expReward}*\n`
     txt += `╰┈┈┈┈┈┈┈┈⬡\n\n`
-    txt += `> Klaim lagi dalam 1 jam!`
+    txt += `> ¡No te olvides de volver en una hora por más!`
     
     await sock.sendMessage(m.chat, {
         text: txt,
