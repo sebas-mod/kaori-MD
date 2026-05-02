@@ -3,15 +3,16 @@ import config from '../../config.js'
 import path from 'path'
 import fs from 'fs'
 import te from '../../src/lib/ourin-error.js'
+
 const NEOXR_APIKEY = config.APIkey?.neoxr || 'Milik-Bot-OurinMD'
 
 const pluginConfig = {
-    name: 'filmget',
-    alias: ['getfilm', 'filmdetail', 'filminfo'],
+    name: 'peliculainfo',
+    alias: ['filmget', 'getfilm', 'filmdetail', 'filminfo', 'peliinfo'],
     category: 'search',
-    description: 'Ambil detail film',
-    usage: '.filmget <url>',
-    example: '.filmget https://tv.neoxr.eu/film/civil-war-2024',
+    description: 'Obtené los detalles, links de streaming y descarga de una película',
+    usage: '.peliculainfo <url>',
+    example: '.peliculainfo https://tv.neoxr.eu/film/civil-war-2024',
     cooldown: 10,
     energi: 1,
     isEnabled: true
@@ -29,11 +30,11 @@ async function handler(m, { sock }) {
 
     if (!url || !url.includes('neoxr.eu')) {
         return m.reply(
-            `🎬 *ꜰɪʟᴍ ᴅᴇᴛᴀɪʟ*\n\n` +
-            `> Ambil detail film dari URL\n\n` +
-            `*Format:*\n` +
-            `> \`${m.prefix}filmget <url>\`\n\n` +
-            `> Gunakan \`${m.prefix}film <judul>\` untuk cari film dulu`
+            `🎬 *𝐃𝐄𝐓𝐀𝐋𝐋𝐄 𝐃𝐄 𝐏𝐄𝐋𝐈́𝐂𝐔𝐋𝐀*\n\n` +
+            `> Obtené la información completa desde la URL.\n\n` +
+            `*Uso:*\n` +
+            `> \`${m.prefix}peliculainfo <url>\`\n\n` +
+            `> Primero buscá con \`${m.prefix}pelicula <título>\``
         )
     }
 
@@ -45,7 +46,7 @@ async function handler(m, { sock }) {
 
         if (!data?.status || !data?.data) {
             m.react('❌')
-            return m.reply('❌ *ɢᴀɢᴀʟ*\n\n> Film tidak ditemukan')
+            return m.reply('❌ *𝐄𝐑𝐑𝐎𝐑*\n\n> No se pudo encontrar la información de esta película.')
         }
 
         const film = data.data
@@ -60,30 +61,30 @@ async function handler(m, { sock }) {
             } catch {}
         }
 
-        let text = `🎬 *${film.title || 'Film'}*\n\n`
-        text += `╭┈┈⬡「 📋 *ɪɴꜰᴏ* 」\n`
+        let text = `🎬 *${film.title || 'Pelicula'}*\n\n`
+        text += `╭┈┈⬡「 📋 *𝐈𝐍𝐅𝐎𝐑𝐌𝐀𝐂𝐈𝐎́𝐍* 」\n`
         text += `┃ ⭐ Rating: ${film.rating || '-'}\n`
-        text += `┃ 📺 Quality: ${film.quality || '-'}\n`
-        text += `┃ ⏱️ Duration: ${film.duration || '-'}\n`
-        text += `┃ 📅 Release: ${film.release || '-'}\n`
-        text += `┃ 🎭 Genre: ${film.tags || '-'}\n`
+        text += `┃ 📺 Calidad: ${film.quality || '-'}\n`
+        text += `┃ ⏱️ Duración: ${film.duration || '-'}\n`
+        text += `┃ 📅 Estreno: ${film.release || '-'}\n`
+        text += `┃ 🎭 Género: ${film.tags || '-'}\n`
         text += `┃ 🎬 Director: ${film.director || '-'}\n`
-        text += `┃ 👥 Actors: ${film.actors || '-'}\n`
+        text += `┃ 👥 Actores: ${film.actors || '-'}\n`
         text += `╰┈┈┈┈┈┈┈┈⬡\n\n`
 
-        text += `📝 *Synopsis:*\n`
+        text += `📝 *Sinopsis:*\n`
         text += `> ${film.synopsis || '-'}\n\n`
 
         if (streams.length > 0) {
-            text += `▶️ *Streaming:*\n`
+            text += `▶️ *Streaming Disponible:*\n`
             streams.forEach((s, i) => {
-                text += `> ${i + 1}. ${s.server}\n`
+                text += `> ${i + 1}. Servidor: ${s.server}\n`
             })
             text += `\n`
         }
 
         if (downloads.length > 0) {
-            text += `📥 *Download:*\n`
+            text += `📥 *Opciones de Descarga:*\n`
             downloads.forEach((d, i) => {
                 text += `> ${i + 1}. ${d.provider}\n`
             })
@@ -95,28 +96,29 @@ async function handler(m, { sock }) {
             buttons.push({
                 name: 'cta_url',
                 buttonParamsJson: JSON.stringify({
-                    display_text: `▶️ ${streams[0].server}`,
+                    display_text: `▶️ Mirar en ${streams[0].server}`,
                     url: streams[0].url
                 })
             })
         }
 
+        // Mostrar hasta 2 opciones de descarga en botones rápidos
         downloads.slice(0, 2).forEach(d => {
             buttons.push({
                 name: 'cta_url',
                 buttonParamsJson: JSON.stringify({
-                    display_text: `📥 ${d.provider}`,
+                    display_text: `📥 Bajar vía ${d.provider}`,
                     url: d.url
                 })
             })
         })
 
         const saluranId = config.saluran?.id || '120363208449943317@newsletter'
-        const saluranName = config.saluran?.name || config.bot?.name || 'Ourin-AI'
+        const saluranName = config.saluran?.name || config.bot?.name || '𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈Ɀ𝐀𝐖𝐀 𝐌𝐃'
 
         const msgContent = {
             text,
-            footer: `🎬 Nonton Film Online`,
+            footer: `🎬 Mirá pelis con **𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈Ɀ𝐀𝐖𝐀 𝐌𝐃**`,
             contextInfo: {
                 forwardingScore: 9999,
                 isForwarded: true,
@@ -130,7 +132,7 @@ async function handler(m, { sock }) {
 
         if (thumbBuffer) {
             msgContent.contextInfo.externalAdReply = {
-                title: film.title || 'Film',
+                title: film.title || 'Pelicula',
                 body: `⭐ ${film.rating} | ${film.quality}`,
                 thumbnail: thumbBuffer,
                 mediaType: 1,
@@ -148,6 +150,7 @@ async function handler(m, { sock }) {
         m.react('✅')
 
     } catch (error) {
+        console.error(error)
         m.react('☢')
         m.reply(te(m.prefix, m.command, m.pushName))
     }
