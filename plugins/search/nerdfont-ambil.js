@@ -1,3 +1,4 @@
+javascript
 import _sharp from 'sharp'
 import axios from "axios";
 import * as cheerio from "cheerio";
@@ -47,12 +48,12 @@ async function nerdfonts() {
   }
 }
 const pluginConfig = {
-  name: "nerdfont-ambil",
-  alias: ["dafont-ambil", "fontambil"],
+  name: "nerdfont-descargar",
+  alias: ["dafont-descargar", "fontdescargar"],
   category: "search",
-  description: "Cari font di DaFont",
-  usage: ".nerdfont-ambil <query>",
-  example: ".nerdfont-ambil Coolvetica",
+  description: "Buscar y descargar fuentes de NerdFonts",
+  usage: ".nerdfont-descargar <query>",
+  example: ".nerdfont-descargar Coolvetica",
   isOwner: false,
   isPremium: false,
   isGroup: false,
@@ -72,15 +73,17 @@ function formatNumber(num) {
 async function handler(m, { sock }) {
   const query = m.text?.trim()?.toLowerCase();
   if (!query)
-    return m.reply(`*NERD FONT*\n\n> Masukan nama font yang ingin didownload`);
+    return m.reply(`*NERD FONT*\n\n> Ingrese el nombre de la fuente que desea descargar`);
   try {
     const res = await nerdfonts();
     const data = res.find(
       (d, i) => d?.name.toLowerCase() === query.toLowerCase(),
     );
+    if (!data) return m.reply("❌ Fuente no encontrada.");
+    
     sock.sendMessage(m.chat, {
       document: { url: data.download_url },
-      fileName: data.name,
+      fileName: data.name + ".zip",
       mimetype: "application/zip",
       jpegThumbnail: await (
         await getSharp()
@@ -91,8 +94,8 @@ async function handler(m, { sock }) {
       )
         .resize(50, 50)
         .toBuffer(),
-      caption: `*Done*
-Jika kamu ingin mendownload lagi, ketik ${m.prefix}nerdfont lagi`,
+      caption: `*Hecho*
+Si deseas descargar otra, usa el comando ${m.prefix}nerdfont nuevamente`,
     });
   } catch (err) {
     return m.reply(te(m.prefix, m.command, m.pushName));
