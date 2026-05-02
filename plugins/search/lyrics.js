@@ -2,6 +2,7 @@ import axios from 'axios'
 import config from '../../config.js'
 import * as cheerio from 'cheerio'
 import te from '../../src/lib/ourin-error.js'
+
 const CONFIG = {
   searchQuery: "",
   scaEsv: "",
@@ -42,7 +43,7 @@ async function GoogleLyrics(judul) {
     headers: {
       "authority": "www.google.com",
       "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-      "accept-language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
+      "accept-language": "es-ES,es;q=0.9,en-US;q=0.8,en;q=0.7",
       "cache-control": "no-cache",
       "pragma": "no-cache",
       "user-agent": CONFIG.userAgent,
@@ -72,18 +73,18 @@ async function GoogleLyrics(judul) {
   return {
     title: $('div[data-attrid="title"]').text().trim(),
     subtitle: $('div[data-attrid="subtitle"]').text().trim(),
-    lyrics: lyrics || "Lirik kosong / tidak ketemu"
+    lyrics: lyrics || "Letra vacía / no encontrada"
   }
 }
 
 
 const pluginConfig = {
-    name: 'lirik',
-    alias: ['lyric', 'lyrics', 'liriklagu'],
+    name: 'letra',
+    alias: ['lyric', 'lyrics', 'lirik', 'letra'],
     category: 'search',
-    description: 'Cari lirik lagu',
-    usage: '.lirik <query>',
-    example: '.lirik ',
+    description: 'Buscar letra de canción',
+    usage: '.letra <query>',
+    example: '.letra ',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -95,24 +96,24 @@ const pluginConfig = {
 
 async function handler(m, { sock }) {
     const query = m.text?.trim()
-    
+
     if (!query) {
         return m.reply(
-            `*ʟɪʀɪᴋ ʟᴀɢᴜ*\n\n` +
-            `> Masukkan kata kunci pencarian\n\n` +
-            `> Contoh: \`${m.prefix}lirik Somewhere only we know\``
+            `*ʟᴇᴛʀᴀ ᴅᴇ ᴄᴀɴᴄɪᴏ́ɴ*\n\n` +
+            `> Ingrese una palabra clave de búsqueda\n\n` +
+            `> Ejemplo: \`${m.prefix}letra Somewhere only we know\``
         )
     }
-    
+
     m.react('🔍')
-    
+
     try {
         const json = await GoogleLyrics(query)
         const texts = `🎶 \`\`\`${json.title}\`\`\`\n> ${json.subtitle}\n\n${json.lyrics}`
         await m.reply(texts)
-        
+
         m.react('✅')
-        
+
     } catch (error) {
         m.react('☢')
         m.reply(te(m.prefix, m.command, m.pushName))
