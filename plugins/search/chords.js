@@ -1,13 +1,14 @@
 import axios from 'axios'
 import config from '../../config.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
-    name: 'chords',
-    alias: ['chord', 'kunci', 'kuncigitar'],
+    name: 'acordes',
+    alias: ['chords', 'chord', 'guitarra', 'kunci'],
     category: 'search',
-    description: 'Cari chord/kunci gitar lagu',
-    usage: '.chords <judul lagu>',
-    example: '.chords komang',
+    description: 'Buscá los acordes o notas de guitarra de una canción',
+    usage: '.acordes <título de la canción>',
+    example: '.acordes de música ligera',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -24,11 +25,11 @@ async function handler(m, { sock }) {
 
     if (!text) {
         return m.reply(
-            `🎸 *ᴄʜᴏʀᴅs sᴇᴀʀᴄʜ*\n\n` +
-            `> Cari chord/kunci gitar lagu\n\n` +
-            `> Contoh:\n` +
-            `\`${m.prefix}chords komang\`\n` +
-            `\`${m.prefix}chord perjalanan terindah\``
+            `🎸 *𝐁𝐔́𝐒𝐐𝐔𝐄𝐃𝐀 𝐃𝐄 𝐀𝐂𝐎𝐑𝐃𝐄𝐒*\n\n` +
+            `> Buscá los acordes para tocar con la guitarra.\n\n` +
+            `> Ejemplo:\n` +
+            `\`${m.prefix}acordes de música ligera\`\n` +
+            `\`${m.prefix}chord flaca calamaro\``
         )
     }
 
@@ -41,16 +42,17 @@ async function handler(m, { sock }) {
 
         if (!data?.status || !data?.data?.chord) {
             m.react('❌')
-            return m.reply(`❌ Chord tidak ditemukan untuk: \`${text}\``)
+            return m.reply(`❌ No encontré acordes para: \`${text}\``)
         }
 
         const chord = data.data.chord
 
-        const caption = `${chord}`
-        await m.reply(caption)
+        // Enviar los acordes directamente
+        await m.reply(`🎼 *𝐀𝐂𝐎𝐑𝐃𝐄𝐒 𝐄𝐍𝐂𝐎𝐍𝐓𝐑𝐀𝐃𝐎𝐒*\n\n${chord}\n\n> Notas proporcionadas por **𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈Ɀ𝐀𝐖𝐀 𝐌𝐃**`)
         m.react('✅')
 
     } catch (err) {
+        console.error(err)
         m.react('☢')
         return m.reply(te(m.prefix, m.command, m.pushName))
     }
