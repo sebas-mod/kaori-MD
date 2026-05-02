@@ -26,7 +26,7 @@ try {
 async function handler(m, { sock }) {
     const args = m.args || []
     const url = args[0]?.trim()
-    
+
     if (!url || !url.includes('neoxr.eu')) {
         return m.reply(
             `🎬 *ꜰɪʟᴍ ᴅᴇᴛᴀɪʟ*\n\n` +
@@ -36,22 +36,22 @@ async function handler(m, { sock }) {
             `> Gunakan \`${m.prefix}film <judul>\` untuk cari film dulu`
         )
     }
-    
+
     m.react('🎬')
-    
+
     try {
         const apiUrl = `https://api.neoxr.eu/api/film-get?url=${encodeURIComponent(url)}&apikey=${NEOXR_APIKEY}`
         const { data } = await axios.get(apiUrl, { timeout: 30000 })
-        
+
         if (!data?.status || !data?.data) {
             m.react('❌')
             return m.reply('❌ *ɢᴀɢᴀʟ*\n\n> Film tidak ditemukan')
         }
-        
+
         const film = data.data
         const streams = data.stream || []
         const downloads = data.download || []
-        
+
         let thumbBuffer = null
         if (film.thumbnail) {
             try {
@@ -59,7 +59,7 @@ async function handler(m, { sock }) {
                 thumbBuffer = Buffer.from(thumbRes.data)
             } catch {}
         }
-        
+
         let text = `🎬 *${film.title || 'Film'}*\n\n`
         text += `╭┈┈⬡「 📋 *ɪɴꜰᴏ* 」\n`
         text += `┃ ⭐ Rating: ${film.rating || '-'}\n`
@@ -70,10 +70,10 @@ async function handler(m, { sock }) {
         text += `┃ 🎬 Director: ${film.director || '-'}\n`
         text += `┃ 👥 Actors: ${film.actors || '-'}\n`
         text += `╰┈┈┈┈┈┈┈┈⬡\n\n`
-        
+
         text += `📝 *Synopsis:*\n`
         text += `> ${film.synopsis || '-'}\n\n`
-        
+
         if (streams.length > 0) {
             text += `▶️ *Streaming:*\n`
             streams.forEach((s, i) => {
@@ -81,16 +81,16 @@ async function handler(m, { sock }) {
             })
             text += `\n`
         }
-        
+
         if (downloads.length > 0) {
             text += `📥 *Download:*\n`
             downloads.forEach((d, i) => {
                 text += `> ${i + 1}. ${d.provider}\n`
             })
         }
-        
+
         const buttons = []
-        
+
         if (streams.length > 0) {
             buttons.push({
                 name: 'cta_url',
@@ -100,7 +100,7 @@ async function handler(m, { sock }) {
                 })
             })
         }
-        
+
         downloads.slice(0, 2).forEach(d => {
             buttons.push({
                 name: 'cta_url',
@@ -110,10 +110,10 @@ async function handler(m, { sock }) {
                 })
             })
         })
-        
+
         const saluranId = config.saluran?.id || '120363208449943317@newsletter'
         const saluranName = config.saluran?.name || config.bot?.name || 'Ourin-AI'
-        
+
         const msgContent = {
             text,
             footer: `🎬 Nonton Film Online`,
@@ -127,7 +127,7 @@ async function handler(m, { sock }) {
                 }
             }
         }
-        
+
         if (thumbBuffer) {
             msgContent.contextInfo.externalAdReply = {
                 title: film.title || 'Film',
@@ -138,15 +138,15 @@ async function handler(m, { sock }) {
                 sourceUrl: url
             }
         }
-        
+
         if (buttons.length > 0) {
             msgContent.interactiveButtons = buttons
         }
-        
+
         await sock.sendMessage(m.chat, msgContent, { quoted: m })
-        
+
         m.react('✅')
-        
+
     } catch (error) {
         m.react('☢')
         m.reply(te(m.prefix, m.command, m.pushName))
