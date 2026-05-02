@@ -21,7 +21,7 @@ const NEOXR_APIKEY = config.APIkey?.neoxr || 'Milik-Bot-OurinMD'
 
 async function handler(m, { sock }) {
     const text = m.text?.trim()
-    
+
     if (!text) {
         return m.reply(
             `🎸 *ᴄʜᴏʀᴅs sᴇᴀʀᴄʜ*\n\n` +
@@ -31,25 +31,25 @@ async function handler(m, { sock }) {
             `\`${m.prefix}chord perjalanan terindah\``
         )
     }
-    
+
     m.react('🕕')
-    
+
     try {
         const { data } = await axios.get(`https://api.neoxr.eu/api/chord?q=${encodeURIComponent(text)}&apikey=${NEOXR_APIKEY}`, {
             timeout: 30000
         })
-        
+
         if (!data?.status || !data?.data?.chord) {
             m.react('❌')
             return m.reply(`❌ Chord tidak ditemukan untuk: \`${text}\``)
         }
-        
+
         const chord = data.data.chord
 
         const caption = `${chord}`
         await m.reply(caption)
         m.react('✅')
-        
+
     } catch (err) {
         m.react('☢')
         return m.reply(te(m.prefix, m.command, m.pushName))
