@@ -1,12 +1,13 @@
 import { default as axios } from 'axios'
 import te from '../../src/lib/ourin-error.js'
 import config from '../../config.js'
+
 const pluginConfig = {
     name: 'spotify',
-    alias: ['spotifysearch', 'spsearch'],
+    alias: ['spotifysearch', 'spsearch', 'buscarspotify'],
     category: 'search',
-    description: 'Cari lagu di Spotify',
-    usage: '.spotify <query>',
+    description: 'Buscar canciones en Spotify',
+    usage: '.spotify <búsqueda>',
     example: '.spotify neffex grateful',
     isOwner: false,
     isPremium: false,
@@ -22,9 +23,9 @@ async function handler(m) {
 
     if (!query) {
         return m.reply(
-            `⚠️ *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ*\n\n` +
-            `> \`${m.prefix}spotify <query>\`\n\n` +
-            `> Contoh:\n` +
+            `⚠️ *MODO DE USO*\n\n` +
+            `> \`${m.prefix}spotify <búsqueda>\`\n\n` +
+            `> Ejemplo:\n` +
             `> \`${m.prefix}spotify neffex grateful\``
         )
     }
@@ -33,21 +34,21 @@ async function handler(m) {
         const res = await axios.get(`https://api.neoxr.eu/api/spotify-search?q=${encodeURIComponent(query)}&apikey=${config.APIkey.neoxr}`)
         const results = res.data
         if (!results.status) {
-            return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak ditemukan hasil untuk *${query}*`)
+            return m.reply(`❌ *FALLÓ*\n\n> No se encontraron resultados para *${query}*`)
         }
 
         const tracks = results.data
 
         let txt = `🎵 *sᴘᴏᴛɪꜰʏ sᴇᴀʀᴄʜ*\n\n`
-        txt += `> Query: *${query}*\n\n`
+        txt += `> Búsqueda: *${query}*\n\n`
 
         tracks.forEach((t, i) => {
             txt += `*${i + 1}.* ${t.title}\n`
-            txt += `   ├ 🖼️ ${t.popularity}\n`
-            txt += `   ├ ${t.url}\n\n`
+            txt += `   ├ 🖼️ Popularidad: ${t.popularity}\n`
+            txt += `   ├ 🔗 ${t.url}\n\n`
         })
 
-        txt += `> 💡 Download: \`${m.prefix}spdl <url / id>\` atau \`${m.prefix}spotplay ${query}\``
+        txt += `> 💡 Descargar: \`${m.prefix}spdl <url / id>\` o \`${m.prefix}spotplay ${query}\``
 
         return m.reply(txt.trim())
     } catch (err) {
