@@ -13,28 +13,32 @@ import { promisify } from "util";
 import yts from "yt-search";
 import config from "../../config.js";
 import te from "../../src/lib/ourin-error.js";
+
 const run = promisify(exec);
 const pluginConfig = {
   name: "playch",
   alias: ["pch", "playsaluran"],
   category: "search",
-  description: "Putar musik ke saluran (convert opus)",
-  usage: ".playch <query> atau .playch --idch <id> <query>",
+  description: "Reproducir música en un canal (convertir a opus)",
+  usage: ".playch <query> o .playch --idch <id> <query>",
   example: ".playch komang",
   cooldown: 15,
   energi: 1,
   isEnabled: true,
 };
+
 function pickVideo(search) {
   const v = search?.videos || [];
   return v.find((x) => x.seconds && x.seconds < 900) || v[0] || null;
 }
+
 function formatViews(n) {
   if (!n) return "0";
   if (n >= 1e6) return (n / 1e6).toFixed(1) + "M";
   if (n >= 1e3) return (n / 1e3).toFixed(1) + "K";
   return n.toString();
 }
+
 async function toOggOpus(mp3Buf) {
   const tmp = path.join(process.cwd(), "temp");
   if (!fs.existsSync(tmp)) fs.mkdirSync(tmp, { recursive: true });
@@ -54,6 +58,7 @@ async function toOggOpus(mp3Buf) {
   } catch {}
   return buf;
 }
+
 async function handler(m, { sock }) {
   const raw = m.text?.trim() || "";
   let chId = config?.saluran?.id;
@@ -69,43 +74,43 @@ async function handler(m, { sock }) {
 
   if (!q)
     return m.reply(
-      `🎵 *PLAY SALURAN*\n\n\`${m.prefix}playch <judul lagu>\`\n\`${m.prefix}playch --idch <id_saluran> <judul lagu>\``,
+      `🎵 *PLAY CANAL*\n\n\`${m.prefix}playch <título de la canción>\`\n\`${m.prefix}playch --idch <id_del_canal> <título de la canción>\``,
     );
   if (!chId)
     return m.reply(
-      `❌ Saluran belum diatur. Gunakan \`--idch <id>\` atau atur di config.js`,
+      `❌ El canal no ha sido configurado. Usá \`--idch <id>\` o configuralo en config.js`,
     );
 
   m.react("🔎");
   try {
     const { videos } = await yts(q);
     const video = pickVideo({ videos });
-    if (!video) return m.reply(`❌ Video tidak ditemukan`);
+    if (!video) return m.reply(`❌ Video no encontrado`);
 
-    const ytChannel = video.author?.name || video.author?.username || "Unknown";
+    const ytChannel = video.author?.name || video.author?.username || "Desconocido";
 
-    let info = `🎵 *NOW PLAYING (SALURAN)*\n\n`;
-    info += `📌 *Judul:* ${video.title}\n\n`;
-    info += `*DETAIL*\n`;
-    info += `👤 Channel: *${ytChannel}*\n`;
-    info += `⏱️ Durasi: *${video.duration.timestamp}*\n`;
-    info += `👀 Views: *${formatViews(video.views)}*\n`;
-    info += `📅 Upload: *${video.ago}*\n`;
+    let info = `🎵 *REPRODUCIENDO AHORA (CANAL)*\n\n`;
+    info += `📌 *Título:* ${video.title}\n\n`;
+    info += `*DETALLES*\n`;
+    info += `👤 Canal: *${ytChannel}*\n`;
+    info += `⏱️ Duración: *${video.duration.timestamp}*\n`;
+    info += `👀 Vistas: *${formatViews(video.views)}*\n`;
+    info += `📅 Subido: *${video.ago}*\n`;
     info += `🆔 ID: \`${video.videoId}\`\n\n`;
     if (video.description) {
       const desc = video.description.substring(0, 150).replace(/\n/g, " ");
-      info += `*Deskripsi:*\n_${desc}${video.description.length > 150 ? "..." : ""}_\n\n`;
+      info += `*Descripción:*\n_${desc}${video.description.length > 150 ? "..." : ""}_\n\n`;
     }
-    info += `📡 Saluran: \`${chId}\`\n`;
+    info += `📡 Canal ID: \`${chId}\`\n`;
     info += `🔗 ${video.url}\n\n`;
-    info += `_⏳ mengirim audio ke saluran, harap tunggu..._`;
+    info += `_⏳ enviando audio al canal, por favor esperá..._`;
 
     await sock.sendMedia(m.chat, video.thumbnail, info, m, { type: "image" });
 
     const { data } = await axios.get(
       `https://api.zenzxz.my.id/download/youtube?url=${video.url}`,
     );
-    if (!data?.result?.download) throw new Error("API gagal, URL kosong");
+    if (!data?.result?.download) throw new Error("Falla en la API, URL vacía");
 
     m.react("🎵");
     const audioRes = await axios.get(data.result.download, {
@@ -113,9 +118,9 @@ async function handler(m, { sock }) {
       timeout: 60000,
     });
     const mp3Buf = Buffer.from(audioRes.data);
-    if (mp3Buf.length < 50000) throw new Error("Audio terlalu kecil");
+    if (mp3Buf.length < 50000) throw new Error("El audio es demasiado pequeño");
     const opusBuf = await toOggOpus(mp3Buf);
-    if (opusBuf.length < 10000) throw new Error("Konversi opus gagal");
+    if (opusBuf.length < 10000) throw new Error("La conversión a opus falló");
     const title = video.title;
 
     await sock.sendMessage(chId, {
@@ -132,7 +137,7 @@ async function handler(m, { sock }) {
         },
         externalAdReply: {
           title,
-          body: `Channel • ${ytChannel}`,
+          body: `Canal • ${ytChannel}`,
           thumbnailUrl: video.thumbnail,
           sourceUrl: video.url,
           mediaType: 1,
@@ -141,11 +146,12 @@ async function handler(m, { sock }) {
       },
     });
     m.react("✅");
-    m.reply(`✅ *${title}* berhasil dikirim ke saluran`);
+    m.reply(`✅ *${title}* fue enviado con éxito al canal`);
   } catch (e) {
     console.error("[PlayCh]", e);
     m.react("☢");
     m.reply(te(m.prefix, m.command, m.pushName));
   }
 }
+
 export { pluginConfig as config, handler };
