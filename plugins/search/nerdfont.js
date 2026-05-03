@@ -1,3 +1,4 @@
+
 import _sharp from 'sharp'
 import axios from "axios";
 import * as cheerio from "cheerio";
@@ -50,8 +51,8 @@ const pluginConfig = {
   name: "dafont",
   alias: ["nerdfont", "font"],
   category: "search",
-  description: "Cari font di DaFont",
-  usage: ".dafont <query>",
+  description: "Buscar fuentes en DaFont",
+  usage: ".dafont <búsqueda>",
   example: ".dafont Coolvetica",
   isOwner: false,
   isPremium: false,
@@ -75,26 +76,26 @@ async function handler(m, { sock }) {
     const res = await nerdfonts();
     const rows = res.map((f, i) => {
       return {
-        header: `Font ${f.name}`,
+        header: `Fuente ${f.name}`,
         title: f.info,
-        description: `Version: ${f.version}`,
+        description: `Versión: ${f.version}`,
         id: `${m.prefix}nerdfont-ambil ${f.name}`,
       };
     });
     await sock.sendMessage(
       m.chat,
       {
-        text: "Silahkan pilih font yang ingin kamu download",
-        footer: "Click tombol di bawah ini",
+        text: "Por favor, elegí la fuente que quieras descargar",
+        footer: "Hacé clic en el botón de abajo",
         interactiveButtons: [
           {
             name: "single_select",
             buttonParamsJson: JSON.stringify({
-              title: `Pilih Font Disini`,
+              title: `Elegí la fuente acá`,
               sections: [
                 {
-                  title: "Aku harap, font ini dapat membantu kamu",
-                  highlight_label: "Font Pilihan",
+                  title: "Espero que esta fuente te sirva",
+                  highlight_label: "Fuente elegida",
                   rows: rows,
                 },
               ],
