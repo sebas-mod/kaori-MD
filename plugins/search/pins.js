@@ -4,12 +4,13 @@ import axios from 'axios'
 import crypto from 'crypto'
 import te from '../../src/lib/ourin-error.js'
 import { f } from '../../src/lib/ourin-http.js'
+
 const pluginConfig = {
     name: 'pins',
-    alias: ['pinsearch', 'pinterestsearch'],
+    alias: ['pinsearch', 'pinterestsearch', 'pin'],
     category: 'search',
-    description: 'Cari gambar di Pinterest (album)',
-    usage: '.pins <query>',
+    description: 'Buscar imágenes en Pinterest (álbum)',
+    usage: '.pins <búsqueda>',
     example: '.pins Zhao Lusi',
     isOwner: false,
     isPremium: false,
@@ -24,8 +25,8 @@ async function handler(m, { sock, config: botConfig }) {
     const query = m.text?.trim()
     if (!query) {
         return m.reply(
-            `🔍 *ᴘɪɴᴛᴇʀᴇsᴛ sᴇᴀʀᴄʜ*\n\n` +
-            `> Contoh:\n` +
+            `🔍 *ʙᴜ́sǫᴜᴇᴅᴀ ᴅᴇ ᴘɪɴᴛᴇʀᴇsᴛ*\n\n` +
+            `> Ejemplo:\n` +
             `\`${m.prefix}pins Zhao Lusi\``
         )
     }
@@ -33,11 +34,11 @@ async function handler(m, { sock, config: botConfig }) {
 
     try {
         const data = await f(`https://api.siputzx.my.id/api/s/pinterest?query=${query}`)
-        
+
         const results = data?.data?.slice(0, 10)
         if (!results || results.length === 0) {
             m.react('❌')
-            return m.reply(`❌ Tidak ditemukan hasil untuk: ${query}`)
+            return m.reply(`❌ No se encontraron resultados para: ${query}`)
         }
 
         const mediaPromises = results.map((item, i) => {
@@ -51,7 +52,7 @@ async function handler(m, { sock, config: botConfig }) {
                     image: { url: imageUrl },
                 }
             } catch (e) {
-                console.log('[Pins] Image error:', e.message)
+                console.log('[Pins] Error de imagen:', e.message)
                 return null
             }
         })
@@ -60,19 +61,19 @@ async function handler(m, { sock, config: botConfig }) {
 
         if (mediaList.length === 0) {
             m.react('❌')
-            return m.reply('❌ Gagal memuat gambar')
+            return m.reply('❌ Error al cargar las imágenes')
         }
 
 
         try {
-            
+
             await sock.sendMessage(m.chat, {
                 albumMessage: mediaList
             }, { quoted: m })
             m.react('✅')
 
         } catch (err) {
-            console.log('[Pins] Album gagal, kirim satu-satu:', err.message)
+            console.log('[Pins] Álbum fallido, enviando una por una:', err.message)
 
             for (const content of mediaList) {
                 await sock.sendMessage(
