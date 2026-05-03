@@ -3,12 +3,13 @@ import crypto from 'crypto'
 import { generateWAMessage, generateWAMessageFromContent, jidNormalizedUser } from 'ourin'
 import config from '../../config.js'
 import te from '../../src/lib/ourin-error.js'
+
 const pluginConfig = {
   name: "ptvsearch",
-  alias: ["ptvs"],
+  alias: ["ptvs", "tiktoksearch", "buscartt"],
   category: "search",
-  description: "Cari video TikTok",
-  usage: ".ptvsearch <query>",
+  description: "Buscar videos de TikTok",
+  usage: ".ptvsearch <búsqueda>",
   example: ".ptvsearch jj epep",
   isOwner: false,
   isPremium: false,
@@ -45,11 +46,11 @@ async function handler(m, { sock }) {
     return m.reply(
       `╭┈┈⬡「 🎵 *ᴛɪᴋᴛᴏᴋ sᴇᴀʀᴄʜ* 」
 ┃
-┃ ㊗ ᴜsᴀɢᴇ: \`${m.prefix}ttsearch <query>\`
+┃ ㊗ ᴜsᴏ: \`${m.prefix}ptvsearch <búsqueda>\`
 ┃
 ╰┈┈⬡
 
-> \`Contoh: ${m.prefix}ttsearch anime\``,
+> \`Ejemplo: ${m.prefix}ptvsearch anime\``,
     );
   }
 
@@ -60,11 +61,8 @@ async function handler(m, { sock }) {
 
     if (!videos || videos.length === 0) {
       m.react("❌");
-      return m.reply(`❌ Tidak ditemukan video untuk: ${query}`);
+      return m.reply(`❌ No se encontraron videos para: ${query}`);
     }
-
-    const saluranId = config.saluran?.id || "120363208449943317@newsletter";
-    const saluranName = config.saluran?.name || config.bot?.name || "Ourin-AI";
 
     const formatDuration = (sec) => {
       const min = Math.floor(sec / 60);
@@ -72,6 +70,7 @@ async function handler(m, { sock }) {
       return `${min}:${s.toString().padStart(2, "0")}`;
     };
 
+    // Selecciona un video aleatorio de los resultados y lo envía como nota de video (PTV)
     await sock.sendMessage(m.chat, {
       video: { url: videos[Math.floor(Math.random() * videos.length)].video },
       mimetype: "video/mp4",
