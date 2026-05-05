@@ -14,7 +14,7 @@ const config = {
   },
 
   session: {
-    pairingNumber: "5491138403093", // Número WA para vincular
+    pairingNumber: "5491140951814", // Número WA para vincular
     usePairingCode: true, // true = Código, false = QR
   },
 
