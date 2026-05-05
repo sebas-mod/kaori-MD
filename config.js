@@ -9,19 +9,19 @@ const config = {
   },
 
   owner: {
-    name: "sebas", // Nombre del owner
-    number: ["5491138403093"], // Formato: 549xxx (sin + o 0)
+    name: "sebas",
+    number: ["5491138403093"],
   },
 
   session: {
-    pairingNumber: "5491140951814", // Número WA para vincular
-    usePairingCode: true, // true = Código, false = QR
+    pairingNumber: "5491140951814",
+    usePairingCode: true,
   },
 
   bot: {
-    name: "ᴋᴀᴏʀɪ ᴍᴅ", // Nombre del bot
-    version: "2.4.5", // Versión del bot
-    developer: "Zann", // Desarrollador
+    name: "ᴋᴀᴏʀɪ ᴍᴅ",
+    version: "2.4.5",
+    developer: "Zann",
   },
 
   mode: "public",
@@ -31,8 +31,7 @@ const config = {
   },
 
   vercel: {
-    // obtener token en: https://vercel.com/account/tokens
-    token: "", // Token Vercel para deploy (obligatorio si usas .deploy)
+    token: "",
   },
 
   store: {
@@ -65,21 +64,21 @@ const config = {
   },
 
   energi: {
-    enabled: true, // Si está activo, funciona el sistema de energía
+    enabled: true,
     default: 99999,
     premium: 99999999,
     owner: -1,
   },
 
   sticker: {
-    packname: "ᴋᴀᴏʀɪ ᴍᴅ", // Nombre del pack
-    author: "Nombre", // Autor del sticker
+    packname: "ᴋᴀᴏʀɪ ᴍᴅ",
+    author: "Nombre",
   },
 
   saluran: {
-    id: "-@newsletter", // ID del canal
-    name: "BOT WHATSAPP MULTIDISPOSITIVO", // Nombre del canal
-    link: "https://whatsapp.com/channel/0029VbB37bgBfxoAmAlsgE0t", // Link
+    id: "-@newsletter",
+    name: "BOT WHATSAPP MULTIDISPOSITIVO",
+    link: "https://whatsapp.com/channel/0029VbB37bgBfxoAmAlsgE0t",
   },
 
   groupProtection: {
@@ -109,8 +108,8 @@ const config = {
   features: {
     antiSpam: true,
     antiSpamInterval: 3000,
-    antiCall: true, // rechaza llamadas entrantes
-    blockIfCall: true, // bloquea al que llama
+    antiCall: true,
+    blockIfCall: true,
     autoTyping: true,
     autoRead: false,
     logMessage: true,
@@ -119,7 +118,7 @@ const config = {
   },
 
   registration: {
-    enabled: false, // si es true, el usuario debe registrarse
+    enabled: false,
     rewards: {
       koin: 30000,
       energi: 300,
@@ -140,25 +139,18 @@ const config = {
     error: "❌ *Error!* Intenta más tarde.",
 
     ownerOnly: "*Acceso denegado!* Solo para el owner.",
-    premiumOnly:
-      "💎 *Solo Premium!* Usa *.benefitpremium* para más info.",
+    premiumOnly: "💎 *Solo Premium!* Usa *.benefitpremium* para más info.",
 
     groupOnly: "👥 *Solo grupos!*",
-    privateOnly:
-      "👤 *Solo privado!*",
+    privateOnly: "👤 *Solo privado!*",
 
-    adminOnly:
-      "🛡️ *Solo admins!*",
-    botAdminOnly:
-      "🤖 *El bot necesita ser admin!*",
+    adminOnly: "🛡️ *Solo admins!*",
+    botAdminOnly: "🤖 *El bot necesita ser admin!*",
 
-    cooldown:
-      "🕕 Espera %time% segundos.",
-    energiExceeded:
-      "⚡ Energía agotada. Espera o compra premium.",
+    cooldown: "🕕 Espera %time% segundos.",
+    energiExceeded: "⚡ Energía agotada. Espera o compra premium.",
 
-    banned:
-      "🚫 Estás baneado por incumplir reglas.",
+    banned: "🚫 Estás baneado por incumplir reglas.",
 
     rejectCall: "🚫 NO LLAMES A ESTE NÚMERO",
   },
@@ -167,7 +159,6 @@ const config = {
   backup: { enabled: false, intervalHours: 24, retainDays: 7 },
   scheduler: { resetHour: 0, resetMinute: 0 },
 
-  // modo desarrollo
   dev: {
     enabled: process.env.NODE_ENV === "development",
     watchPlugins: true,
@@ -175,7 +166,6 @@ const config = {
     debugLog: false,
   },
 
-  // puedes dejar vacío
   pterodactyl: {
     server1: { domain: "", apikey: "", capikey: "", egg: "15", nestid: "5", location: "1" },
     server2: { domain: "", apikey: "", capikey: "", egg: "15", nestid: "5", location: "1" },
@@ -219,14 +209,80 @@ const config = {
   },
 };
 
-// TODO EL RESTO IGUAL (no se toca)
-function isOwner(number) { /* igual */ }
-function isPremium(number) { /* igual */ }
-function isPartner(number) { /* igual */ }
-function isBanned(number) { /* igual */ }
-function setBotNumber(number) { if (number) config.bot.number = number.replace(/[^0-9]/g, ""); }
-function isSelf(number) { /* igual */ }
-function getConfig() { return config; }
+function cleanNumber(value = "") {
+  return String(value).replace(/[^0-9]/g, "");
+}
+
+function matchNumber(a = "", b = "") {
+  const x = cleanNumber(a);
+  const y = cleanNumber(b);
+  if (!x || !y) return false;
+  return x === y || x.endsWith(y) || y.endsWith(x);
+}
+
+function isOwner(number) {
+  const target = cleanNumber(number);
+  if (!target) return false;
+
+  const ownerNumbers = config.owner?.number || [];
+  if (ownerNumbers.some((owner) => matchNumber(target, owner))) return true;
+
+  try {
+    return ownerPremiumDb.isOwner(target);
+  } catch {
+    return false;
+  }
+}
+
+function isPremium(number) {
+  const target = cleanNumber(number);
+  if (!target) return false;
+  if (isOwner(target)) return true;
+
+  try {
+    return ownerPremiumDb.isPremium(target);
+  } catch {
+    return false;
+  }
+}
+
+function isPartner(number) {
+  const target = cleanNumber(number);
+  if (!target) return false;
+  if (isOwner(target)) return true;
+
+  try {
+    return ownerPremiumDb.isPartner(target);
+  } catch {
+    return false;
+  }
+}
+
+function isBanned(number) {
+  const target = cleanNumber(number);
+  if (!target) return false;
+  if (isOwner(target)) return false;
+
+  try {
+    const db = getDatabase();
+    const bannedUsers = db.setting("bannedUsers") || [];
+    return bannedUsers.some((user) => matchNumber(target, user));
+  } catch {
+    return false;
+  }
+}
+
+function setBotNumber(number) {
+  if (number) config.bot.number = cleanNumber(number);
+}
+
+function isSelf(number) {
+  return matchNumber(number, config.bot?.number || "");
+}
+
+function getConfig() {
+  return config;
+}
 
 config.isOwner = isOwner;
 config.isPremium = isPremium;
