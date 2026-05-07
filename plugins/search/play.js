@@ -1,78 +1,108 @@
-/**
- * Nama Plugin: Play
- * Pembuat Code: Zann
- * API/Scraper: api.nexray.web.id
- * Saluran: https://whatsapp.com/channel/0029Vb7g5Qt90x2yn7bOlM2U
- */
+import fetch from "node-fetch";
 import yts from "yt-search";
-import axios from "axios";
-const pluginConfig = {
-  name: "play",
-  alias: ["playaudio"],
-  category: "search",
-  description: "Reproducir música de YouTube (Siputzx API)",
-  usage: ".play <búsqueda>",
-  example: ".play komang",
-  cooldown: 15,
-  energi: 1,
-  isEnabled: true,
-};
 
-function formatViews(n) {
-  if (!n) return "0";
-  if (n >= 1e6) return (n / 1e6).toFixed(1) + "M";
-  if (n >= 1e3) return (n / 1e3).toFixed(1) + "K";
-  return n.toString();
-}
-
-async function handler(m, { sock, text }) {
-  const query = m.text?.trim();
-  if (!query)
-    return m.reply(`🎵 *ᴘʟᴀʏ*\n\n> Ejemplo:\n\`${m.prefix}play komang\``);
-
-  m.react("🕐");
+// Implementación de safeFetch integrada
+async function safeFetch(url, options = {}) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), global.timeout || 15000); 
 
   try {
-    const search = await yts(query);
-    if (!search.videos.length) throw "Video no encontrado";
-
-    const video = search.videos[0];
-
-    let info = `🎵 *REPRODUCIENDO AHORA*\n\n`;
-    info += `📌 *Título:* ${video.title}\n\n`;
-    info += `*DETALLES*\n`;
-    info += `👤 Canal: *${video.author.name}*\n`;
-    info += `⏱️ Duración: *${video.duration.timestamp}*\n`;
-    info += `👀 Vistas: *${formatViews(video.views)}*\n`;
-    info += `📅 Subido: *${video.ago}*\n`;
-    info += `🆔 ID: \`${video.videoId}\`\n\n`;
-    if (video.description) {
-      const desc = video.description.substring(0, 150).replace(/\n/g, " ");
-      info += `*Descripción:*\n_${desc}${video.description.length > 150 ? "..." : ""}_\n\n`;
-    }
-    info += `🔗 ${video.url}\n\n`;
-    info += `_⏳ enviando audio, por favor espera..._`;
-
-    const result = await sock.sendMedia(m.chat, video.thumbnail, info, m, {
-      type: "image",
+    const res = await fetch(url, {
+      ...options,
+      signal: controller.signal
     });
-
-    const { data } = await axios.get(
-      `https://api.zenzxz.my.id/download/youtube?url=${video.url}`,
-    );
-
-    await sock.sendMedia(m.chat, data?.result.download, video.title, result, {
-      type: "audio",
-    });
-
-    m.react("✅");
-  } catch (err) {
-    console.error("[Play]", err);
-    m.react("😭");
-    m.reply(
-      `Vaya, la función de música tiene problemas en este momento, inténtalo de nuevo más tarde y no hagas spam.`,
-    );
+    return res;
+  } catch (e) {
+    throw new Error('API_TIMEOUT');
+  } finally {
+    clearTimeout(timeout);
   }
 }
+
+const pluginConfig = {
+  name: 'play', 
+  alias: ['play2', 'mp3', 'yta', 'mp4', 'ytv', 'play3', 'ytadoc', 'playdoc', 'ytmp3doc', 'play4', 'ytvdoc', 'play2doc', 'ytmp4doc'],
+  category: 'search',
+  description: 'Busca audios/videos en Youtube y los envía usando Faa API',
+  usage: '.play <búsqueda>',
+  example: '.play Joji Glimpse of Us',
+  cooldown: 30,
+  energi: 2,
+  isEnabled: true
+};
+
+async function handler(m, { sock, command }) {
+    try {
+      const query = m.text?.trim() || m.args?.join(" ");
+      if (!query) return m.reply('✨ *𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 - 𝐏𝐋𝐀𝐘*\n\nEscribe el nombre de lo que deseas buscar.\n> *Ejemplo:* `.play stay with me`');
+      
+      const search = await yts(query);
+      if (!search.all?.length) return m.reply('⭐ No se encontraron resultados para tu búsqueda.');
+      const video = search.all.find(v => v.type === 'video') || search.all[0];
+      
+      const mensaje = `╭──〔 𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 〕──⬣\n` +
+                      `┋ ✧ *TÍTULO:* ${video.title}\n` +
+                      `┋ ✧ *TIEMPO:* ${video.timestamp}\n` +
+                      `┋ ✧ *URL:* ${video.url}\n` +
+                      `╰───────────────⬡\n\n` +
+                      `📡 _Obteniendo medios desde Faa API..._`;
+
+      await sock.sendMessage(m.chat, {
+        text: mensaje,
+        contextInfo: {
+          externalAdReply: {
+            title: "𝐊𝐄𝐈 𝐊𝐀𝐑𝐔𝐈𝐙𝐀𝐖𝐀 • 𝐌𝐔𝐒𝐈𝐂",
+            body: "Powered by KenisawaDev",
+            mediaType: 1,
+            sourceUrl: video.url,
+            thumbnailUrl: video.thumbnail,
+            renderLargerThumbnail: true
+          }
+        }
+      }, { quoted: m });
+
+      const cmd = command || m.command;
+
+      // Lógica para AUDIO (MP3)
+      if (['play', 'yta', 'mp3', 'ytmp3', 'play3', 'ytadoc', 'playdoc', 'ytmp3doc'].includes(cmd)) {
+        const response = await safeFetch(`https://api-faa.my.id/faa/ytmp3?url=${encodeURIComponent(video.url)}`);
+        const data = await response.json();
+
+        if (!data.status || !data.result?.mp3) throw new Error('DOWNLOAD_ERROR');
+
+        const isDoc = ['play3', 'ytadoc', 'playdoc', 'ytmp3doc'].includes(cmd);
+        const options = isDoc 
+          ? { document: { url: data.result.mp3 }, mimetype: "audio/mpeg", fileName: `${video.title}.mp3` }
+          : { audio: { url: data.result.mp3 }, mimetype: "audio/mpeg" };
+
+        await sock.sendMessage(m.chat, options, { quoted: m });
+      } 
+      
+      // Lógica para VIDEO (MP4)
+      else if (['play2', 'ytv', 'mp4', 'play4', 'ytvdoc', 'play2doc', 'ytmp4doc'].includes(cmd)) {
+        const response = await safeFetch(`https://api-faa.my.id/faa/ytmp4?url=${encodeURIComponent(video.url)}`);
+        const data = await response.json();
+
+        if (!data.status || !data.result?.download_url) throw new Error('DOWNLOAD_ERROR');
+
+        const isDoc = ['play4', 'ytvdoc', 'play2doc', 'ytmp4doc'].includes(cmd);
+        const mediaType = isDoc ? 'document' : 'video';
+        
+        await sock.sendMessage(m.chat, { 
+          [mediaType]: { url: data.result.download_url }, 
+          fileName: `${video.title}.mp4`, 
+          mimetype: 'video/mp4',
+          caption: `🚀 *Archivo listo.*`
+        }, { quoted: m });
+      }
+
+    } catch (error) {
+      console.error("[Kei-Play Error]", error);
+      const errorMsg = error.message === 'API_TIMEOUT' 
+        ? '⏳ Tiempo de espera agotado (Faa API).' 
+        : '⚠️ Error crítico al procesar la descarga.';
+      m.reply(errorMsg);
+    }
+  }
 
 export { pluginConfig as config, handler };
