@@ -541,48 +541,115 @@ async function handler(m, { sock, config: botConfig, db, uptime }) {
         }
         break;
       case 5: {
-        // V5 — Lista nativa de WhatsApp (listMessage) — compatible y estable
         const categoryRows = menuSorted.map(({ cat, cmds, emoji }) => ({
           title: `${emoji} ${toMonoUpperBold(cat)}`,
-          rowId: `${prefix}menucat ${cat}`,
-          description: `${cmds.length} comandos disponibles`,
+          id: `${prefix}menucat ${cat}`,
+          description: `${cmds.length} comandos`,
         }));
-
-        let headerText = `*@${m.pushName || "Usuario"}* 🪸\nSoy *KAORI MD*, un bot de WhatsApp listo para ayudarte.\n\n`;
+        let headerText = `*@${m.pushName || "Usuario"}* 🪸
+Soy *KAORI MD*, un bot de WhatsApp listo para ayudarte.  
+Puedes usarme para buscar información, obtener datos o realizar tareas sencillas directamente por WhatsApp — práctico y sin complicaciones.\n\n`;
         headerText += `╭┈┈⬡「 🤖 *ɪɴꜰᴏ ᴅᴇʟ ʙᴏᴛ* 」\n`;
-        headerText += `┃ \`◦\` ɴᴏᴍʙʀᴇ: *${botConfig.bot?.name || "KAORI MD"}*\n`;
+        headerText += `┃ \`◦\` ɴᴏᴍʙʀᴇ: *KAORI MD*\n`;
         headerText += `┃ \`◦\` ᴠᴇʀsɪóɴ: *v${botConfig.bot?.version || "1.2.0"}*\n`;
         headerText += `┃ \`◦\` ᴍᴏᴅᴏ: *${(botConfig.mode || "público").toUpperCase()}*\n`;
         headerText += `┃ \`◦\` ᴀᴄᴛɪᴠᴏ: *${uptimeFormatted}*\n`;
         headerText += `┃ \`◦\` ᴛᴏᴛᴀʟ ᴄᴍᴅs: *${totalCmds}*\n`;
         headerText += `╰┈┈┈┈┈┈┈┈⬡\n\n`;
-        headerText += `📋 *Toca el botón de abajo para elegir una categoría*`;
-
+        headerText += `📋 *Selecciona una categoría abajo para ver la lista de comandos*`;
+        
         try {
+          const buttons = [
+            {
+              name: "single_select",
+              buttonParamsJson: JSON.stringify({
+                title: "📁 sᴇʟᴇᴄᴄɪᴏɴᴀʀ ᴍᴇɴú",
+                sections: [
+                  {
+                    title: "📋 SELECCIONAR CATEGORÍA",
+                    rows: categoryRows,
+                  },
+                ],
+              }),
+            },
+            {
+              name: "quick_reply",
+              buttonParamsJson: JSON.stringify({
+                display_text: "📊 TOTAL DE FUNCIONES",
+                id: `${prefix}totalfitur`,
+              }),
+            },
+            {
+              name: "quick_reply",
+              buttonParamsJson: JSON.stringify({
+                display_text: "📊 MENÚ COMPLETO",
+                id: `${prefix}allmenu`,
+              }),
+            },
+          ];
+          let headerMedia = null;
           if (imageBuffer) {
-            await sock.sendMessage(m.chat, {
-              image: imageBuffer,
-              caption: `🤖 *${botConfig.bot?.name || "KAORI MD"}*\n> Selecciona una categoría en el botón de abajo 👇`,
-              contextInfo: getContextInfo(botConfig, m, thumbBuffer),
-            }, { quoted: getVerifiedQuoted(botConfig) });
+            try {
+              headerMedia = await prepareWAMessageMedia(
+                {
+                  image: imageBuffer,
+                },
+                {
+                  upload: sock.waUploadToServer,
+                },
+              );
+            } catch (e) {}
           }
-
-          await sock.sendMessage(m.chat, {
-            text: headerText,
-            footer: `© ${botConfig.bot?.name || "KAORI MD"} | ${menuSorted.length} categorías`,
-            title: `🤖 ${botConfig.bot?.name || "KAORI MD"}`,
-            buttonText: "📁 Ver categorías del menú",
-            sections: [
-              {
-                title: "📋 SELECCIONAR CATEGORÍA",
-                rows: categoryRows,
+          const msg = generateWAMessageFromContent(
+            m.chat,
+            {
+              viewOnceMessage: {
+                message: {
+                  messageContextInfo: {
+                    deviceListMetadata: {},
+                    deviceListMetadataVersion: 2,
+                  },
+                  interactiveMessage:
+                    proto.Message.InteractiveMessage.fromObject({
+                      body: proto.Message.InteractiveMessage.Body.fromObject({
+                        text: headerText,
+                      }),
+                      footer:
+                        proto.Message.InteractiveMessage.Footer.fromObject({
+                          text: `© ${botConfig.bot?.name || "Ourin-AI"} | ${menuSorted.length} categorías`,
+                        }),
+                      header:
+                        proto.Message.InteractiveMessage.Header.fromObject({
+                          title: `${botConfig.bot?.name || "Ourin-AI"}`,
+                          hasMediaAttachment: !!headerMedia,
+                          ...(headerMedia || {}),
+                        }),
+                      nativeFlowMessage:
+                        proto.Message.InteractiveMessage.NativeFlowMessage.fromObject(
+                          {
+                            buttons: buttons,
+                          },
+                        ),
+                      contextInfo: {
+                        mentionedJid: [m.sender],
+                        forwardingScore: 9999,
+                        isForwarded: true,
+                        forwardedNewsletterMessageInfo: {
+                          newsletterJid: saluranId,
+                          newsletterName: saluranName,
+                          serverMessageId: 127,
+                        },
+                      },
+                    }),
+                },
               },
-            ],
-            contextInfo: getContextInfo(botConfig, m, thumbBuffer),
-          }, { quoted: getVerifiedQuoted(botConfig) });
-
+            },
+            { userJid: m.sender, quoted: getVerifiedQuoted(botConfig) },
+          );
+          await sock.relayMessage(m.chat, msg.message, {
+            messageId: msg.key.id,
+          });
         } catch (btnError) {
-          console.error("[Menu V5] listMessage error:", btnError.message);
           await sendFallback(
             m,
             sock,
@@ -674,42 +741,127 @@ async function handler(m, { sock, config: botConfig, db, uptime }) {
         }
         break;
       case 7: {
-        // V7 — Imagen + lista nativa con preview de comandos por categoría
         try {
-          const v7Rows = menuSorted.map(({ cat, cmds, emoji }) => ({
-            title: `${emoji} ${toMonoUpperBold(cat)}`,
-            rowId: `${prefix}menucat ${cat}`,
-            description: `${cmds.slice(0, 3).map(c => `${prefix}${c}`).join(", ")}${cmds.length > 3 ? ` +${cmds.length - 3} más` : ""}`,
-          }));
-
-          const v7Text = `${greeting} *${m.pushName}!* 🪸\n\n` +
-            `╭─〔 🎴 *ᴄᴀᴛᴇɢᴏʀíᴀs* 〕\n` +
-            menuSorted.map(({ cat, cmds, emoji }) =>
-              `*│* ${emoji} *${toMonoUpperBold(cat)}* — ${cmds.length} cmds`
-            ).join("\n") +
-            `\n╰────────────────⬣\n\n` +
-            `> Toca el botón para explorar cada categoría`;
-
-          if (imageBuffer) {
-            await sock.sendMessage(m.chat, {
-              image: imageBuffer,
-              caption: v7Text,
-              contextInfo: getContextInfo(botConfig, m, thumbBuffer),
-            }, { quoted: getVerifiedQuoted(botConfig) });
+          const carouselCards = [];
+          for (const { cat, cmds, emoji } of menuSorted) {
+            const categoryName = toSmallCaps(cat);
+            let cardBody = `━━━━━━━━━━━━━━━\n`;
+            for (const cmd of cmds.slice(0, 15)) {
+              cardBody += `◦ \`${prefix}${toSmallCaps(cmd)}\`\n`;
+            }
+            if (cmds.length > 15) {
+              cardBody += `\n_...y ${cmds.length - 15} comandos más_`;
+            }
+            cardBody += `\n\n> Total: ${cmds.length} comandos`;
+            let cardMedia = null;
+            try {
+              const catThumbPath = path.join(
+                process.cwd(),
+                "assets",
+                "images",
+                `cat-${cat}.jpg`,
+              );
+              const defaultV7Path = path.join(
+                process.cwd(),
+                "assets",
+                "images",
+                "ourin-v7.jpg",
+              );
+              let sourceImage = fs.existsSync(defaultV7Path)
+                ? fs.readFileSync(defaultV7Path)
+                : thumbBuffer;
+              if (fs.existsSync(catThumbPath)) {
+                sourceImage = fs.readFileSync(catThumbPath);
+              }
+              if (sourceImage) {
+                const resizedImage = await (await getSharp())(sourceImage)
+                  .resize(300, 300, { fit: "cover" })
+                  .jpeg({ quality: 80 })
+                  .toBuffer();
+                cardMedia = await prepareWAMessageMedia(
+                  {
+                    image: resizedImage,
+                  },
+                  { upload: sock.waUploadToServer },
+                );
+              }
+            } catch (e) {
+              console.error("[Menu V7] Card media error:", e.message);
+            }
+            const cardMessage = {
+              header: proto.Message.InteractiveMessage.Header.fromObject({
+                title: `${emoji} ${categoryName.toUpperCase()}`,
+                hasMediaAttachment: !!cardMedia,
+                ...(cardMedia || {}),
+              }),
+              body: proto.Message.InteractiveMessage.Body.fromObject({
+                text: cardBody,
+              }),
+              footer: proto.Message.InteractiveMessage.Footer.create({
+                text: `${botConfig.bot?.name || "Ourin-AI"} • ${cat}`,
+              }),
+              nativeFlowMessage:
+                proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
+                  buttons: [
+                    {
+                      name: "quick_reply",
+                      buttonParamsJson: JSON.stringify({
+                        display_text: `📋 Ver ${categoryName}`,
+                        id: `${prefix}menucat ${cat}`,
+                      }),
+                    },
+                  ],
+                }),
+            };
+            carouselCards.push(cardMessage);
           }
-
-          await sock.sendMessage(m.chat, {
-            text: `🗂 *Elige una categoría para ver sus comandos:*`,
-            footer: `${botConfig.bot?.name || "KAORI MD"} v${botConfig.bot?.version || "1.0"}`,
-            title: `${botConfig.bot?.name || "KAORI MD"}`,
-            buttonText: "🎴 Ver categorías",
-            sections: [{ title: "📋 CATEGORÍAS", rows: v7Rows }],
-            contextInfo: getContextInfo(botConfig, m, thumbBuffer),
-          }, { quoted: getVerifiedQuoted(botConfig) });
-
-        } catch (v7Error) {
-          console.error("[Menu V7] Error:", v7Error.message);
-          await sendFallback(m, sock, text, imageBuffer, thumbBuffer, botConfig, "V7");
+          if (carouselCards.length === 0) {
+            await m.reply(text);
+            break;
+          }
+          const msg = await generateWAMessageFromContent(
+            m.chat,
+            {
+              viewOnceMessage: {
+                message: {
+                  messageContextInfo: {
+                    deviceListMetadata: {},
+                    deviceListMetadataVersion: 2,
+                  },
+                  interactiveMessage:
+                    proto.Message.InteractiveMessage.fromObject({
+                      body: proto.Message.InteractiveMessage.Body.fromObject({
+                        text: `${greeting} *${m.pushName}!*\n\n> Desliza para ver las categorías del menú\n> Toca el botón para ver los detalles`,
+                      }),
+                      footer:
+                        proto.Message.InteractiveMessage.Footer.fromObject({
+                          text: `${botConfig.bot?.name || "Ourin-AI"} v${botConfig.bot?.version || "1.0"}`,
+                        }),
+                      carouselMessage:
+                        proto.Message.InteractiveMessage.CarouselMessage.fromObject(
+                          {
+                            cards: carouselCards,
+                          },
+                        ),
+                    }),
+                },
+              },
+            },
+            { userJid: m.sender, quoted: getVerifiedQuoted(botConfig) },
+          );
+          await sock.relayMessage(m.chat, msg.message, {
+            messageId: msg.key.id,
+          });
+        } catch (carouselError) {
+          await sendFallback(
+            m,
+            sock,
+            text,
+            imageBuffer,
+            thumbBuffer,
+            botConfig,
+            "V7",
+          );
         }
         break;
       }
@@ -832,161 +984,382 @@ async function handler(m, { sock, config: botConfig, db, uptime }) {
         break;
       }
       case 9: {
-        // V9 — Imagen v9 + lista nativa de categorías
         try {
-          const v9Rows = menuSorted.map(({ cat, cmds, emoji }) => ({
-            title: `${emoji} ${toMonoUpperBold(cat)}`,
-            rowId: `${prefix}menucat ${cat}`,
-            description: `${cmds.length} comandos`,
-          }));
-
-          const v9ImgPath = path.join(process.cwd(), "assets", "images", "ourin-v9.jpg");
-          const v9Img = fs.existsSync(v9ImgPath) ? fs.readFileSync(v9ImgPath) : imageBuffer;
-
-          if (v9Img) {
-            await sock.sendMessage(m.chat, {
-              image: v9Img,
-              caption: text,
-              contextInfo: getContextInfo(botConfig, m, thumbBuffer),
-            }, { quoted: getVerifiedQuoted(botConfig) });
+          let headerMedia = null;
+          if (imageBuffer) {
+            try {
+              const resized = await (
+                await getSharp()
+              )(fs.readFileSync("./assets/images/ourin-v9.jpg"))
+                .resize(300, 300, { fit: "cover" })
+                .jpeg({ quality: 80 })
+                .toBuffer();
+              headerMedia = await prepareWAMessageMedia(
+                { image: resized },
+                { upload: sock.waUploadToServer },
+              );
+            } catch (e) {
+              console.error("[Menu V9] Media prep error:", e.message);
+            }
           }
-
-          await sock.sendMessage(m.chat, {
-            text: `🍀 *ᴇʟᴇɢɪʀ ᴄᴀᴛᴇɢᴏʀíᴀ*\n\n> Toca el botón para ver los comandos de cada sección`,
-            footer: `© ${botConfig.bot?.name || "KAORI MD"} v${botConfig.bot?.version || "1.9.0"}`,
-            title: `${botConfig.bot?.name || "KAORI MD"}`,
-            buttonText: "🍀 ᴇʟᴇɢɪʀ ᴄᴀᴛᴇɢᴏʀíᴀ",
-            sections: [{ title: "📋 SELECCIONAR CATEGORÍA", rows: v9Rows }],
-            contextInfo: getContextInfo(botConfig, m, thumbBuffer),
-          }, { quoted: getVerifiedQuoted(botConfig) });
-
+          const zannerz =
+            "https://wa.me/" + (botConfig.owner?.number?.[0] || "6281234567890");
+          const buttons = [
+            {
+              name: "single_select",
+              buttonParamsJson: JSON.stringify({ has_multiple_buttons: true }),
+            },
+            {
+              name: "cta_url",
+              buttonParamsJson: JSON.stringify({
+                display_text: "Mi número de owner",
+                url: zannerz,
+                merchant_url: zannerz,
+              }),
+            },
+            {
+              name: "quick_reply",
+              buttonParamsJson: JSON.stringify({
+                display_text: "🧾 Mostrar todo el menú",
+                id: `${prefix}allmenu`,
+              }),
+            },
+          ];
+          const msg = generateWAMessageFromContent(
+            m.chat,
+            {
+              viewOnceMessage: {
+                message: {
+                  messageContextInfo: {
+                    deviceListMetadata: {},
+                    deviceListMetadataVersion: 2,
+                  },
+                  interactiveMessage:
+                    proto.Message.InteractiveMessage.fromObject({
+                      body: proto.Message.InteractiveMessage.Body.fromObject({
+                        text: text,
+                      }),
+                      footer:
+                        proto.Message.InteractiveMessage.Footer.fromObject({
+                          text: `© ${botConfig.bot?.name || "Ourin-AI"} v${botConfig.bot?.version || "1.9.0"}`,
+                        }),
+                      header:
+                        proto.Message.InteractiveMessage.Header.fromObject({
+                          hasMediaAttachment: !!headerMedia,
+                          ...(headerMedia || {}),
+                        }),
+                      nativeFlowMessage:
+                        proto.Message.InteractiveMessage.NativeFlowMessage.fromObject(
+                          {
+                            messageParamsJson: JSON.stringify({
+                              limited_time_offer: {
+                                text: botConfig.bot?.name || "kaori-md",
+                                url: saluranLink,
+                                copy_code: botConfig.owner?.name || "kaori-md",
+                                expiration_time: Date.now() * 999,
+                              },
+                              bottom_sheet: {
+                                in_thread_buttons_energi: 2,
+                                divider_indices: [1, 2, 3, 4, 5, 999],
+                                list_title: botConfig.bot?.name || "kaori-md",
+                                button_title: "🍀 ᴇʟᴇɢɪʀ ᴄᴀᴛᴇɢᴏʀíᴀ",
+                              },
+                            }),
+                            buttons: buttons,
+                          },
+                        ),
+                      contextInfo: {
+                        mentionedJid: [m.sender],
+                        forwardingScore: 9999,
+                        isForwarded: true,
+                        forwardedNewsletterMessageInfo: {
+                          newsletterJid: saluranId,
+                          newsletterName: saluranName,
+                          serverMessageId: 127,
+                        },
+                      },
+                    }),
+                },
+              },
+            },
+            { userJid: m.sender, quoted: getVerifiedQuoted(botConfig) },
+          );
+          await sock.relayMessage(m.chat, msg.message, {
+            messageId: msg.key.id,
+          });
         } catch (v9Error) {
-          console.error("[Menu V9] Error:", v9Error.message);
-          await sendFallback(m, sock, text, imageBuffer, thumbBuffer, botConfig, "V9");
+          await sendFallback(
+            m,
+            sock,
+            text,
+            imageBuffer,
+            thumbBuffer,
+            botConfig,
+            "V9",
+          );
         }
         break;
       }
       case 10: {
-        // V10 — Imagen v9 + texto de info completo + lista de categorías
         try {
-          const v10ImgPath = path.join(process.cwd(), "assets", "images", "ourin-v9.jpg");
-          const v10Img = fs.existsSync(v10ImgPath) ? fs.readFileSync(v10ImgPath) : imageBuffer;
-
-          const v10Text = `Hola *@${m.pushName || "Usuario"}* 🪸\n` +
-            `Soy ${botConfig.bot?.name || "KAORI MD"}, un bot de WhatsApp listo para ayudarte.\n\n` +
-            `─────────────────────────\n` +
-            `Nombre    : ${botConfig.bot?.name || "KAORI MD"}\n` +
-            `Versión   : v${botConfig.bot?.version || "1.9.0"}\n` +
-            `Entorno   : Node.js ${process.version}\n` +
-            `Activo    : ${uptimeFormatted}\n` +
-            `Mi owner  : ${botConfig.owner?.name || "KAORI MD"}\n` +
-            `─────────────────────────`;
-
-          const v10Rows = menuSorted.map(({ cat, cmds, emoji }) => ({
-            title: `${emoji} ${toMonoUpperBold(cat)}`,
-            rowId: `${prefix}menucat ${cat}`,
-            description: `${cmds.length} comandos`,
-          }));
-
-          if (v10Img) {
-            await sock.sendMessage(m.chat, {
-              image: v10Img,
-              caption: v10Text,
-              contextInfo: getContextInfo(botConfig, m, thumbBuffer),
-            }, { quoted: getVerifiedQuoted(botConfig) });
+          let productImage = null;
+          try {
+            const imgPath = path.join(
+              process.cwd(),
+              "assets",
+              "images",
+              "ourin-v9.jpg",
+            );
+            const imgBuffer = fs.existsSync(imgPath)
+              ? fs.readFileSync(imgPath)
+              : imageBuffer || thumbBuffer;
+            if (imgBuffer) {
+              const resized = await (await getSharp())(imgBuffer)
+                .resize(736, 890, { fit: "cover" })
+                .jpeg({ quality: 85 })
+                .toBuffer();
+              productImage = await prepareWAMessageMedia(
+                { image: resized },
+                { upload: sock.waUploadToServer },
+              );
+            }
+          } catch (e) {
+            console.error("[Menu V10] Media prep error:", e.message);
           }
-
-          await sock.sendMessage(m.chat, {
-            text: `📋 *Haz clic en el botón para mostrar el menú por categorías*`,
-            footer: `© ${botConfig.bot?.name || "KAORI MD"} 2026`,
-            title: `${botConfig.bot?.name || "KAORI MD"}`,
-            buttonText: `🌺 ${botConfig.bot?.name || "KAORI MD"}`,
-            sections: [{ title: "📁 CATEGORÍAS DEL MENÚ", rows: v10Rows }],
-            contextInfo: getContextInfo(botConfig, m, thumbBuffer),
-          }, { quoted: getVerifiedQuoted(botConfig) });
-
+          const footerText = `
+Hola *@${m.pushName || "Usuario"}* 🪸
+Soy ${botConfig.bot?.name || "Ourin-AI"}, un bot de WhatsApp listo para ayudarte.  
+Puedes usarme para buscar información, obtener datos o ayudarte con tareas simples directamente desde WhatsApp — práctico y sin complicaciones.
+─────────────────────────
+Nombre    : ${botConfig.bot?.name || "Ourin-AI"}
+Versión   : v${botConfig.bot?.version || "1.9.0"}
+Entorno   : Node.js ${process.version}
+Activo    : ${uptimeFormatted}
+Mi owner  : ${botConfig.owner?.name || "Lucky Archz"}
+─────────────────────────
+Haz clic en el botón de abajo para mostrar el menú`;
+          const buttons = [
+            {
+              name: "quick_reply",
+              buttonParamsJson: JSON.stringify({
+                display_text: botConfig.bot?.name || "Ourin-AI",
+                id: `${prefix}allmenu`,
+              }),
+            },
+          ];
+          const productId = `Zann Zann Zann Zann Zann :)`;
+          const businessJid = botConfig.botNumber
+            ? `${botConfig.botNumber}@s.whatsapp.net`
+            : m.botJid || sock.user?.id;
+          const msg = generateWAMessageFromContent(
+            m.chat,
+            {
+              viewOnceMessage: {
+                message: {
+                  messageContextInfo: {
+                    deviceListMetadata: {},
+                    deviceListMetadataVersion: 2,
+                  },
+                  interactiveMessage:
+                    proto.Message.InteractiveMessage.fromObject({
+                      header:
+                        proto.Message.InteractiveMessage.Header.fromObject({
+                          title: `${botConfig.bot?.name || "Ourin-AI"} Menú`,
+                          hasMediaAttachment: !!productImage,
+                          productMessage: {
+                            product: {
+                              productImage: productImage?.imageMessage || null,
+                              productId: productId,
+                              title: `${botConfig.bot?.name || "Ourin-AI"} Menú`,
+                              description: "Menú",
+                              currencyCode: "USD",
+                              priceAmount1000: "1000000000000000",
+                              retailerId: botConfig.bot?.name || "Ourin",
+                              productImageCount: 1,
+                            },
+                            businessOwnerJid: businessJid,
+                          },
+                        }),
+                      body: proto.Message.InteractiveMessage.Body.fromObject({
+                        text: `*© ${botConfig.bot?.name || "Ourin-AI"} 2026*`,
+                      }),
+                      footer:
+                        proto.Message.InteractiveMessage.Footer.fromObject({
+                          text: footerText,
+                        }),
+                      nativeFlowMessage:
+                        proto.Message.InteractiveMessage.NativeFlowMessage.fromObject(
+                          { buttons: buttons },
+                        ),
+                      contextInfo: {
+                        mentionedJid: [m.sender],
+                        forwardingScore: 9999,
+                        isForwarded: true,
+                        forwardedNewsletterMessageInfo: {
+                          newsletterJid: saluranId,
+                          newsletterName: saluranName,
+                          serverMessageId: 127,
+                        },
+                      },
+                    }),
+                },
+              },
+            },
+            { userJid: m.sender, quoted: getVerifiedQuoted(botConfig) },
+          );
+          await sock.relayMessage(m.chat, msg.message, {
+            messageId: msg.key.id,
+          });
         } catch (v10Error) {
-          console.error("[Menu V10] Error:", v10Error.message);
-          await sendFallback(m, sock, text, imageBuffer, thumbBuffer, botConfig, "V10");
+          await sendFallback(
+            m,
+            sock,
+            text,
+            imageBuffer,
+            thumbBuffer,
+            botConfig,
+            "V10",
+          );
         }
         break;
       }
       case 11: {
-        // V11 — Documento con miniatura v11 + lista nativa de categorías
         try {
           const docuThumb =
             thumbBuffer ||
             imageBuffer ||
-            fs.readFileSync(path.join(process.cwd(), "assets", "images", "ourin-allmenu.jpg"));
-
-          const titleText =
-            `Hola *@${m.pushName}*\n\nAntes que nada, gracias por usar nuestro bot\n\n` +
-            `╭─ \`INFORMACIÓN DEL BOT\` 𝜗ৎ\n` +
-            `┆ ᵎᵎ Nombre del bot : *${botConfig.bot?.name || "KAORI MD"}*\n` +
-            `┆ ᵎᵎ Owner del bot : *${botConfig.owner?.name || "KAORI MD"}*\n` +
-            `┆ ᵎᵎ Prefijo : *${prefix}*\n` +
-            `┆ ᵎᵎ Total de comandos : *${totalCmds}*\n` +
-            `┆ ᵎᵎ Tu rol : ${m.isOwner ? "Dueño" : m.isPremium ? "Premium" : "Usuario"}\n` +
-            `╰─────\n\nPulsa el botón de abajo para elegir un menú`;
-
-          const v11Rows = menuSorted.map(({ cat, cmds, emoji }) => ({
+            fs.readFileSync(
+              path.join(process.cwd(), "assets", "images", "ourin-allmenu.jpg"),
+            );
+          const catRows = menuSorted.map(({ cat, cmds }) => ({
+            header: "",
             title: `🍀 ${toMonoUpperBold(cat)}`,
-            rowId: `${prefix}menucat ${cat}`,
+            id: `${prefix}menucat ${cat}`,
             description: `Contiene ${cmds.length} comandos`,
           }));
-
-          let resizedThumb = docuThumb;
-          try {
-            resizedThumb = await (await getSharp())(docuThumb).resize({ width: 300, height: 300 }).toBuffer();
-          } catch (e) {}
-
-          // Enviar documento con miniatura v11
-          const v11ThumbPath = path.join(process.cwd(), "assets", "images", "ourin-v11.jpg");
-          await sock.sendMessage(m.chat, {
-            document: fs.readFileSync("./package.json"),
-            mimetype: "image/png",
-            fileName: greeting,
-            caption: titleText,
-            jpegThumbnail: resizedThumb,
-            contextInfo: {
-              mentionedJid: [m.sender],
-              forwardingScore: 777,
-              isForwarded: true,
-              forwardedNewsletterMessageInfo: { newsletterJid: saluranId, newsletterName: saluranName, serverMessageId: 127 },
-              externalAdReply: {
-                title: botConfig.bot?.name || "KAORI MD",
-                body: "Runtime: " + process.uptime().toFixed(0) + "s",
-                mediaType: 1,
-                thumbnail: fs.existsSync(v11ThumbPath) ? fs.readFileSync(v11ThumbPath) : thumbBuffer || imageBuffer,
-                mediaUrl: saluranLink,
-                sourceUrl: saluranLink,
-                renderLargerThumbnail: true,
+          const titleText = `Hola *@${m.pushName}*\n\nAntes que nada, gracias por usar nuestro bot\n\n╭─ \`INFORMACIÓN DEL BOT\` 𝜗ৎ\n┆ ᵎᵎ Nombre del bot : *${botConfig.bot?.name || "Ourin-AI"}*\n┆ ᵎᵎ Owner del bot : *${botConfig.owner?.name || "Ourin-AI"}*\n┆ ᵎᵎ Prefijo : *${prefix}*\n┆ ᵎᵎ Total de comandos : *${totalCmds}*\n┆ ᵎᵎ Tu rol : ${m.isOwner ? "Dueño" : m.isPremium ? "Premium" : "Usuario"}\n╰─────\n\npulsa el botón de abajo para elegir un menú`;
+          await sock.sendMessage(
+            m.chat,
+            {
+              interactiveMessage: {
+                title: titleText,
+                footer:
+                  botConfig.settings?.footer ||
+                  `© ${botConfig.bot?.name || "Ourin-AI"} 2026`,
+                document: fs.readFileSync("./package.json"),
+                mimetype: "image/png",
+                fileName: `${greeting}`,
+                jpegThumbnail: await (await getSharp())(docuThumb)
+                  .resize({ width: 300, height: 300 })
+                  .toBuffer(),
+                contextInfo: {
+                  mentionedJid: [m.sender],
+                  forwardingScore: 777,
+                  isForwarded: true,
+                  forwardedNewsletterMessageInfo: {
+                    newsletterJid: saluranId,
+                    newsletterName: saluranName,
+                    serverMessageId: 127,
+                  },
+                },
+                externalAdReply: {
+                  title: botConfig.bot?.name || "Ourin-AI",
+                  body: "Runtime: " + process.uptime() + "s",
+                  mediaType: 1,
+                  thumbnail: fs.existsSync("./assets/images/ourin-v11.jpg")
+                    ? fs.readFileSync("./assets/images/ourin-v11.jpg")
+                    : thumbBuffer || imageBuffer,
+                  mediaUrl: saluranLink,
+                  sourceUrl: saluranLink,
+                  renderLargerThumbnail: true,
+                },
+                nativeFlowMessage: {
+                  messageParamsJson: JSON.stringify({
+                    limited_time_offer: {
+                      text: `Usa este bot con responsabilidad`,
+                      url: saluranLink,
+                      copy_code: botConfig.bot?.name || "Ourin-AI",
+                      expiration_time: Date.now() * 999,
+                    },
+                    bottom_sheet: {
+                      in_thread_buttons_limit: 2,
+                      divider_indices: [1, 2, 3, 4, 5, 999],
+                      list_title: "Elegir menú",
+                      button_title: "🍀 Elegir menú aquí",
+                    },
+                    tap_target_configuration: {
+                      title: " X ",
+                      description: "bomboclard",
+                      canonical_url: "https://ourin.site",
+                      domain: "shop.example.com",
+                      button_index: 0,
+                    },
+                  }),
+                  buttons: [
+                    {
+                      name: "single_select",
+                      buttonParamsJson: JSON.stringify({
+                        has_multiple_buttons: true,
+                      }),
+                    },
+                    {
+                      name: "call_permission_request",
+                      buttonParamsJson: JSON.stringify({
+                        has_multiple_buttons: true,
+                      }),
+                    },
+                    {
+                      name: "single_select",
+                      buttonParamsJson: JSON.stringify({
+                        title: "Opciones del menú",
+                        sections: [
+                          {
+                            title: "🍀 Elige el menú que quieras",
+                            highlight_label: botConfig.bot?.name || "Ourin-AI",
+                            rows: catRows,
+                          },
+                        ],
+                        has_multiple_buttons: true,
+                      }),
+                    },
+                    {
+                      name: "cta_url",
+                      buttonParamsJson: JSON.stringify({
+                        display_text: "🌏 Visita nuestro canal",
+                        url: saluranLink,
+                        merchant_url: saluranLink,
+                      }),
+                    },
+                    {
+                      name: "quick_reply",
+                      buttonParamsJson: JSON.stringify({
+                        display_text: "🖐 Nuestro owner",
+                        id: `${prefix}owner`,
+                      }),
+                    },
+                    {
+                      name: "quick_reply",
+                      buttonParamsJson: JSON.stringify({
+                        display_text: "🌺 Ver todo el menú",
+                        id: `${prefix}allmenu`,
+                      }),
+                    },
+                  ],
+                },
               },
             },
-          }, { quoted: getVerifiedQuoted(botConfig) });
-
-          // Lista nativa para seleccionar categoría
-          await sock.sendMessage(m.chat, {
-            text: `🍀 *Elige el menú que quieras*\n\n> Visita nuestro canal: ${saluranLink}`,
-            footer: botConfig.settings?.footer || `© ${botConfig.bot?.name || "KAORI MD"} 2026`,
-            title: `${botConfig.bot?.name || "KAORI MD"}`,
-            buttonText: "🍀 Elegir menú aquí",
-            sections: [
-              {
-                title: "🍀 Elige el menú que quieras",
-                rows: [
-                  ...v11Rows,
-                  { title: "🌺 Ver todo el menú", rowId: `${prefix}allmenu`, description: "Mostrar todos los comandos" },
-                  { title: "🖐 Nuestro owner", rowId: `${prefix}owner`, description: "Contactar al owner" },
-                ],
-              },
-            ],
-            contextInfo: getContextInfo(botConfig, m, thumbBuffer),
-          }, { quoted: getVerifiedQuoted(botConfig) });
-
+            { quoted: getVerifiedQuoted(botConfig) },
+          );
         } catch (v11Error) {
-          console.error("[Menu V11] Error:", v11Error.message);
-          await sendFallback(m, sock, text, imageBuffer, thumbBuffer, botConfig, "V11");
+          await sendFallback(
+            m,
+            sock,
+            text,
+            imageBuffer,
+            thumbBuffer,
+            botConfig,
+            "V11",
+          );
         }
         break;
       }
@@ -995,90 +1368,162 @@ async function handler(m, { sock, config: botConfig, db, uptime }) {
           const docuThumb =
             thumbBuffer ||
             imageBuffer ||
-            fs.readFileSync(path.join(process.cwd(), "assets", "images", "ourin-allmenu.jpg"));
-
+            fs.readFileSync(
+              path.join(process.cwd(), "assets", "images", "ourin-allmenu.jpg"),
+            );
+          const catButtons = menuSorted.map(({ cat }) => ({
+            name: "quick_reply",
+            buttonParamsJson: JSON.stringify({
+              display_text: `${toMonoUpperBold(cat)}`,
+              id: `${prefix}menucat ${cat}`,
+            }),
+          }));
           function formatBytes(bytes, decimals = 2) {
             if (!Number.isFinite(bytes) || bytes < 0) return "0 B";
             if (bytes === 0) return "0 B";
             const k = 1024;
             const units = ["B", "KB", "MB", "GB", "TB"];
-            const i = Math.min(Math.floor(Math.log(bytes) / Math.log(k)), units.length - 1);
+            const i = Math.min(
+              Math.floor(Math.log(bytes) / Math.log(k)),
+              units.length - 1,
+            );
             const value = bytes / Math.pow(k, i);
-            return `${value.toFixed(decimals).replace(/\.0+$/, "").replace(/(\.\d*[1-9])0+$/, "$1")} ${units[i]}`;
+            const fixed = value.toFixed(decimals);
+            const pretty = fixed
+              .replace(/\.0+$/, "")
+              .replace(/(\.\d*[1-9])0+$/, "$1");
+            return `${pretty} ${units[i]}`;
           }
-
           const obj = JSON.parse(fs.readFileSync("./database/main/users.json"));
-          const bytes = Buffer.byteLength(JSON.stringify(obj), "utf8");
-
+          const jsonStr = JSON.stringify(obj);
+          const bytes = Buffer.byteLength(jsonStr, "utf8");
           let pp;
           try {
-            pp = Buffer.from((await axios.get(await sock.profilePictureUrl(m.sender, "image"), { responseType: "arraybuffer" })).data);
+            pp = Buffer.from(
+              (
+                await axios.get(
+                  await sock.profilePictureUrl(m.sender, "image"),
+                  { responseType: "arraybuffer" },
+                )
+              ).data,
+            );
           } catch (error) {
             pp = fs.readFileSync("./assets/images/pp-kosong.jpg");
           }
-
-          const v12Rows = menuSorted.map(({ cat, cmds, emoji }) => ({
-            title: `${emoji} ${toMonoUpperBold(cat)}`,
-            rowId: `${prefix}menucat ${cat}`,
-            description: `${cmds.length} comandos`,
-          }));
-
-          let resizedPP = pp;
-          try { resizedPP = await (await getSharp())(pp).resize({ width: 300, height: 300 }).toBuffer(); } catch (e) {}
-
-          const v11ThumbPath = path.join(process.cwd(), "assets", "images", "ourin-v11.jpg");
-
-          // Documento con foto de perfil como miniatura
-          await sock.sendMessage(m.chat, {
-            document: fs.readFileSync("./package.json"),
-            mimetype: "image/png",
-            fileName: getTimeGreeting(),
-            caption:
-              `🌾 *𝘏𝘰𝘭𝘢! ${m.pushName}*\n\n` +
-              `𝘎𝘳𝘢𝘤𝘪𝘢𝘴 𝘱𝘰𝘳 𝘦𝘴𝘤𝘳𝘪𝘣𝘪𝘳𝘯𝘰𝘴.\n\n` +
-              `╭─「 *${m.pushName}* 」\n` +
-              `│ • Versión del bot : *${botConfig.bot?.version || "2.1.0"}*\n` +
-              `│ • Base de datos   : ${formatBytes(bytes)}\n` +
-              `╰──`,
-            jpegThumbnail: resizedPP,
-            contextInfo: {
-              mentionedJid: [m.sender],
-              forwardingScore: 777,
-              isForwarded: true,
-              forwardedNewsletterMessageInfo: { newsletterJid: saluranId, newsletterName: saluranName, serverMessageId: 127 },
-              externalAdReply: {
-                title: botConfig.bot?.name || "KAORI MD",
-                body: `🍃 OWNER DEL BOT: ${botConfig.owner?.name || "KAORI MD"}`,
-                mediaType: 1,
-                thumbnail: fs.existsSync(v11ThumbPath) ? fs.readFileSync(v11ThumbPath) : thumbBuffer || imageBuffer,
-                mediaUrl: botConfig?.info?.website || saluranLink,
-                sourceUrl: botConfig?.info?.website || saluranLink,
-                renderLargerThumbnail: true,
+          const zanton = [
+            {
+              name: "single_select",
+              buttonParamsJson: JSON.stringify({
+                has_multiple_buttons: true,
+              }),
+            },
+            {
+              name: "call_permission_request",
+              buttonParamsJson: JSON.stringify({
+                has_multiple_buttons: true,
+              }),
+            },
+            {
+              name: "quick_reply",
+              buttonParamsJson: JSON.stringify({
+                display_text: "Ver todo el menú",
+                id: `${m.prefix}allmenu`,
+              }),
+            },
+          ];
+          zanton.push(...catButtons);
+          await sock.sendMessage(
+            m.chat,
+            {
+              interactiveMessage: {
+                title: `🌾 *𝘏𝘰𝘭𝘢! ${m.pushName}*\n\n𝘎𝘳𝘢𝘤𝘪𝘢𝘴 𝘱𝘰𝘳 𝘦𝘴𝘤𝘳𝘪𝘣𝘪𝘳𝘯𝘰𝘴. 𝘈𝘩𝘰𝘳𝘢 𝘦𝘴𝘵á𝘴 𝘩𝘢𝘣𝘭𝘢𝘯𝘥𝘰 𝘤𝘰𝘯 𝘯𝘶𝘦𝘴𝘵𝘳𝘰 𝘣𝘰𝘵 𝘢𝘶𝘵𝘰𝘮á𝘵𝘪𝘤𝘰 𝘥𝘦 𝘞𝘩𝘢𝘵𝘴𝘈𝘱𝘱. \n\n╭─「 *${m.pushName}* 」\n│ • Versión del bot : *${botConfig.bot?.version || "2.1.0"}*\n│ • Base de datos   : ${formatBytes(bytes)}\n╰──`,
+                footer:
+                  botConfig.settings?.footer ||
+                  `© ${botConfig.bot?.name || "Ourin-AI"} 2026`,
+                document: fs.readFileSync("./package.json"),
+                mimetype: "image/png",
+                fileName: `${getTimeGreeting()}`,
+                jpegThumbnail: await (await getSharp())(pp)
+                  .resize({ width: 300, height: 300 })
+                  .toBuffer(),
+                contextInfo: {
+                  mentionedJid: [m.sender],
+                  forwardingScore: 777,
+                  isForwarded: true,
+                  forwardedNewsletterMessageInfo: {
+                    newsletterJid: saluranId,
+                    newsletterName: saluranName,
+                    serverMessageId: 127,
+                  },
+                },
+                externalAdReply: {
+                  title: botConfig.bot?.name || "Ourin-AI",
+                  body: `🍃 OWNER DEL BOT: ${botConfig.owner?.name || "Ourin-AI"}`,
+                  mediaType: 1,
+                  thumbnail: fs.existsSync("./assets/images/ourin-v11.jpg")
+                    ? fs.readFileSync("./assets/images/ourin-v11.jpg")
+                    : thumbBuffer || imageBuffer,
+                  mediaUrl: botConfig?.info?.website || saluranLink,
+                  sourceUrl: botConfig?.info?.website || saluranLink,
+                  renderLargerThumbnail: true,
+                },
+                nativeFlowMessage: {
+                  messageParamsJson: JSON.stringify({
+                    bottom_sheet: {
+                      in_thread_buttons_limit: 2,
+                      divider_indices: [1, 2, 3, 4, 5, 999],
+                      list_title: "Elige la categoría que quieres ver",
+                      button_title: "🧾 Toca aquí",
+                    },
+                    tap_target_configuration: {
+                      title: " X ",
+                      description: "bomboclard",
+                      canonical_url: "https://ourin.site",
+                      domain: "shop.example.com",
+                      button_index: 0,
+                    },
+                  }),
+                  buttons: zanton,
+                },
               },
             },
-          }, { quoted: getVerifiedQuoted(botConfig) });
-
-          // Lista nativa para elegir categoría
-          await sock.sendMessage(m.chat, {
-            text: `🧾 *Elige la categoría que quieres ver*`,
-            footer: botConfig.settings?.footer || `© ${botConfig.bot?.name || "KAORI MD"} 2026`,
-            title: `${botConfig.bot?.name || "KAORI MD"}`,
-            buttonText: "🧾 Toca aquí",
-            sections: [
-              {
-                title: "📋 CATEGORÍAS DEL MENÚ",
-                rows: [
-                  { title: "🌺 Ver todo el menú", rowId: `${prefix}allmenu`, description: "Mostrar todos los comandos" },
-                  ...v12Rows,
-                ],
+            {
+              quoted: {
+                key: {
+                  remoteJid: "0@s.whatsapp.net",
+                  fromMe: false,
+                  id: `ownername`,
+                  participant: "0@s.whatsapp.net",
+                },
+                message: {
+                  requestPaymentMessage: {
+                    currencyCodeIso4217: "USD",
+                    amount1000: 999999999,
+                    requestFrom: "0@s.whatsapp.net",
+                    noteMessage: {
+                      extendedTextMessage: { text: `${botConfig?.bot?.name}` },
+                    },
+                    expiryTimestamp: 999999999,
+                    amount: {
+                      value: 91929291929,
+                      offset: 1000,
+                      currencyCode: "USD",
+                    },
+                  },
+                },
               },
-            ],
-            contextInfo: getContextInfo(botConfig, m, thumbBuffer),
-          }, { quoted: getVerifiedQuoted(botConfig) });
-
+            },
+          );
         } catch (v12Error) {
-          console.error("[Menu V12] Error:", v12Error.message);
-          await sendFallback(m, sock, text, imageBuffer, thumbBuffer, botConfig, "V12");
+          await sendFallback(
+            m,
+            sock,
+            text,
+            imageBuffer,
+            thumbBuffer,
+            botConfig,
+            "V12",
+          );
         }
         break;
       case 13: {
@@ -1402,224 +1847,370 @@ ${menuSorted.map(({ cat }) => `│ *${prefix}menucat ${cat}*`).join("\n")}
       }
       case 14:
         try {
-          const docuThumbV14 = fs.existsSync(path.join(process.cwd(), "assets", "images", "ourin-v11.jpg"))
-            ? fs.readFileSync(path.join(process.cwd(), "assets", "images", "ourin-v11.jpg"))
-            : thumbBuffer || imageBuffer;
-
+          const saluranIdV14 =
+            botConfig.saluran?.id || "120363208449943317@newsletter";
+          const saluranNameV14 =
+            botConfig.saluran?.name || botConfig.bot?.name || "Ourin-AI";
+          const docuThumbV14 = fs.readFileSync(
+            path.join(process.cwd(), "assets", "images", "ourin-v11.jpg"),
+          );
+          const catButtons = menuSorted.map(({ cat }) => ({
+            name: "quick_reply",
+            buttonParamsJson: JSON.stringify({
+              display_text: `${toMonoUpperBold(cat)}`,
+              id: `${prefix}menucat ${cat}`,
+            }),
+          }));
+          const obj = JSON.parse(fs.readFileSync("./database/main/users.json"));
+          const jsonStr = JSON.stringify(obj);
+          const bytes = Buffer.byteLength(jsonStr, "utf8");
           let pp;
           try {
-            pp = Buffer.from((await axios.get(await sock.profilePictureUrl(m.sender, "image"), { responseType: "arraybuffer" })).data);
+            pp = Buffer.from(
+              (
+                await axios.get(
+                  await sock.profilePictureUrl(m.sender, "image"),
+                  { responseType: "arraybuffer" },
+                )
+              ).data,
+            );
           } catch (error) {
             pp = fs.readFileSync("./assets/images/pp-kosong.jpg");
           }
-
-          const v14Rows = menuSorted.map(({ cat, cmds, emoji }) => ({
-            title: `${emoji} ${toMonoUpperBold(cat)}`,
-            rowId: `${prefix}menucat ${cat}`,
-            description: `${cmds.length} comandos`,
-          }));
-
-          let resizedPP = pp;
-          try { resizedPP = await (await getSharp())(pp).resize({ width: 300, height: 300 }).toBuffer(); } catch (e) {}
-
-          const v14FooterText =
-            `Hola *${m.pushName}* ≽^• ˕ • ྀི≼\n` +
-            `*⌞ INFO DEL USUARIO ⌝*\n` +
-            `‧ Número    : +${m.sender.split("@")[0]}\n` +
-            `‧ Nombre    : ${m.pushName}\n\n` +
-            `*⌞ INFO DEL BOT ⌝*\n` +
-            `‧ Nombre    : ${botConfig.bot?.name || "Bot"}\n` +
-            `‧ Versión   : ${botConfig.bot?.version || "v1.0.0"}\n` +
-            `‧ Prefijo   : ${m.prefix || "Sin prefijo"}\n\n` +
-            `*⌞ CÓMO USAR ⌝*\n` +
-            `‧ Haz clic en el botón para ver el menú por categorías\n` +
-            `‧ Haz clic en *VER TODO EL MENÚ* para ver todas las funciones`;
-
-          // Documento con miniatura v11
-          await sock.sendMessage(m.chat, {
-            document: fs.readFileSync("./package.json"),
-            mimetype: "image/png",
-            fileName: getTimeGreeting(),
-            caption: v14FooterText,
-            jpegThumbnail: resizedPP,
-            contextInfo: {
-              mentionedJid: [m.sender],
-              forwardingScore: 19,
-              isForwarded: true,
-              forwardedNewsletterMessageInfo: { newsletterJid: saluranId, newsletterName: saluranName, serverMessageId: 127 },
-              externalAdReply: {
-                title: botConfig?.bot?.name,
-                body: `🌾 Desarrollado por ${botConfig?.bot?.developer || botConfig?.owner?.name || "KAORI MD"}`,
-                thumbnail: fs.readFileSync("./assets/images/ourin.jpg"),
-                sourceUrl: saluranLink,
-                mediaUrl: saluranLink,
-                mediaType: 1,
-                renderLargerThumbnail: true,
+          const zanton = [
+            {
+              name: "single_select",
+              buttonParamsJson: JSON.stringify({
+                has_multiple_buttons: true,
+              }),
+            },
+            {
+              name: "call_permission_request",
+              buttonParamsJson: JSON.stringify({
+                has_multiple_buttons: true,
+              }),
+            },
+            {
+              name: "quick_reply",
+              buttonParamsJson: JSON.stringify({
+                display_text: "Ver todo el menú",
+                id: `${m.prefix}allmenu`,
+              }),
+            },
+          ];
+          zanton.push(...catButtons);
+          const msg = generateWAMessageFromContent(
+            m.chat,
+            {
+              viewOnceMessage: {
+                message: {
+                  messageContextInfo: {
+                    deviceListMetadata: {},
+                    deviceListMetadataVersion: 2,
+                  },
+                  interactiveMessage: proto.Message.InteractiveMessage.create({
+                    contextInfo: {
+                      mentionedJid: [m.sender],
+                      forwardingScore: 19,
+                      isForwarded: true,
+                      forwardedNewsletterMessageInfo: {
+                        newsletterId: saluranIdV14,
+                        newsletterName: `- ${saluranNameV14}`,
+                        serverMessageId: -1,
+                      },
+                      externalAdReply: {
+                        title: botConfig?.bot?.name,
+                        body: `🌾 Desarrollado por ${botConfig?.bot?.developer}`,
+                        thumbnail: fs.readFileSync("./assets/images/ourin.jpg"),
+                        sourceUrl: `https://instagram.com/ourin.md`,
+                        mediaUrl: `https://instagram.com/ourin.md`,
+                        mediaType: 2,
+                        renderLargerThumbnail: true,
+                      },
+                    },
+                    header: {
+                      title: null,
+                      locationMessage: {
+                        degreesLatitude: 0,
+                        degreesLongitude: 0,
+                        name: `꫶ᥫ᭡꫶ ${m.pushName || "User"}`,
+                        url: `https://ss.ss`,
+                        address: `Espero que tengas un bonito día :3`,
+                        jpegThumbnail: await (await getSharp())(docuThumbV14)
+                          .resize({ width: 300, height: 300 })
+                          .toBuffer(),
+                      },
+                      subtitle: "",
+                      hasMediaAttachment: false,
+                    },
+                    body: { text: null },
+                    footer: {
+                      text:
+                        `Hola *${m.pushName}* ≽^• ˕ • ྀི≼\n` +
+                        `*⌞ INFO DEL USUARIO ⌝*\n` +
+                        `‧ Número    : +${m.sender.split("@")[0]}\n` +
+                        `‧ Nombre    : ${m.pushName}\n\n` +
+                        `*⌞ INFO DEL BOT ⌝*\n` +
+                        `‧ Nombre    : ${botConfig.bot?.name || "Bot"}\n` +
+                        `‧ Versión   : ${botConfig.bot?.version || "v1.0.0"}\n` +
+                        `‧ Prefijo   : ${m.prefix || "Sin prefijo"}\n\n` +
+                        `*⌞ CÓMO USAR ⌝*\n` +
+                        `‧ Haz clic en el botón para ver el menú por categorías\n` +
+                        `‧ Haz clic en *VER TODO EL MENÚ* para ver todas las funciones`,
+                    },
+                    nativeFlowMessage:
+                      proto.Message.InteractiveMessage.NativeFlowMessage.create(
+                        {
+                          buttons: zanton,
+                          messageParamsJson: JSON.stringify({
+                            bottom_sheet: {
+                              in_thread_buttons_limit: 1,
+                              divider_indices: [1],
+                              list_title: getTimeGreeting(),
+                              button_title: "𖤍",
+                            },
+                          }),
+                        },
+                      ),
+                  }),
+                },
               },
             },
-          }, { quoted: getVerifiedQuoted(botConfig) });
-
-          // Lista nativa
-          await sock.sendMessage(m.chat, {
-            text: `꫶ᥫ᭡꫶ *${m.pushName || "User"}*\n\n> Espero que tengas un bonito día :3`,
-            footer: `${botConfig.bot?.name || "KAORI MD"}`,
-            title: `${botConfig.bot?.name || "KAORI MD"}`,
-            buttonText: "𖤍 Ver menú",
-            sections: [
-              {
-                title: getTimeGreeting(),
-                rows: [
-                  { title: "🌺 Ver todo el menú", rowId: `${prefix}allmenu`, description: "Mostrar todos los comandos" },
-                  ...v14Rows,
-                ],
-              },
-            ],
-            contextInfo: getContextInfo(botConfig, m, thumbBuffer),
-          }, { quoted: m });
-
+            {
+              quoted: m,
+              userJid: sock.user?.id,
+            },
+          );
+          await sock.relayMessage(msg.key.remoteJid, msg.message, {
+            messageId: msg.key.id,
+            quoted: m,
+          });
         } catch (v14Error) {
-          console.error("[Menu V14] Error:", v14Error.message);
-          await sendFallback(m, sock, text, imageBuffer, thumbBuffer, botConfig, "V14");
+          await sendFallback(
+            m,
+            sock,
+            text,
+            imageBuffer,
+            thumbBuffer,
+            botConfig,
+            "V14",
+          );
         }
         break;
       case 15:
         try {
-          const v15Rows = menuSorted.map(({ cat, cmds, emoji }) => ({
+          const catRows = menuSorted.map(({ cat, emoji }) => ({
             title: `[ ${emoji} ] - ${toMonoUpperBold(`${cat} MENU`)}`,
-            rowId: `${prefix}menucat ${cat}`,
             description: `Haz clic para abrir ${cat}`,
+            id: `${prefix}menucat ${cat}`,
           }));
-
+          const obj = JSON.parse(fs.readFileSync("./database/main/users.json"));
+          const jsonStr = JSON.stringify(obj);
           let pp;
           try {
-            pp = Buffer.from((await axios.get(await sock.profilePictureUrl(m.sender, "image"), { responseType: "arraybuffer" })).data);
+            pp = Buffer.from(
+              (
+                await axios.get(
+                  await sock.profilePictureUrl(m.sender, "image"),
+                  { responseType: "arraybuffer" },
+                )
+              ).data,
+            );
           } catch (error) {
             pp = fs.readFileSync("./assets/images/pp-kosong.jpg");
           }
-
-          let resizedPP = pp;
-          try { resizedPP = await (await getSharp())(pp).resize({ width: 300, height: 300 }).toBuffer(); } catch (e) {}
-
-          // Intentar obtener clima, si falla usar texto genérico
-          let titleWeather = `🌿 Hola *${m.pushName}* 👋`;
-          try {
-            const res = await axios.get("https://bmkg-restapi.vercel.app/v1/weather/33.26.16.2005", { timeout: 5000 });
-            const weatherData = res.data?.data?.forecast?.[0]?.entries?.[0];
-            if (weatherData) {
-              const cuaca = weatherData.weather;
-              const suhu = weatherData.temperature_c;
-              const weatherEmoji = { Cerah: "☀️", "Cerah Berawan": "🌤️", Berawan: "☁️", "Berawan Tebal": "🌥️", Hujan: "🌧️", "Hujan Petir": "⛈️", Kabut: "🌫️" };
-              titleWeather = `🌡️ ${suhu}°C | ${weatherEmoji[cuaca] || "🌤️"} ${cuaca}`;
-            }
-          } catch (e) {}
-
-          const user = db.getUser(m.sender);
-          const rpgData = user?.rpg || {};
-          const v15Footer =
-            `🌿 Hola *${m.pushName}* 👋\n` +
-            `Bienvenido a *${botConfig.bot?.name}* ✨\n\n` +
-            `☁︎ *ESTADÍSTICAS DEL BOT* ☁︎\n` +
-            `→ *Nombre*: ${botConfig.bot?.name}\n` +
-            `→ *Versión*: ${botConfig.bot?.version}\n` +
-            `→ *Total de funciones*: ${totalCmds} funciones\n` +
-            `→ *Propietario*: ${botConfig?.owner?.name}\n` +
-            `→ *Prefijo*: ${m?.prefix}\n\n` +
-            `☁︎ *TUS ESTADÍSTICAS* ☁︎\n` +
-            `→ *Usuario*: ${m?.pushName}\n` +
-            `→ *Rol*: ${m?.isOwner ? "Dueño" : m?.isPremium ? "Premium" : "Usuario"}\n` +
-            `→ *Energía*: ${m?.isOwner || m?.isPremium ? "∞ Ilimitada" : (user?.energi ?? 25)}\n` +
-            `→ *Nivel*: ${Math.floor((user?.exp || 0) / 20000) + 1}\n` +
-            `→ *Exp*: ${(user?.exp ?? 0).toLocaleString()}\n` +
-            `→ *Monedas*: ${(user?.koin ?? 0).toLocaleString()}` +
-            (rpgData.health !== undefined ? `\n→ *HP*: ${rpgData.health}/${rpgData.maxHealth}\n→ *Maná*: ${rpgData.mana}/${rpgData.maxMana}\n→ *Estamina*: ${rpgData.stamina}/${rpgData.maxStamina}` : "") +
-            `\n\nPulsa el botón de abajo para elegir una categoría`;
-
-          // Documento con foto de perfil
-          await sock.sendMessage(m.chat, {
-            document: fs.readFileSync("./package.json"),
-            mimetype: "image/png",
-            fileName: greeting,
-            caption: v15Footer,
-            jpegThumbnail: resizedPP,
-            contextInfo: {
-              mentionedJid: [m.sender],
-              forwardingScore: 7,
-              isForwarded: true,
-              externalAdReply: {
-                title: titleWeather,
-                body: `Hola ${m.pushName}! Usa este bot con responsabilidad`,
-                previewType: "VIDEO",
-                thumbnail: fs.readFileSync("./assets/images/ourin.jpg"),
-                sourceUrl: config.info?.website || saluranLink,
-                renderLargerThumbnail: true,
-                showAdAttribution: false,
+          const zanton = [
+            {
+              name: "single_select",
+              buttonParamsJson: JSON.stringify({
+                has_multiple_buttons: true,
+              }),
+            },
+            {
+              name: "call_permission_request",
+              buttonParamsJson: JSON.stringify({
+                has_multiple_buttons: true,
+              }),
+            },
+            {
+              name: "quick_reply",
+              buttonParamsJson: JSON.stringify({
+                display_text: "🎄 Ver todo el menú",
+                id: `${m.prefix}allmenu`,
+              }),
+            },
+            {
+              name: "single_select",
+              buttonParamsJson: JSON.stringify({
+                title: "📁 Ver categorías",
+                sections: [
+                  {
+                    title: "📋 ELIGE UNA CATEGORÍA",
+                    rows: catRows,
+                  },
+                ],
+                has_multiple_buttons: true,
+              }),
+            },
+            {
+              name: "quick_reply",
+              buttonParamsJson: JSON.stringify({
+                display_text: "🌾 Owner de este bot",
+                id: `${m.prefix}owner`,
+              }),
+            },
+          ];
+          const ftroliQuoted = {
+            key: {
+              fromMe: false,
+              participant: "0@s.whatsapp.net",
+              remoteJid: "status@broadcast",
+            },
+            message: {
+              orderMessage: {
+                orderId: "44444444444444",
+                thumbnail:
+                  (await (await getSharp())(pp)
+                    .resize({ width: 300, height: 300 })
+                    .toBuffer()) || null,
+                itemCount: totalCmds,
+                status: "INQUIRY",
+                surface: "CATALOG",
+                message: `★ Gracias\n✦ ¿Hay algún error? Repórtalo al owner`,
+                orderTitle: `📋 ${totalCmds} comandos`,
+                sellerJid: botConfig.botNumber
+                  ? `${botConfig.botNumber}@s.whatsapp.net`
+                  : m.sender,
+                token: "ourin-menu-v8",
+                totalAmount1000: 3333333,
+                totalCurrencyCode: "IDR",
+                contextInfo: {
+                  isForwarded: true,
+                  forwardingScore: 9,
+                  forwardedNewsletterMessageInfo: {
+                    newsletterJid: saluranId,
+                    newsletterName: saluranName,
+                    serverMessageId: 127,
+                  },
+                },
               },
             },
-          }, { quoted: getVerifiedQuoted(botConfig) });
-
-          // Lista nativa con categorías + opciones extra
-          await sock.sendMessage(m.chat, {
-            text: `🌥️ *Elige el menú que quieras*`,
-            footer: `${botConfig.bot?.name || "KAORI MD"}`,
-            title: `${botConfig.bot?.name || "KAORI MD"}`,
-            buttonText: "🌥️ Más completo",
-            sections: [
-              {
-                title: "📋 ELIGE UNA CATEGORÍA",
-                rows: [
-                  { title: "🎄 Ver todo el menú", rowId: `${prefix}allmenu`, description: "Mostrar todos los comandos" },
-                  { title: "🌾 Owner de este bot", rowId: `${prefix}owner`, description: "Contactar al owner" },
-                  ...v15Rows,
-                ],
+          };
+          const res = await axios.get(
+            "https://bmkg-restapi.vercel.app/v1/weather/33.26.16.2005",
+          );
+          const data = res.data.data;
+          const today = data.forecast[0];
+          const now = today.entries[0];
+          const cuaca = now.weather;
+          const suhu = now.temperature_c;
+          const weatherEmoji = {
+            Cerah: "☀️",
+            "Cerah Berawan": "🌤️",
+            Berawan: "☁️",
+            "Berawan Tebal": "🌥️",
+            Hujan: "🌧️",
+            "Hujan Petir": "⛈️",
+            Kabut: "🌫️",
+          };
+          const emojiCuaca = weatherEmoji[cuaca] || "🌤️";
+          const titles = `🌡️ ${suhu}°C | ${emojiCuaca} ${cuaca}`;
+          await sock.sendMessage(
+            m.chat,
+            {
+              interactiveMessage: {
+                title: ``,
+                footer: `🌿 Hola *${m.pushName}* 👋
+Bienvenido a *${botConfig.bot?.name}* ✨
+Este bot está listo para ayudarte con muchas funciones interesantes que puedes usar cuando quieras 🚀
+Desde entretenimiento y herramientas hasta otras funciones geniales, aquí ya tienes de todo 🎄
+No dudes en explorar todos los menús disponibles
+Usa el bot con responsabilidad y mantén siempre el respeto al interactuar 😊
+Espero que tu experiencia sea agradable y disfrutes usando este bot 🌟
+☁︎ *ESTADÍSTICAS DEL BOT* ☁︎
+→ *Nombre*: ${botConfig.bot?.name}
+→ *Versión*: ${botConfig.bot?.version}
+→ *Total de funciones*: ${totalCmds} funciones
+→ *Propietario*: ${botConfig?.owner?.name}
+→ *Prefijo*: ${m?.prefix}
+☁︎ *TUS ESTADÍSTICAS* ☁︎
+→ *Usuario*: ${m?.pushName}
+→ *Rol*: ${m?.isOwner ? "Dueño" : m?.isPremium ? "Premium" : "Usuario"}
+→ *Energía*: ${m?.isOwner || m?.isPremium ? "∞ Ilimitada" : (db.getUser(m.sender)?.energi ?? 25)}
+→ *Nivel*: ${(Math.floor((db.getUser(m.sender)?.exp || 0) / 20000) + 1)}
+→ *Exp*: ${(db.getUser(m.sender)?.exp ?? 0).toLocaleString()}
+→ *Monedas*: ${(db.getUser(m.sender)?.koin ?? 0).toLocaleString()}
+${(() => {
+  const r = db.getUser(m.sender)?.rpg || {};
+  return r.health !== undefined
+    ? `→ *HP*: ${r.health}/${r.maxHealth}\n→ *Maná*: ${r.mana}/${r.maxMana}\n→ *Estamina*: ${r.stamina}/${r.maxStamina}`
+    : "";
+})()}
+Pulsa el botón de abajo para elegir una categoría`,
+                document: fs.readFileSync("./package.json"),
+                mimetype: "image/png",
+                fileName: `${greeting}`,
+                jpegThumbnail: await (
+                  await getSharp()
+                )(fs.readFileSync("./assets/images/ourin2.jpg"))
+                  .resize({ width: 300, height: 300 })
+                  .toBuffer(),
+                contextInfo: {
+                  mentionedJid: [m.sender],
+                  forwardingScore: 7,
+                  isForwarded: true,
+                },
+                externalAdReply: {
+                  title: titles,
+                  body: `Hola ${m.pushName}! Usa este bot con responsabilidad`,
+                  previewType: "VIDEO",
+                  thumbnail: fs.readFileSync("./assets/images/ourin.jpg"),
+                  sourceUrl: config.info.website,
+                  renderLargerThumbnail: true,
+                  containsAutoReply: true,
+                  showAdAttribution: false,
+                },
+                nativeFlowMessage: {
+                  messageParamsJson: JSON.stringify({
+                    limited_time_offer: {
+                      text: `${botConfig?.bot?.name}`,
+                      url: saluranLink,
+                      copy_code: null,
+                      expiration_time: null,
+                    },
+                    bottom_sheet: {
+                      in_thread_buttons_limit: 2,
+                      divider_indices: [1, 2, 3, 4, 5, 999],
+                      list_title: "Elige el menú que quieras",
+                      button_title: "🌥️ Más completo",
+                    },
+                    tap_target_configuration: {
+                      title: " X ",
+                      description: "bomboclard",
+                      canonical_url: "https://ourin.site",
+                      domain: "shop.example.com",
+                      button_index: 0,
+                    },
+                  }),
+                  buttons: zanton,
+                },
               },
-            ],
-            contextInfo: getContextInfo(botConfig, m, thumbBuffer),
-          }, { quoted: getVerifiedQuoted(botConfig) });
-
-        } catch (v15Error) {
-          console.error("[Menu V15] Error:", v15Error.message);
-          await sendFallback(m, sock, text, imageBuffer, thumbBuffer, botConfig, "V14");
+            },
+            { quoted: ftroliQuoted },
+          );
+        } catch (v14Error) {
+          console.log(v14Error);
+          await sendFallback(
+            m,
+            sock,
+            text,
+            imageBuffer,
+            thumbBuffer,
+            botConfig,
+            "V14",
+          );
         }
         break;
-      case 16: {
-        // V16 — Imagen info + Lista nativa separada (máxima compatibilidad WA)
-        try {
-          const catSections = menuSorted.map(({ cat, cmds, emoji }) => ({
-            title: `${emoji} ${toMonoUpperBold(cat)}`,
-            rowId: `${prefix}menucat ${cat}`,
-            description: `${cmds.length} comandos disponibles`,
-          }));
-
-          // Paso 1: Enviar imagen con el texto completo del menú
-          if (imageBuffer) {
-            await sock.sendMessage(m.chat, {
-              image: imageBuffer,
-              caption: text,
-              contextInfo: getContextInfo(botConfig, m, thumbBuffer),
-            }, { quoted: getVerifiedQuoted(botConfig) });
-          }
-
-          // Paso 2: Lista nativa para elegir categoría
-          await sock.sendMessage(m.chat, {
-            text: `📋 *Elige una categoría para ver sus comandos*\n\n> Usa el botón de abajo para navegar el menú`,
-            footer: `© ${botConfig.bot?.name || "KAORI MD"} v${botConfig.bot?.version || "1.0.0"}`,
-            title: `🤖 ${botConfig.bot?.name || "KAORI MD"}`,
-            buttonText: "📁 Ver categorías",
-            sections: [
-              {
-                title: "📋 CATEGORÍAS DEL MENÚ",
-                rows: catSections,
-              },
-            ],
-            contextInfo: getContextInfo(botConfig, m, thumbBuffer),
-          }, { quoted: getVerifiedQuoted(botConfig) });
-
-        } catch (v16Error) {
-          console.error("[Menu V16] Error:", v16Error.message);
-          await sendFallback(m, sock, text, imageBuffer, thumbBuffer, botConfig, "V5");
-        }
-        break;
-      }
       default:
         await m.reply(text);
     }
