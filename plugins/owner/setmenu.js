@@ -8,8 +8,8 @@ const pluginConfig = {
   alias: ["variantemenu", "estilomenu", "configmenu"],
   category: "owner",
   description: "Configura el estilo visual del menú",
-  usage: ".setmenu <v1-v15>",
-  example: ".setmenu v8",
+  usage: ".setmenu <v1-v16>",
+  example: ".setmenu v16",
   isOwner: true,
   isPremium: false,
   isGroup: false,
@@ -30,8 +30,8 @@ const VARIANTS = {
   v4: { id: 4, name: "Video", desc: "Video + contextInfo + citado verificado" },
   v5: {
     id: 5,
-    name: "Botón",
-    desc: "Imagen + botones (selección única y respuesta rápida)",
+    name: "Lista con imagen ✅",
+    desc: "Imagen + lista nativa de categorías — botón funcional y estable",
   },
   v6: {
     id: 6,
@@ -67,6 +67,7 @@ const VARIANTS = {
   },
   v14: { id: 14, name: "MENÚ VERSIÓN 14", desc: "Diseño experimental Y" },
   v15: { id: 15, name: "MENÚ VERSIÓN 15", desc: "Diseño experimental Z" },
+  v16: { id: 16, name: "Imagen + Lista ✅", desc: "Imagen completa + lista nativa separada — máxima compatibilidad" },
 };
 
 async function handler(m, { sock, db }) {
@@ -76,7 +77,7 @@ async function handler(m, { sock, db }) {
   if (variant) {
     const selected = VARIANTS[variant];
     if (!selected) {
-      await m.reply(`❌ ¡Variante no válida!\n\nUsa: v1 hasta v15`);
+      await m.reply(`❌ ¡Variante no válida!\n\nUsa: v1 hasta v16`);
       return;
     }
 
